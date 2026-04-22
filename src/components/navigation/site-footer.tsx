@@ -1,8 +1,18 @@
 import Link from "next/link";
-import { getLandingPageData } from "@/lib/data";
+import {
+  getContactInfo,
+  getNavigationItems,
+  getSiteSettings,
+  getSocialLinks,
+} from "@/lib/data";
 
 export async function SiteFooter() {
-  const { settings, contact, navigation, socialLinks } = await getLandingPageData();
+  const [settings, contact, navigation, socialLinks] = await Promise.all([
+    getSiteSettings(),
+    getContactInfo(),
+    getNavigationItems(),
+    getSocialLinks(),
+  ]);
 
   return (
     <footer className="border-t border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-surface)_92%,transparent)]">
@@ -27,6 +37,8 @@ export async function SiteFooter() {
               {item.title}
             </Link>
           ))}
+          <Link href="/account">Account</Link>
+          <Link href="/products">Products</Link>
         </div>
 
         <div className="space-y-3 text-sm text-[var(--color-muted)]">
@@ -35,6 +47,7 @@ export async function SiteFooter() {
           </p>
           {contact?.phone1 ? <p>{contact.phone1}</p> : null}
           {contact?.phone2 ? <p>{contact.phone2}</p> : null}
+          {contact?.email ? <p>{contact.email}</p> : null}
           {contact?.address ? <p>{contact.address}</p> : null}
           <div className="flex flex-wrap gap-3 pt-2">
             {socialLinks.map((item) => (

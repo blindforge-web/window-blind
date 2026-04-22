@@ -45,7 +45,7 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
           <Link
-            href={`/blinds/${product.slug}`}
+            href={`/products/${product.slug}`}
             className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)] transition hover:border-[var(--color-forest)] hover:bg-[var(--color-forest)] hover:text-white"
           >
             See Details

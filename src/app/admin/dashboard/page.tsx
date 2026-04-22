@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { redirect } from "next/navigation";
 import {
   deleteClient,
@@ -19,6 +20,7 @@ import {
   upsertTeamMember,
 } from "@/app/actions";
 import { CreateProductPanel } from "@/components/admin/create-product-panel";
+import { AdminPasswordResetPanel } from "@/components/admin/admin-password-reset-panel";
 import { DeliveryStateCard } from "@/components/admin/delivery-state-card";
 import { PaymentAccountPanel } from "@/components/admin/payment-account-panel";
 import { ProductAdminCard } from "@/components/admin/product-admin-card";
@@ -35,12 +37,12 @@ import { formatCompactNumber } from "@/lib/utils";
 const editableSections = [
   "hero",
   "about",
+  "products",
   "services",
   "reliability",
   "gallery",
   "team",
   "clients",
-  "booking",
   "contact",
 ] as const;
 
@@ -264,7 +266,7 @@ export default async function AdminDashboardPage() {
   const dashboard = await getAdminDashboardData();
   const actionsEnabled = Boolean(admin);
   const pendingOrders = dashboard.orders.filter(
-    (order) => order.status !== "completed",
+    (order) => order.status !== "paid_delivered",
   ).length;
 
   return (
@@ -279,12 +281,11 @@ export default async function AdminDashboardPage() {
               Admin Dashboard
             </p>
             <h1 className="mt-2 font-display text-6xl leading-none">
-              Sunpilot content and booking control
+              Content, products, and offline-order control
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
-              This dashboard manages the live landing page, storage-backed media,
-              and realtime booking queue from the existing Next.js and Supabase
-              architecture.
+              Manage the public site, product catalog, offline payment workflow,
+              and customer order queue from one Supabase-backed dashboard.
             </p>
           </div>
           {admin ? <SignOutButton /> : null}
@@ -317,12 +318,14 @@ export default async function AdminDashboardPage() {
           ))}
         </section>
 
+        {admin?.role === "super_admin" ? <AdminPasswordResetPanel /> : null}
+
         <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
             <PanelHeading
               eyebrow="Branding"
               title="Site settings and theme"
-              body="These values drive the brand name, color system, tagline, footer note, and optional logo across the public site."
+              body="These values drive the brand name, stored logo, color system, tagline, and footer note across the public site."
             />
 
             <form action={saveSiteSettings} className="grid gap-4 lg:grid-cols-2">
@@ -569,7 +572,7 @@ export default async function AdminDashboardPage() {
           <PanelHeading
             eyebrow="Sections"
             title="Landing page section content"
-            body="Every hero, about, services, gallery, team, clients, booking, and contact text block is editable here."
+            body="Update the brochure sections that appear across the public home page."
           />
 
           <div className="grid gap-5 xl:grid-cols-2">
@@ -1561,8 +1564,8 @@ export default async function AdminDashboardPage() {
         <section className="space-y-5">
           <PanelHeading
             eyebrow="Orders"
-            title="Realtime booking queue"
-            body="New bookings are written into Supabase and the dashboard refreshes when order rows change."
+            title="Realtime offline-order queue"
+            body="Incoming offline-payment orders appear here so admins can review proof and update the status."
           />
 
           {dashboard.orders.length ? (
@@ -1577,10 +1580,10 @@ export default async function AdminDashboardPage() {
             </div>
           ) : (
             <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/92 p-8">
-              <h3 className="font-display text-4xl">No bookings yet</h3>
+              <h3 className="font-display text-4xl">No orders yet</h3>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                Once visitors submit the booking form, their requests will appear
-                here and can be updated from pending to completed.
+                Once visitors place an offline order, it will appear here for
+                payment verification and delivery updates.
               </p>
             </div>
           )}

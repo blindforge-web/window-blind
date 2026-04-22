@@ -46,6 +46,7 @@ export type SocialLink = {
 export type SectionKey =
   | "hero"
   | "about"
+  | "products"
   | "services"
   | "reliability"
   | "gallery"
@@ -116,7 +117,7 @@ export type GalleryItem = {
   isActive: boolean;
 };
 
-export type OrderStatus = "pending" | "in_progress" | "completed";
+export type OrderStatus = "pending" | "paid" | "paid_delivered";
 
 export type Product = {
   id: string;
@@ -170,9 +171,17 @@ export type OrderItem = {
   status: OrderStatus;
   createdAt: string;
   productName?: string;
+  productSlug?: string;
   amount?: number;
+  quantity?: number;
   deliveryState?: string;
+  width?: string;
+  height?: string;
+  selectedColor?: string;
+  mountType?: string;
+  controlSide?: string;
   paymentProofUploaded?: boolean;
+  paymentProofUrl?: string | null;
 };
 
 export type LandingPageData = {
@@ -196,9 +205,12 @@ export type AdminDashboardData = LandingPageData & {
   products: Product[];
 };
 
-export type OfflineOrderActionState = {
+export type ActionFeedbackState = {
   status: "idle" | "error" | "success";
   message?: string;
+};
+
+export type OfflineOrderActionState = ActionFeedbackState & {
   orderReference?: string;
 };
 
@@ -207,8 +219,12 @@ export type AdminAuthActionState = {
   message?: string;
 };
 
-export type AdminIdentity = {
+export type UserIdentity = {
   id: string;
   email: string;
   fullName: string;
+};
+
+export type AdminIdentity = UserIdentity & {
+  role: string;
 };

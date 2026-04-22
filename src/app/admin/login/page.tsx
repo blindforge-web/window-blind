@@ -13,12 +13,12 @@ export default async function AdminLoginPage() {
             Admin Access
           </p>
           <h1 className="mt-4 font-display text-6xl leading-none">
-            Manage sections, media, bookings, and live site content.
+            Manage products, content, and offline payment orders.
           </h1>
           <ul className="mt-8 space-y-4 text-sm leading-7 text-white/80">
-            <li>Navbar, hero copy, services, team members, and clients are editable.</li>
-            <li>Gallery photos and videos can be uploaded or replaced from the dashboard.</li>
-            <li>Bookings move from pending to completed with realtime dashboard refresh.</li>
+            <li>Branding, navbar links, gallery media, and company sections are editable.</li>
+            <li>Products, delivery states, and offline payment account details are managed here.</li>
+            <li>Orders can move from pending to paid or paid delivered after proof review.</li>
           </ul>
         </section>
 

@@ -1,6 +1,3 @@
--- Sunpilot CMS plus the existing storefront, checkout, payment, and admin schema.
--- Apply on a clean Supabase database, or reset the database before reseeding.
-
 create extension if not exists pgcrypto;
 
 drop table if exists public.orders cascade;
@@ -181,6 +178,7 @@ create table public.gallery_items (
 create table public.orders (
   id uuid primary key default gen_random_uuid(),
   reference text not null unique,
+  customer_user_id uuid references auth.users (id) on delete set null,
   customer_name text not null,
   customer_phone text not null,
   customer_email text,
@@ -198,9 +196,24 @@ create table public.orders (
   control_side text not null,
   notes text,
   payment_proof_path text,
-  status text not null default 'pending' check (status in ('pending', 'in_progress', 'completed')),
+  status text not null default 'pending' check (status in ('pending', 'paid', 'paid_delivered')),
   created_at timestamptz not null default now()
 );
+
+create index orders_customer_user_id_idx on public.orders (customer_user_id);
+create index orders_status_idx on public.orders (status);
+
+create or replace function public.is_active_admin()
+returns boolean
+language sql
+stable
+as $$
+  select exists (
+    select 1
+    from public.admin_profiles
+    where user_id = auth.uid() and is_active = true
+  );
+$$;
 
 alter table public.admin_profiles enable row level security;
 alter table public.site_settings enable row level security;
@@ -296,284 +309,123 @@ on public.gallery_items
 for select
 using (true);
 
-drop policy if exists "public can create orders" on public.orders;
-create policy "public can create orders"
+drop policy if exists "customers read own orders" on public.orders;
+create policy "customers read own orders"
 on public.orders
-for insert
-with check (true);
+for select
+to authenticated
+using (customer_user_id = auth.uid());
 
 drop policy if exists "admins manage site settings" on public.site_settings;
 create policy "admins manage site settings"
 on public.site_settings
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage contact info" on public.contact_info;
 create policy "admins manage contact info"
 on public.contact_info
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage navbar" on public.navbar;
 create policy "admins manage navbar"
 on public.navbar
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage social links" on public.social_links;
 create policy "admins manage social links"
 on public.social_links
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage site sections" on public.site_sections;
 create policy "admins manage site sections"
 on public.site_sections
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage site highlights" on public.site_highlights;
 create policy "admins manage site highlights"
 on public.site_highlights
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage services" on public.services;
 create policy "admins manage services"
 on public.services
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage products" on public.products;
 create policy "admins manage products"
 on public.products
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage delivery states" on public.delivery_states;
 create policy "admins manage delivery states"
 on public.delivery_states
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage team members" on public.team_members;
 create policy "admins manage team members"
 on public.team_members
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage clients" on public.clients;
 create policy "admins manage clients"
 on public.clients
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins manage gallery items" on public.gallery_items;
 create policy "admins manage gallery items"
 on public.gallery_items
 for all
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 drop policy if exists "admins read orders" on public.orders;
 create policy "admins read orders"
 on public.orders
 for select
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin());
 
 drop policy if exists "admins update orders" on public.orders;
 create policy "admins update orders"
 on public.orders
 for update
 to authenticated
-using (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (public.is_active_admin())
+with check (public.is_active_admin());
 
 insert into storage.buckets (id, name, public)
 values ('site-media', 'site-media', true)
@@ -596,36 +448,15 @@ create policy "admins manage site media"
 on storage.objects
 for all
 to authenticated
-using (
-  bucket_id = 'site-media'
-  and exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-)
-with check (
-  bucket_id = 'site-media'
-  and exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (bucket_id = 'site-media' and public.is_active_admin())
+with check (bucket_id = 'site-media' and public.is_active_admin());
 
 drop policy if exists "admins can read payment proofs" on storage.objects;
 create policy "admins can read payment proofs"
 on storage.objects
 for select
 to authenticated
-using (
-  bucket_id = 'payment-proofs'
-  and exists (
-    select 1
-    from public.admin_profiles
-    where user_id = auth.uid() and is_active = true
-  )
-);
+using (bucket_id = 'payment-proofs' and public.is_active_admin());
 
 alter table public.orders replica identity full;
 

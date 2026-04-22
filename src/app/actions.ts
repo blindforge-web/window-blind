@@ -3,7 +3,7 @@
 import { Buffer } from "node:buffer";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createSupabasePublicClient } from "@/lib/supabase/public";
+import { getCurrentAdmin } from "@/lib/auth";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
@@ -11,6 +11,7 @@ import {
   hasServiceRoleConfig,
 } from "@/lib/supabase/env";
 import type {
+  ActionFeedbackState,
   AdminAuthActionState,
   OfflineOrderActionState,
   OrderStatus,
@@ -38,8 +39,14 @@ function buildEntityId(prefix: string, source: string) {
 
 function revalidateSite() {
   revalidatePath("/");
+  revalidatePath("/products");
   revalidatePath("/admin/dashboard");
   revalidatePath("/admin/login");
+}
+
+function getRedirectPath(formData: FormData, fallback: string) {
+  const redirectTo = getText(formData, "redirectTo");
+  return redirectTo || fallback;
 }
 
 async function requireAdminSupabase() {
@@ -121,68 +128,6 @@ async function resolveMediaUrl({
   return data.publicUrl;
 }
 
-export async function submitOrderRequest(
-  _previousState: OfflineOrderActionState,
-  formData: FormData,
-): Promise<OfflineOrderActionState> {
-  const name = getText(formData, "name");
-  const phone = getText(formData, "phone");
-  const email = getText(formData, "email");
-  const address = getText(formData, "address");
-  const orderType = getText(formData, "orderType");
-  const description = getText(formData, "description");
-
-  if (!name || !phone || !address || !orderType || !description) {
-    return {
-      status: "error",
-      message: "Fill every required booking field before submitting.",
-    };
-  }
-
-  if (!hasPublicSupabaseConfig) {
-    return {
-      status: "error",
-      message: "Supabase is not configured yet. Add the public keys to save bookings.",
-    };
-  }
-
-  const supabase = createSupabasePublicClient();
-  if (!supabase) {
-    return {
-      status: "error",
-      message: "Supabase connection is unavailable.",
-    };
-  }
-
-  const reference = buildOrderReference();
-  const { error } = await supabase.from("orders").insert({
-    reference,
-    name,
-    phone,
-    email: email || null,
-    address,
-    order_type: orderType,
-    description,
-    status: "pending",
-  });
-
-  if (error) {
-    return {
-      status: "error",
-      message: "The booking could not be saved. Check the Supabase setup and try again.",
-    };
-  }
-
-  revalidatePath("/admin/dashboard");
-
-  return {
-    status: "success",
-    message:
-      "Your booking has been submitted. The Sunpilot admin team will review it and follow up.",
-    orderReference: reference,
-  };
-}
-
 function splitList(rawValue: FormDataEntryValue | null) {
   return String(rawValue ?? "")
     .split(",")
@@ -194,6 +139,12 @@ export async function submitOfflineOrder(
   _previousState: OfflineOrderActionState,
   formData: FormData,
 ): Promise<OfflineOrderActionState> {
+  const sessionSupabase = hasPublicSupabaseConfig
+    ? await createSupabaseServerClient()
+    : null;
+  const {
+    data: { user },
+  } = sessionSupabase ? await sessionSupabase.auth.getUser() : { data: { user: null } };
   const customerName = getText(formData, "customerName");
   const phone = getText(formData, "phone");
   const email = getText(formData, "email");
@@ -209,7 +160,8 @@ export async function submitOfflineOrder(
   const productId = getText(formData, "productId");
   const productSlug = getText(formData, "productSlug");
   const productName = getText(formData, "productName");
-  const totalAmount = getNumber(formData, "totalAmount");
+  const unitAmount = getNumber(formData, "unitAmount");
+  const totalAmount = unitAmount * quantity;
   const paymentProof = formData.get("paymentProof");
 
   if (
@@ -285,9 +237,10 @@ export async function submitOfflineOrder(
 
   const { error: insertError } = await supabase.from("orders").insert({
     reference,
+    customer_user_id: user?.id ?? null,
     customer_name: customerName,
     customer_phone: phone,
-    customer_email: email || null,
+    customer_email: email || user?.email || null,
     product_id: productId,
     product_slug: productSlug,
     product_name: productName,
@@ -314,6 +267,7 @@ export async function submitOfflineOrder(
 
   revalidatePath("/admin/dashboard");
   revalidatePath("/checkout/offline");
+  revalidatePath("/account");
 
   return {
     status: "success",
@@ -375,6 +329,118 @@ export async function signInAdmin(
   redirect("/admin/dashboard");
 }
 
+export async function signInCustomer(
+  _previousState: ActionFeedbackState,
+  formData: FormData,
+): Promise<ActionFeedbackState> {
+  if (!hasPublicSupabaseConfig) {
+    return {
+      status: "error",
+      message: "Supabase auth is not configured yet.",
+    };
+  }
+
+  const email = getText(formData, "email");
+  const password = getText(formData, "password");
+
+  if (!email || !password) {
+    return {
+      status: "error",
+      message: "Enter your email and password.",
+    };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: "Sign-in failed. Check the credentials and try again.",
+    };
+  }
+
+  redirect(getRedirectPath(formData, "/account"));
+}
+
+export async function signUpCustomer(
+  _previousState: ActionFeedbackState,
+  formData: FormData,
+): Promise<ActionFeedbackState> {
+  if (!hasPublicSupabaseConfig) {
+    return {
+      status: "error",
+      message: "Supabase auth is not configured yet.",
+    };
+  }
+
+  const fullName = getText(formData, "fullName");
+  const email = getText(formData, "email");
+  const password = getText(formData, "password");
+  const confirmPassword = getText(formData, "confirmPassword");
+
+  if (!fullName || !email || !password || !confirmPassword) {
+    return {
+      status: "error",
+      message: "Complete every field before creating your account.",
+    };
+  }
+
+  if (password.length < 8) {
+    return {
+      status: "error",
+      message: "Use a password with at least 8 characters.",
+    };
+  }
+
+  if (password !== confirmPassword) {
+    return {
+      status: "error",
+      message: "Passwords do not match.",
+    };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+      },
+    },
+  });
+
+  if (error) {
+    return {
+      status: "error",
+      message: error.message || "Account creation failed.",
+    };
+  }
+
+  if (!data.session) {
+    return {
+      status: "success",
+      message:
+        "Account created. Confirm your email if required, then sign in to view future orders.",
+    };
+  }
+
+  redirect(getRedirectPath(formData, "/account"));
+}
+
+export async function signOutCustomer() {
+  if (hasPublicSupabaseConfig) {
+    const supabase = await createSupabaseServerClient();
+    await supabase.auth.signOut();
+  }
+
+  redirect("/account");
+}
+
 export async function signOutAdmin() {
   if (hasPublicSupabaseConfig) {
     const supabase = await createSupabaseServerClient();
@@ -382,6 +448,104 @@ export async function signOutAdmin() {
   }
 
   redirect("/admin/login");
+}
+
+export async function resetAdminPassword(
+  _previousState: ActionFeedbackState,
+  formData: FormData,
+): Promise<ActionFeedbackState> {
+  if (!hasServiceRoleConfig) {
+    return {
+      status: "error",
+      message: "Add the Supabase service role key to enable password resets.",
+    };
+  }
+
+  const currentAdmin = await getCurrentAdmin();
+
+  if (!currentAdmin || currentAdmin.role !== "super_admin") {
+    return {
+      status: "error",
+      message: "Only a super admin can reset admin passwords.",
+    };
+  }
+
+  const email = getText(formData, "email").toLowerCase();
+  const password = getText(formData, "password");
+
+  if (!email || !password) {
+    return {
+      status: "error",
+      message: "Enter the target admin email and the new password.",
+    };
+  }
+
+  if (password.length < 8) {
+    return {
+      status: "error",
+      message: "Use a password with at least 8 characters.",
+    };
+  }
+
+  const serviceSupabase = createSupabaseServiceClient();
+
+  if (!serviceSupabase) {
+    return {
+      status: "error",
+      message: "Supabase service connection is unavailable.",
+    };
+  }
+
+  const { data: userPage, error: listError } =
+    await serviceSupabase.auth.admin.listUsers();
+
+  if (listError) {
+    return {
+      status: "error",
+      message: "Could not load admin users from Supabase Auth.",
+    };
+  }
+
+  const targetUser = userPage.users.find(
+    (user) => user.email?.toLowerCase() === email,
+  );
+
+  if (!targetUser) {
+    return {
+      status: "error",
+      message: "No Supabase Auth user was found for that email.",
+    };
+  }
+
+  const { data: adminProfile } = await serviceSupabase
+    .from("admin_profiles")
+    .select("is_active")
+    .eq("user_id", targetUser.id)
+    .maybeSingle<{ is_active: boolean | null }>();
+
+  if (!adminProfile?.is_active) {
+    return {
+      status: "error",
+      message: "That user is not an active admin profile.",
+    };
+  }
+
+  const { error: updateError } = await serviceSupabase.auth.admin.updateUserById(
+    targetUser.id,
+    { password },
+  );
+
+  if (updateError) {
+    return {
+      status: "error",
+      message: "Password reset failed. Check the service-role configuration.",
+    };
+  }
+
+  return {
+    status: "success",
+    message: `Password updated for ${email}.`,
+  };
 }
 
 export async function saveProductPricing(formData: FormData) {
@@ -404,6 +568,7 @@ export async function saveProductPricing(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/catalog");
+  revalidatePath("/products");
   revalidatePath("/admin/dashboard");
 }
 
@@ -461,6 +626,7 @@ export async function createProduct(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/catalog");
+  revalidatePath("/products");
   revalidatePath("/admin/dashboard");
 }
 
@@ -477,6 +643,7 @@ export async function toggleProductListing(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/catalog");
+  revalidatePath("/products");
   revalidatePath("/admin/dashboard");
 }
 
@@ -937,4 +1104,5 @@ export async function updateOrderStatus(formData: FormData) {
 
   await supabase.from("orders").update({ status }).eq("id", orderId);
   revalidatePath("/admin/dashboard");
+  revalidatePath("/account");
 }

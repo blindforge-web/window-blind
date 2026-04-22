@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import Link from "next/link";
+import { useActionState, useState } from "react";
 import { submitOfflineOrder } from "@/app/actions";
 import { SubmitButton } from "@/components/store/submit-button";
 import { initialOfflineOrderState } from "@/lib/action-states";
@@ -11,24 +12,69 @@ export function OfflineOrderForm({
   product,
   deliveryStates,
   liveMode,
+  initialCustomerName = "",
+  initialEmail = "",
+  loggedIn = false,
 }: {
   product: Product;
   deliveryStates: DeliveryState[];
   liveMode: boolean;
+  initialCustomerName?: string;
+  initialEmail?: string;
+  loggedIn?: boolean;
 }) {
   const [state, formAction] = useActionState(
     submitOfflineOrder,
     initialOfflineOrderState,
   );
+  const [quantity, setQuantity] = useState(1);
   const activeStates = deliveryStates.filter((item) => item.isActive);
-  const totalAmount = product.salePrice ?? product.basePrice;
+  const unitAmount = product.salePrice ?? product.basePrice;
+  const totalAmount = unitAmount * quantity;
 
   return (
     <form action={formAction} className="space-y-6" encType="multipart/form-data">
       <input type="hidden" name="productId" value={product.id} />
       <input type="hidden" name="productSlug" value={product.slug} />
       <input type="hidden" name="productName" value={product.name} />
-      <input type="hidden" name="totalAmount" value={totalAmount} />
+      <input type="hidden" name="unitAmount" value={unitAmount} />
+
+      <div className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/72 p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-muted)]">
+              Order tracking
+            </p>
+            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+              {loggedIn ? (
+                "This order will be attached to your account so you can track status and open the receipt later."
+              ) : (
+                <>
+                  Ordering without login is allowed.{" "}
+                  <Link
+                    href={`/account?next=/checkout/offline?product=${product.slug}`}
+                    className="font-semibold text-[var(--color-primary)]"
+                  >
+                    Sign in first
+                  </Link>{" "}
+                  if you want order history and receipt access inside your account.
+                </>
+              )}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--color-line)] bg-[rgba(245,249,255,0.92)] px-4 py-3 text-right">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+              Total to transfer
+            </p>
+            <p className="mt-1 text-2xl font-extrabold text-[var(--color-ink)]">
+              {formatCurrency(totalAmount)}
+            </p>
+            <p className="mt-1 text-xs text-[var(--color-muted)]">
+              {formatCurrency(unitAmount)} each
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
@@ -36,6 +82,7 @@ export function OfflineOrderForm({
           <input
             name="customerName"
             required
+            defaultValue={initialCustomerName}
             className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
           />
         </label>
@@ -52,6 +99,7 @@ export function OfflineOrderForm({
           <input
             name="email"
             type="email"
+            defaultValue={initialEmail}
             className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
           />
         </label>
@@ -113,6 +161,9 @@ export function OfflineOrderForm({
             min="1"
             defaultValue="1"
             required
+            onChange={(event) =>
+              setQuantity(Math.max(1, Number(event.currentTarget.value) || 1))
+            }
             className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
           />
         </label>
@@ -179,7 +230,7 @@ export function OfflineOrderForm({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-muted)]">
-              Payment Proof
+              Payment proof
             </p>
             <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
               Upload the transfer receipt or screenshot for{" "}
@@ -189,7 +240,7 @@ export function OfflineOrderForm({
               .
             </p>
             {!liveMode ? (
-              <p className="mt-2 text-xs font-semibold text-[var(--color-bronze)]">
+              <p className="mt-2 text-xs font-semibold text-[var(--color-secondary)]">
                 Supabase service mode is not connected yet. Submission currently
                 runs in preview mode.
               </p>

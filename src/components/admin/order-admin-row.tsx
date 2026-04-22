@@ -2,7 +2,7 @@ import { updateOrderStatus } from "@/app/actions";
 import type { OrderItem, OrderStatus } from "@/lib/types";
 import { formatCurrency, formatDateTime, formatStatusLabel } from "@/lib/utils";
 
-const statusOptions: OrderStatus[] = ["pending", "in_progress", "completed"];
+const statusOptions: OrderStatus[] = ["pending", "paid", "paid_delivered"];
 
 export function OrderAdminRow({
   order,
@@ -36,10 +36,22 @@ export function OrderAdminRow({
         {order.email ? <p>{order.email}</p> : null}
         <p>{order.address}</p>
         {order.deliveryState ? <p>State: {order.deliveryState}</p> : null}
+        {order.quantity ? <p>Quantity: {order.quantity}</p> : null}
         {typeof order.amount === "number" ? (
           <p>Amount: {formatCurrency(order.amount)}</p>
         ) : null}
-        {order.paymentProofUploaded ? <p>Payment proof uploaded</p> : null}
+        {order.paymentProofUrl ? (
+          <a
+            href={order.paymentProofUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-[var(--color-primary)]"
+          >
+            View payment proof
+          </a>
+        ) : order.paymentProofUploaded ? (
+          <p>Payment proof uploaded</p>
+        ) : null}
         <p className="text-xs uppercase tracking-[0.16em]">
           {formatDateTime(order.createdAt)}
         </p>

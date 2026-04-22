@@ -20,15 +20,15 @@ insert into public.site_settings (
 )
 values (
   'default',
-  'Sunpilot',
-  'Sunpilot',
-  'Custom blinds, furniture, and fitted finishes for homes, offices, and commercial spaces.',
+  'BlindForge',
+  'BlindForge',
+  'Made-to-measure blinds for homes, offices, and commercial interiors.',
   null,
-  'Sunpilot handles custom window blind production, furniture orders, measurement support, and delivery coordination from Onitsha.',
-  'Update In Admin',
-  'Add Account Name',
-  'Add Account Number',
-  'Update the payment account details in the admin dashboard before accepting live transfer orders.',
+  'BlindForge manages product selection, measurement guidance, offline payment confirmation, and delivery coordination from one workflow.',
+  '',
+  '',
+  '',
+  'Offline transfer orders are confirmed after the admin verifies uploaded proof of payment.',
   '#0A2540',
   '#D4AF37',
   '#F5F5F5',
@@ -86,12 +86,10 @@ insert into public.navbar (id, title, link, sort_order, is_active)
 values
   ('nav-home', 'Home', '/#top', 1, true),
   ('nav-about', 'About', '/#about', 2, true),
-  ('nav-services', 'Services', '/#services', 3, true),
-  ('nav-catalog', 'Catalog', '/catalog', 4, true),
+  ('nav-products', 'Products', '/products', 3, true),
+  ('nav-services', 'Services', '/#services', 4, true),
   ('nav-team', 'Team', '/#team', 5, true),
-  ('nav-clients', 'Clients', '/#clients', 6, true),
-  ('nav-booking', 'Book Order', '/#booking', 7, true),
-  ('nav-contact', 'Contact', '/#contact', 8, true)
+  ('nav-contact', 'Contact', '/#contact', 6, true)
 on conflict (id) do update
 set
   title = excluded.title,
@@ -135,137 +133,133 @@ insert into public.site_sections (
 values
   (
     'hero',
-    'Window Blinds and Furniture',
-    'Custom-made blinds and furniture for modern interiors',
-    'Sunpilot helps homes, offices, and project spaces order finished blinds and furniture with clear production flow and delivery coordination.',
-    'Browse live product listings, confirm your measurements, make payment, and submit delivery details directly through the website.',
-    'Browse blinds',
-    '/catalog',
-    'Start checkout',
-    '/checkout/offline',
+    'Blind systems and interior finishing',
+    'Custom blinds built for practical spaces and clean installation',
+    'BlindForge helps homes, offices, and project teams move from product selection to offline payment and delivery confirmation with less friction.',
+    'Browse the live catalog, choose a product, pay offline, upload your proof, and wait for admin confirmation.',
+    'Browse products',
+    '/products',
+    'Track orders',
+    '/account',
     null,
     'image',
-    'Sunpilot hero media',
+    'BlindForge hero media',
     true
   ),
   (
     'about',
-    'About Sunpilot',
-    'Built from Onitsha for clients who want fit, finish, and reliability',
-    'Sunpilot operates from No. 8 Awka Road, Onitsha, Anambra State, serving customers who need custom window blinds and furniture orders handled with attention to detail.',
-    'The brand combines production, measurement support, and practical delivery planning so customers can move from selection to installation with less friction.',
+    'About BlindForge',
+    'A workshop-focused brand for made-to-measure blinds',
+    'BlindForge operates from Onitsha and supports residential, office, and commercial blind orders that need clear communication from selection through delivery.',
+    'The business combines measurement support, product guidance, and practical order handling so customers can buy with more confidence.',
     null,
     null,
     null,
     null,
     null,
     'image',
-    'About Sunpilot',
+    'About BlindForge',
+    true
+  ),
+  (
+    'products',
+    'Browse the catalog',
+    'Start with a few live products, then open the full browse view',
+    'The home page only highlights a small set of products while the full product area handles deeper browsing and checkout.',
+    'Use the browse view to compare collections and open full product details before you place an order.',
+    'Browse more',
+    '/products',
+    'Open account',
+    '/account',
+    null,
+    'image',
+    'BlindForge products',
     true
   ),
   (
     'services',
-    'What We Do',
-    'Core service categories',
-    'Everything below is editable from the admin dashboard, including photos, descriptions, and order.',
-    'Use this section to present the current production and installation focus of the business.',
+    'What we handle',
+    'Service areas around the product workflow',
+    'BlindForge supports customers before, during, and after product selection.',
+    'These sections can be edited from the admin dashboard as the business focus changes.',
     null,
     null,
     null,
     null,
     null,
     'image',
-    'Sunpilot services',
+    'BlindForge services',
     true
   ),
   (
     'reliability',
-    'Why Choose Us',
-    'Operational strengths customers care about',
-    'The landing page highlights should explain why a buyer can trust the process from measurement to delivery.',
-    'Admins can adjust these reliability cards at any time without code changes.',
+    'Order confidence',
+    'Offline payment, proof verification, and manual delivery updates',
+    'Customers do not need to guess what happens next after payment. Orders stay visible to admins and can be updated as soon as proof is checked or delivery is completed.',
+    'The account area also lets signed-in customers review receipts and track status from their side.',
     null,
     null,
     null,
     null,
     null,
     'image',
-    'Sunpilot reliability',
+    'BlindForge reliability',
     true
   ),
   (
     'gallery',
-    'Project Gallery',
-    'Photos and videos from recent work',
-    'This section supports both image and video uploads from Supabase Storage.',
-    'Use it to show fitted blinds, furniture installations, showroom shots, or project walkthrough clips.',
+    'Project gallery',
+    'Selected visuals from recent work',
+    'Show installation finishes, product close-ups, and completed spaces when approved media is available.',
     null,
     null,
     null,
     null,
     null,
     'image',
-    'Sunpilot gallery',
+    'BlindForge gallery',
     true
   ),
   (
     'team',
-    'Meet the Team',
-    'The people behind measurement, production, and installation',
-    'Team profiles are fully dynamic. Admins can update names, roles, bios, and profile photos at any time.',
-    'Social links are intentionally not shown on team cards.',
+    'Team',
+    'The people and units that keep orders moving',
+    'Show the production, support, and installation teams customers rely on during the order process.',
     null,
     null,
     null,
     null,
     null,
     'image',
-    'Sunpilot team',
+    'BlindForge team',
     true
   ),
   (
     'clients',
-    'Our Clients',
-    'Brands, offices, and homes we have served',
-    'Client and partner logos are managed from the dashboard and can be swapped whenever needed.',
-    'Use this area to show trust signals for new buyers.',
+    'Client trust',
+    'Show the businesses, homes, or project types the brand supports',
+    'Publish this section only when you have approved logos or partner references to show.',
     null,
     null,
     null,
     null,
     null,
     'image',
-    'Sunpilot clients',
-    true
-  ),
-  (
-    'booking',
-    'Book Order',
-    'Move from browsing to payment and delivery details',
-    'Customers can browse products, select a blind, transfer payment, upload proof, and submit delivery details online.',
-    'The checkout and order queue stay connected to Supabase so admins can manage everything from one dashboard.',
-    'Browse products',
-    '/catalog',
-    'Start checkout',
-    '/checkout/offline',
-    null,
-    'image',
-    'Sunpilot booking',
+    'BlindForge clients',
     true
   ),
   (
     'contact',
-    'Contact Sunpilot',
-    'Reach the team directly',
-    'Phone lines, WhatsApp, and location details below all come from Supabase and can be updated in the dashboard.',
-    'Use this section for enquiries, measurement scheduling, and delivery coordination.',
+    'Contact',
+    'Reach the business for enquiries, measurements, and delivery coordination',
+    'Keep the most current phone numbers, address, and support channels here so visitors know how to continue the conversation.',
     null,
     null,
     null,
     null,
     null,
     'image',
-    'Sunpilot contact',
+    'BlindForge contact',
     true
   )
 on conflict (section_key) do update
@@ -286,23 +280,23 @@ set
 insert into public.site_highlights (id, title, description, sort_order, is_active)
 values
   (
-    'highlight-measurement',
-    'Measured for your space',
-    'Orders can be tailored to window dimensions, preferred control side, finish, and mounting method.',
+    'highlight-made-to-measure',
+    'Made-to-measure fit',
+    'Every listed product is positioned around actual room measurements and installation needs.',
     1,
     true
   ),
   (
-    'highlight-production',
-    'Clear production timelines',
-    'Lead times and listing visibility stay editable from Supabase so customers always see current availability.',
+    'highlight-offline-verification',
+    'Offline payment verification',
+    'Orders move forward only after uploaded proof is checked by the admin team.',
     2,
     true
   ),
   (
-    'highlight-delivery',
-    'Delivery detail capture',
-    'Buyers submit state and full address details during checkout so fulfilment can be tracked from the admin dashboard.',
+    'highlight-account-tracking',
+    'Account-based tracking',
+    'Signed-in customers can return to the site to view receipts and current order status.',
     3,
     true
   )
@@ -316,25 +310,25 @@ set
 insert into public.services (id, title, description, image_url, sort_order, is_active)
 values
   (
-    'service-blinds',
-    'Window blinds manufacturing',
-    'Custom blinds for residential, office, and project spaces with tailored sizes, finishes, and control options.',
+    'service-residential',
+    'Residential blind supply',
+    'Blinds for living rooms, bedrooms, kitchens, and private spaces that need practical measurement and finish support.',
     null,
     1,
     true
   ),
   (
-    'service-furniture',
-    'Custom furniture orders',
-    'Furniture pieces built to suit interior style, layout requirements, and practical use in homes or commercial spaces.',
+    'service-office',
+    'Office and project supply',
+    'Product support for workspaces, shared offices, and commercial interiors that need coordinated delivery handling.',
     null,
     2,
     true
   ),
   (
-    'service-installation',
-    'Measurement and installation support',
-    'From planning to fitting, Sunpilot can coordinate measurement details, production updates, and delivery preparation.',
+    'service-measurement',
+    'Measurement and order support',
+    'Guidance on product selection, dimensions, quantity planning, and the order details required for production.',
     null,
     3,
     true
@@ -346,97 +340,6 @@ set
   image_url = excluded.image_url,
   sort_order = excluded.sort_order,
   is_active = excluded.is_active;
-
-insert into public.gallery_items (
-  id,
-  title,
-  description,
-  media_url,
-  media_kind,
-  sort_order,
-  is_active
-)
-values
-  (
-    'gallery-residential',
-    'Residential blind finishing',
-    'Use this card for fitted home blinds, layered fabrics, or room transformation shots.',
-    null,
-    'image',
-    1,
-    true
-  ),
-  (
-    'gallery-office',
-    'Office installation',
-    'Ideal for office fit-out images or video walkthroughs showing larger commercial installations.',
-    null,
-    'image',
-    2,
-    true
-  ),
-  (
-    'gallery-furniture',
-    'Furniture detailing',
-    'A flexible media slot for furniture projects, close-up craftsmanship, or delivery-ready pieces.',
-    null,
-    'image',
-    3,
-    true
-  )
-on conflict (id) do update
-set
-  title = excluded.title,
-  description = excluded.description,
-  media_url = excluded.media_url,
-  media_kind = excluded.media_kind,
-  sort_order = excluded.sort_order,
-  is_active = excluded.is_active;
-
-insert into public.delivery_states (code, name, is_active, eta)
-values
-  ('abia', 'Abia', true, '4 to 6 working days'),
-  ('adamawa', 'Adamawa', false, '6 to 9 working days'),
-  ('akwa-ibom', 'Akwa Ibom', true, '4 to 7 working days'),
-  ('anambra', 'Anambra', true, '3 to 5 working days'),
-  ('bauchi', 'Bauchi', false, '6 to 9 working days'),
-  ('bayelsa', 'Bayelsa', false, '6 to 9 working days'),
-  ('benue', 'Benue', true, '4 to 6 working days'),
-  ('borno', 'Borno', false, 'Delivery paused'),
-  ('cross-river', 'Cross River', true, '5 to 7 working days'),
-  ('delta', 'Delta', true, '3 to 5 working days'),
-  ('ebonyi', 'Ebonyi', true, '4 to 6 working days'),
-  ('edo', 'Edo', true, '3 to 5 working days'),
-  ('ekiti', 'Ekiti', true, '3 to 5 working days'),
-  ('enugu', 'Enugu', true, '3 to 5 working days'),
-  ('fct', 'FCT Abuja', true, '2 to 4 working days'),
-  ('gombe', 'Gombe', false, '6 to 9 working days'),
-  ('imo', 'Imo', true, '4 to 6 working days'),
-  ('jigawa', 'Jigawa', false, '6 to 9 working days'),
-  ('kaduna', 'Kaduna', true, '4 to 6 working days'),
-  ('kano', 'Kano', true, '4 to 6 working days'),
-  ('katsina', 'Katsina', false, '6 to 9 working days'),
-  ('kebbi', 'Kebbi', false, '7 to 10 working days'),
-  ('kogi', 'Kogi', true, '4 to 6 working days'),
-  ('kwara', 'Kwara', true, '3 to 5 working days'),
-  ('lagos', 'Lagos', true, '1 to 3 working days'),
-  ('nasarawa', 'Nasarawa', true, '3 to 5 working days'),
-  ('niger', 'Niger', true, '4 to 6 working days'),
-  ('ogun', 'Ogun', true, '2 to 4 working days'),
-  ('ondo', 'Ondo', true, '3 to 5 working days'),
-  ('osun', 'Osun', true, '3 to 5 working days'),
-  ('oyo', 'Oyo', true, '2 to 4 working days'),
-  ('plateau', 'Plateau', true, '4 to 6 working days'),
-  ('rivers', 'Rivers', true, '4 to 6 working days'),
-  ('sokoto', 'Sokoto', false, '7 to 10 working days'),
-  ('taraba', 'Taraba', false, '6 to 9 working days'),
-  ('yobe', 'Yobe', false, 'Delivery paused'),
-  ('zamfara', 'Zamfara', false, 'Delivery paused')
-on conflict (code) do update
-set
-  name = excluded.name,
-  is_active = excluded.is_active,
-  eta = excluded.eta;
 
 insert into public.products (
   slug,
@@ -462,70 +365,92 @@ insert into public.products (
 )
 values
   (
-    'monarch-blackout',
-    'Monarch Blackout',
-    'Luxury Blackout',
-    'Deep light control with a hotel-grade finish for bedrooms and executive spaces.',
-    'Monarch Blackout is built for clients who want absolute privacy, softened acoustics, and a clean premium line across wide windows.',
-    148000,
-    132000,
-    '4 to 6 working days',
+    'linen-roller-blind',
+    'Linen Roller Blind',
+    'Roller Blinds',
+    'A clean roller finish for bedrooms, offices, and reception areas.',
+    'The Linen Roller Blind is built for simple light control and a neat visual line, making it a strong fit for modern homes and workspaces.',
+    85000,
+    null,
+    '3 to 5 working days',
     4.9,
-    138,
-    'Best Seller',
+    18,
+    'Popular',
     true,
-    array['Custom width up to 300cm', 'Custom drop up to 320cm'],
-    array['Ivory Sand', 'Smoke Ash', 'Graphite Bronze', 'Deep Cocoa'],
-    array['Full blackout fabric', 'Heat reduction for sun-facing rooms', 'Neat concealed bottom bar', 'Silent chain control'],
-    array['Bedrooms', 'Short-let apartments', 'Boardrooms'],
-    '#efe3cf',
-    '#6b5849',
-    '#1f1b18',
-    'Blackout'
+    array['120cm x 150cm', '150cm x 180cm', '180cm x 220cm'],
+    array['Ivory', 'Sand', 'Stone Grey'],
+    array['Smooth rolling mechanism', 'Easy daily control', 'Works across home and office spaces'],
+    array['Bedrooms', 'Reception areas', 'Private offices'],
+    '#e8edf2',
+    '#405568',
+    '#d4af37',
+    'Roller Blind'
   ),
   (
-    'axis-zebra',
-    'Axis Zebra',
-    'Modern Dual Layer',
-    'Switch between privacy and view with a clean striped roller profile.',
-    'Axis Zebra gives clients more control during the day by alternating sheer and opaque layers for offices and contemporary interiors.',
-    118000,
-    104000,
-    '4 to 5 working days',
+    'day-night-zebra-blind',
+    'Day and Night Zebra Blind',
+    'Zebra Blinds',
+    'Layered light control for rooms that need privacy and flexibility.',
+    'The Day and Night Zebra Blind balances privacy and natural light with alternating bands that can be adjusted through the day.',
+    110000,
+    98000,
+    '4 to 6 working days',
     4.8,
-    94,
-    'Office Favorite',
+    11,
+    'Sale',
     true,
-    array['Custom width up to 290cm', 'Custom drop up to 300cm'],
-    array['Pebble Grey', 'Warm Ivory', 'Tea Linen', 'Shadow Stone'],
-    array['Dual-layer privacy control', 'Crisp striped silhouette', 'Smooth chain glide', 'Works well on large openings'],
-    array['Offices', 'Dining rooms', 'Meeting suites'],
-    '#ebe2d3',
-    '#73817a',
-    '#213830',
-    'Zebra'
+    array['150cm x 180cm', '180cm x 220cm', '220cm x 240cm'],
+    array['White', 'Smoke', 'Mocha'],
+    array['Dual-layer fabric effect', 'Privacy and light control in one product', 'Suitable for visible front-facing rooms'],
+    array['Living rooms', 'Dining rooms', 'Front offices'],
+    '#f3ede4',
+    '#6f5847',
+    '#cfb28a',
+    'Zebra Blind'
   ),
   (
-    'harbor-roman',
-    'Harbor Roman',
-    'Structured Roman',
-    'Tailored folds that bring a softer luxury finish to statement windows.',
-    'Harbor Roman is suited to clients who want fabric presence and crafted structure in high-end residential interiors.',
-    164000,
+    'blackout-roman-blind',
+    'Blackout Roman Blind',
+    'Roman Blinds',
+    'A fabric-forward blind option for rooms that need stronger light blocking.',
+    'The Blackout Roman Blind adds a softer fabric look while reducing light in bedrooms, lounges, and presentation spaces.',
+    130000,
     null,
     '5 to 7 working days',
     4.9,
-    63,
-    'Designer Pick',
+    9,
+    null,
     true,
-    array['Custom width up to 260cm', 'Custom drop up to 280cm'],
-    array['Stone Biscuit', 'Taupe Linen', 'Forest Dune', 'Cedar Mist'],
-    array['Tailored stitched folds', 'Premium face fabric', 'Luxury residential finish', 'Soft stack when raised'],
-    array['Dining spaces', 'Master suites', 'Show homes'],
-    '#f1e0c8',
-    '#91735a',
-    '#35281f',
-    'Roman'
+    array['140cm x 180cm', '180cm x 220cm', '220cm x 260cm'],
+    array['Cream', 'Taupe', 'Charcoal'],
+    array['Structured fold finish', 'Better light reduction', 'Suitable for more decorative interiors'],
+    array['Bedrooms', 'Media rooms', 'Private lounges'],
+    '#e8dfd6',
+    '#5e4a43',
+    '#d4af37',
+    'Roman Blind'
+  ),
+  (
+    'wood-tone-venetian-blind',
+    'Wood Tone Venetian Blind',
+    'Venetian Blinds',
+    'A slatted finish for spaces that need airflow and directional light control.',
+    'The Wood Tone Venetian Blind works well in offices and functional rooms where customers want a practical blind with a warmer appearance.',
+    95000,
+    null,
+    '3 to 5 working days',
+    4.7,
+    7,
+    'New',
+    true,
+    array['120cm x 150cm', '150cm x 180cm', '180cm x 220cm'],
+    array['Walnut', 'Oak', 'Coffee Brown'],
+    array['Directional light control', 'Hardwearing finish', 'Suitable for practical daily use'],
+    array['Kitchens', 'Work areas', 'Office partitions'],
+    '#d9c6ab',
+    '#6d543e',
+    '#a97743',
+    'Venetian Blind'
   )
 on conflict (slug) do update
 set
@@ -549,8 +474,52 @@ set
   visual_accent = excluded.visual_accent,
   visual_label = excluded.visual_label;
 
--- After creating an auth user inside Supabase Authentication, register that user as an admin:
--- insert into public.admin_profiles (user_id, full_name, is_active)
--- values ('<auth-user-uuid>', 'Primary Admin', true)
--- on conflict (user_id) do update
--- set full_name = excluded.full_name, is_active = excluded.is_active;
+insert into public.delivery_states (code, name, is_active, eta)
+values
+  ('anambra', 'Anambra', true, '2 to 4 working days'),
+  ('lagos', 'Lagos', true, '3 to 5 working days'),
+  ('abuja', 'Abuja', true, '3 to 6 working days'),
+  ('rivers', 'Rivers', true, '3 to 6 working days')
+on conflict (code) do update
+set
+  name = excluded.name,
+  is_active = excluded.is_active,
+  eta = excluded.eta;
+
+insert into public.team_members (id, name, role, bio, image_url, sort_order, is_active)
+values
+  (
+    'team-support',
+    'Customer Support Desk',
+    'Order Communication',
+    'Handles incoming enquiries, order updates, and customer follow-up after payment verification.',
+    null,
+    1,
+    true
+  ),
+  (
+    'team-production',
+    'Production Floor',
+    'Fabrication',
+    'Coordinates material preparation and production scheduling for listed blind collections.',
+    null,
+    2,
+    true
+  ),
+  (
+    'team-installation',
+    'Installation Crew',
+    'Delivery and Fit',
+    'Supports final delivery coordination and installation readiness for completed orders.',
+    null,
+    3,
+    true
+  )
+on conflict (id) do update
+set
+  name = excluded.name,
+  role = excluded.role,
+  bio = excluded.bio,
+  image_url = excluded.image_url,
+  sort_order = excluded.sort_order,
+  is_active = excluded.is_active;

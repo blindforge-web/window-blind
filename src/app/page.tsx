@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
@@ -45,7 +46,7 @@ function SectionLead({
       {body ? (
         <p
           className={`max-w-3xl text-sm leading-7 ${
-            inverse ? "text-white/70" : "text-[var(--color-muted)]"
+            inverse ? "text-white/72" : "text-[var(--color-muted)]"
           }`}
         >
           {body}
@@ -70,7 +71,9 @@ function MediaFrame({
 }) {
   if (mediaUrl && mediaKind === "video") {
     return (
-      <div className={`overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}>
+      <div
+        className={`overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
+      >
         <video
           src={mediaUrl}
           controls
@@ -83,7 +86,9 @@ function MediaFrame({
 
   if (mediaUrl) {
     return (
-      <div className={`overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}>
+      <div
+        className={`overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
+      >
         <img
           src={mediaUrl}
           alt={alt || label}
@@ -96,7 +101,7 @@ function MediaFrame({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_42%,white_58%))] ${className}`}
+      className={`relative overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_38%,white_62%))] ${className}`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.24),transparent_34%)]" />
       <div className="absolute inset-y-0 left-[18%] w-px bg-white/30" />
@@ -119,21 +124,23 @@ export default async function Home() {
     teamMembers,
     clients,
     galleryItems,
-    paymentAccount,
-    socialLinks,
   } = await getLandingPageData();
 
   const hero = sections.hero;
   const about = sections.about;
+  const productsSection = sections.products ?? sections.booking;
   const servicesSection = sections.services;
   const reliability = sections.reliability;
   const gallery = sections.gallery;
   const team = sections.team;
   const clientsSection = sections.clients;
-  const booking = sections.booking;
   const contactSection = sections.contact;
 
   const heroMetrics = [
+    {
+      label: "Products",
+      value: featuredProducts.length.toString().padStart(2, "0"),
+    },
     {
       label: servicesSection?.title || "Services",
       value: services.length.toString().padStart(2, "0"),
@@ -141,10 +148,6 @@ export default async function Home() {
     {
       label: team?.title || "Team",
       value: teamMembers.length.toString().padStart(2, "0"),
-    },
-    {
-      label: clientsSection?.title || "Clients",
-      value: clients.length.toString().padStart(2, "0"),
     },
   ];
 
@@ -165,22 +168,18 @@ export default async function Home() {
               />
 
               <div className="flex flex-wrap gap-4">
-                {hero?.primaryCtaLabel && hero.primaryCtaLink ? (
-                  <Link
-                    href={hero.primaryCtaLink}
-                    className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white transition hover:opacity-90"
-                  >
-                    {hero.primaryCtaLabel}
-                  </Link>
-                ) : null}
-                {hero?.secondaryCtaLabel && hero.secondaryCtaLink ? (
-                  <Link
-                    href={hero.secondaryCtaLink}
-                    className="rounded-full border border-[var(--color-line)] bg-white px-6 py-4 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent)]"
-                  >
-                    {hero.secondaryCtaLabel}
-                  </Link>
-                ) : null}
+                <Link
+                  href={hero?.primaryCtaLink || "/products"}
+                  className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white transition hover:opacity-90"
+                >
+                  {hero?.primaryCtaLabel || "Browse products"}
+                </Link>
+                <Link
+                  href={hero?.secondaryCtaLink || "/account"}
+                  className="rounded-full border border-[var(--color-line)] bg-white px-6 py-4 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent)]"
+                >
+                  {hero?.secondaryCtaLabel || "Track my orders"}
+                </Link>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
@@ -202,7 +201,7 @@ export default async function Home() {
 
             <div className="grid gap-5">
               <MediaFrame
-                label={hero?.title || settings?.brandName || "Sunpilot"}
+                label={hero?.title || settings?.brandName || "BlindForge"}
                 mediaUrl={hero?.mediaUrl}
                 mediaKind={hero?.mediaKind}
                 alt={hero?.mediaAlt}
@@ -220,20 +219,79 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="about" className="mx-auto grid max-w-7xl gap-8 px-6 py-12 lg:grid-cols-[0.92fr_1.08fr] lg:px-10">
-          <MediaFrame
-            label={about?.title || "About"}
-            mediaUrl={about?.mediaUrl}
-            mediaKind={about?.mediaKind}
-            alt={about?.mediaAlt}
-            className="min-h-[24rem]"
-          />
-          <SectionLead
-            eyebrow={about?.eyebrow}
-            title={about?.title}
-            subtitle={about?.subtitle}
-            body={about?.body}
-          />
+        <section id="about" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+          <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
+            <div className="space-y-6">
+              <SectionLead
+                eyebrow={about?.eyebrow}
+                title={about?.title}
+                subtitle={about?.subtitle}
+                body={about?.body}
+              />
+
+              {highlights.length ? (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {highlights.map((item) => (
+                    <article
+                      key={item.id}
+                      className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/88 p-5"
+                    >
+                      <h3 className="text-xl font-extrabold text-[var(--color-ink)]">
+                        {item.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                        {item.description}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            <MediaFrame
+              label={about?.title || settings?.brandName || "About"}
+              mediaUrl={about?.mediaUrl}
+              mediaKind={about?.mediaKind}
+              alt={about?.mediaAlt}
+              className="min-h-[24rem]"
+            />
+          </div>
+        </section>
+
+        <section id="products" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
+            <SectionLead
+              eyebrow={productsSection?.eyebrow || "Products"}
+              title={productsSection?.title || "Featured products"}
+              subtitle={
+                productsSection?.subtitle ||
+                "See a few current listings, then move into the full browse view."
+              }
+              body={productsSection?.body}
+            />
+            <Link
+              href="/products"
+              className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent)]"
+            >
+              Browse more
+            </Link>
+          </div>
+
+          {featuredProducts.length ? (
+            <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-[rgba(255,249,241,0.74)] p-10">
+              <h2 className="font-display text-4xl">Products will appear here soon</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
+                Once live products are listed in Supabase, the home page will show
+                the latest three here.
+              </p>
+            </div>
+          )}
         </section>
 
         <section id="services" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
@@ -243,22 +301,26 @@ export default async function Home() {
             subtitle={servicesSection?.subtitle}
             body={servicesSection?.body}
           />
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+
+          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {services.map((service) => (
               <article
                 key={service.id}
-                className="overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-white/90"
+                className="overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-white/88"
               >
-                <MediaFrame
-                  label={service.title}
-                  mediaUrl={service.imageUrl}
-                  mediaKind="image"
-                  alt={service.title}
-                  className="h-64 rounded-none border-0"
-                />
-                <div className="space-y-3 p-6">
-                  <h3 className="font-display text-3xl leading-none">{service.title}</h3>
-                  <p className="text-sm leading-7 text-[var(--color-muted)]">
+                {service.imageUrl ? (
+                  <img
+                    src={service.imageUrl}
+                    alt={service.title}
+                    className="h-56 w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : null}
+                <div className="p-6">
+                  <h3 className="text-2xl font-extrabold text-[var(--color-ink)]">
+                    {service.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
                     {service.description}
                   </p>
                 </div>
@@ -268,116 +330,107 @@ export default async function Home() {
         </section>
 
         <section className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                Featured Catalog
-              </p>
-              <h2 className="mt-2 font-display text-5xl leading-none">
-                Live product listings from Supabase
-              </h2>
-            </div>
-            <Link
-              href="/catalog"
-              className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
-            >
-              Browse full catalog
-            </Link>
-          </div>
+          <div className="grid gap-6 rounded-[2.4rem] bg-[linear-gradient(150deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_70%,black_30%))] px-8 py-10 text-white lg:grid-cols-[1fr_0.9fr]">
+            <SectionLead
+              eyebrow={reliability?.eyebrow}
+              title={reliability?.title}
+              subtitle={reliability?.subtitle}
+              body={reliability?.body}
+              inverse
+            />
 
-          <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </section>
-
-        <section id="why-us" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <SectionLead
-            eyebrow={reliability?.eyebrow}
-            title={reliability?.title}
-            subtitle={reliability?.subtitle}
-            body={reliability?.body}
-          />
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {highlights.map((item) => (
-              <article
-                key={item.id}
-                className="rounded-[2rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-surface)_88%,transparent)] p-6"
-              >
-                <h3 className="text-lg font-extrabold text-[var(--color-ink)]">
-                  {item.title}
-                </h3>
-                <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                  {item.description}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <article className="rounded-[1.8rem] border border-white/15 bg-white/8 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/65">
+                  Order path
+                </p>
+                <p className="mt-3 text-sm leading-7 text-white/82">
+                  Browse products, move into offline checkout, upload proof of
+                  payment, and wait for admin confirmation.
                 </p>
               </article>
-            ))}
+              <article className="rounded-[1.8rem] border border-white/15 bg-white/8 p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/65">
+                  Customer access
+                </p>
+                <p className="mt-3 text-sm leading-7 text-white/82">
+                  Account login is optional, but signed-in customers can track
+                  status and open receipts later.
+                </p>
+              </article>
+            </div>
           </div>
         </section>
 
-        <section id="gallery" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <SectionLead
-            eyebrow={gallery?.eyebrow}
-            title={gallery?.title}
-            subtitle={gallery?.subtitle}
-            body={gallery?.body}
-          />
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            {galleryItems.map((item) => (
-              <article
-                key={item.id}
-                className="overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-white/90"
-              >
-                <MediaFrame
-                  label={item.title}
-                  mediaUrl={item.mediaUrl}
-                  mediaKind={item.mediaKind}
-                  alt={item.title}
-                  className="h-72 rounded-none border-0"
-                />
-                <div className="space-y-3 p-6">
-                  <h3 className="font-display text-3xl leading-none">{item.title}</h3>
-                  {item.description ? (
-                    <p className="text-sm leading-7 text-[var(--color-muted)]">
-                      {item.description}
-                    </p>
-                  ) : null}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+        {galleryItems.length ? (
+          <section id="gallery" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+            <div className="mb-8">
+              <SectionLead
+                eyebrow={gallery?.eyebrow}
+                title={gallery?.title}
+                subtitle={gallery?.subtitle}
+                body={gallery?.body}
+              />
+            </div>
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {galleryItems.map((item) => (
+                <article
+                  key={item.id}
+                  className="overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-white/88"
+                >
+                  <MediaFrame
+                    label={item.title}
+                    mediaUrl={item.mediaUrl}
+                    mediaKind={item.mediaKind}
+                    alt={item.title}
+                    className="h-72 rounded-none border-0"
+                  />
+                  <div className="p-6">
+                    <h3 className="text-2xl font-extrabold">{item.title}</h3>
+                    {item.description ? (
+                      <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                        {item.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section id="team" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <SectionLead
-            eyebrow={team?.eyebrow}
-            title={team?.title}
-            subtitle={team?.subtitle}
-            body={team?.body}
-          />
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mb-8">
+            <SectionLead
+              eyebrow={team?.eyebrow}
+              title={team?.title}
+              subtitle={team?.subtitle}
+              body={team?.body}
+            />
+          </div>
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {teamMembers.map((member) => (
               <article
                 key={member.id}
-                className="overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-white/90"
+                className="overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-white/88"
               >
-                <MediaFrame
-                  label={member.name}
-                  mediaUrl={member.imageUrl}
-                  mediaKind="image"
-                  alt={member.name}
-                  className="h-80 rounded-none border-0"
-                />
-                <div className="space-y-3 p-6">
-                  <div>
-                    <h3 className="font-display text-3xl leading-none">{member.name}</h3>
-                    <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--color-secondary)]">
-                      {member.role}
-                    </p>
-                  </div>
+                {member.imageUrl ? (
+                  <img
+                    src={member.imageUrl}
+                    alt={member.name}
+                    className="h-72 w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="h-72 bg-[linear-gradient(145deg,var(--color-primary),var(--color-secondary))]" />
+                )}
+                <div className="p-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
+                    {member.role}
+                  </p>
+                  <h3 className="mt-2 text-2xl font-extrabold">{member.name}</h3>
                   {member.bio ? (
-                    <p className="text-sm leading-7 text-[var(--color-muted)]">
+                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
                       {member.bio}
                     </p>
                   ) : null}
@@ -387,122 +440,123 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="clients" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <SectionLead
-            eyebrow={clientsSection?.eyebrow}
-            title={clientsSection?.title}
-            subtitle={clientsSection?.subtitle}
-            body={clientsSection?.body}
-          />
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {clients.map((client) => {
-              const content = (
-                <article className="flex min-h-44 items-center justify-center rounded-[2rem] border border-[var(--color-line)] bg-white/90 p-6">
+        {clients.length ? (
+          <section id="clients" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+            <div className="mb-8">
+              <SectionLead
+                eyebrow={clientsSection?.eyebrow}
+                title={clientsSection?.title}
+                subtitle={clientsSection?.subtitle}
+                body={clientsSection?.body}
+              />
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+              {clients.map((client) => (
+                <article
+                  key={client.id}
+                  className="rounded-[2rem] border border-[var(--color-line)] bg-white/88 p-6"
+                >
                   {client.logoUrl ? (
                     <img
                       src={client.logoUrl}
                       alt={client.name}
-                      className="max-h-20 max-w-full object-contain"
+                      className="h-16 w-auto max-w-full object-contain"
                       loading="lazy"
                     />
-                  ) : (
-                    <p className="text-center text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-ink)]">
-                      {client.name}
-                    </p>
-                  )}
+                  ) : null}
+                  <p className="mt-4 text-lg font-extrabold">{client.name}</p>
                 </article>
-              );
+              ))}
+            </div>
+          </section>
+        ) : null}
 
-              return client.websiteUrl ? (
-                <Link key={client.id} href={client.websiteUrl}>
-                  {content}
+        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+          <div className="rounded-[2.4rem] border border-[var(--color-line)] bg-white/92 px-8 py-10">
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
+                  Next step
+                </p>
+                <h2 className="mt-2 font-display text-5xl leading-none">
+                  Ready to place an order?
+                </h2>
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
+                  Move into the product browse area to choose a listing, then open
+                  the offline checkout page when you are ready to pay and upload
+                  your proof.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/products"
+                  className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white"
+                >
+                  Browse products
                 </Link>
-              ) : (
-                <div key={client.id}>{content}</div>
-              );
-            })}
+                <Link
+                  href="/account"
+                  className="rounded-full border border-[var(--color-line)] px-6 py-4 text-sm font-semibold"
+                >
+                  Open account
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section
-          id="booking"
-          className="mx-auto grid max-w-7xl gap-8 px-6 py-12 lg:grid-cols-[1.02fr_0.98fr] lg:px-10"
-        >
-          <div className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6 lg:p-8">
+        <section id="contact" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
             <SectionLead
-              eyebrow={booking?.eyebrow}
-              title={booking?.title}
-              subtitle={booking?.subtitle}
-              body={booking?.body}
+              eyebrow={contactSection?.eyebrow}
+              title={contactSection?.title}
+              subtitle={contactSection?.subtitle}
+              body={contactSection?.body}
             />
 
-            <div className="mt-8 grid gap-4">
-              <Link
-                href="/catalog"
-                className="rounded-[1.6rem] border border-[var(--color-line)] bg-[var(--color-accent)] px-5 py-4 text-sm font-semibold text-[var(--color-ink)]"
-              >
-                Browse products
-              </Link>
-              <Link
-                href="/checkout/offline"
-                className="rounded-[1.6rem] bg-[var(--color-primary)] px-5 py-4 text-sm font-semibold text-white"
-              >
-                Start checkout
-              </Link>
-              {paymentAccount ? (
-                <div className="rounded-[1.6rem] border border-[var(--color-line)] bg-white px-5 py-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-                    Payment Account
-                  </p>
-                  <p className="mt-3 text-lg font-bold text-[var(--color-ink)]">
-                    {paymentAccount.bankName}
-                  </p>
-                  <p className="text-sm text-[var(--color-muted)]">
-                    {paymentAccount.accountName}
-                  </p>
-                  <p className="mt-1 text-2xl font-extrabold text-[var(--color-ink)]">
-                    {paymentAccount.accountNumber}
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    {paymentAccount.note}
-                  </p>
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div id="contact" className="space-y-6">
-            <div className="rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-primary)] p-6 text-white lg:p-8">
-              <SectionLead
-                eyebrow={contactSection?.eyebrow}
-                title={contactSection?.title}
-                subtitle={contactSection?.subtitle}
-                body={contactSection?.body}
-                inverse
-              />
-            </div>
-
-            <div className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6 lg:p-8">
-              <div className="space-y-4 text-sm leading-7 text-[var(--color-muted)]">
-                {contact?.phone1 ? <p>{contact.phone1}</p> : null}
-                {contact?.phone2 ? <p>{contact.phone2}</p> : null}
-                {contact?.email ? <p>{contact.email}</p> : null}
-                {contact?.address ? <p>{contact.address}</p> : null}
+            <div className="rounded-[2rem] border border-[var(--color-line)] bg-white/88 p-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {contact?.phone1 ? (
+                  <article className="rounded-[1.6rem] bg-[rgba(245,249,255,0.9)] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                      Phone
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
+                      {contact.phone1}
+                    </p>
+                  </article>
+                ) : null}
+                {contact?.phone2 ? (
+                  <article className="rounded-[1.6rem] bg-[rgba(245,249,255,0.9)] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                      Alternate
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
+                      {contact.phone2}
+                    </p>
+                  </article>
+                ) : null}
+                {contact?.email ? (
+                  <article className="rounded-[1.6rem] bg-[rgba(245,249,255,0.9)] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                      Email
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
+                      {contact.email}
+                    </p>
+                  </article>
+                ) : null}
+                {contact?.address ? (
+                  <article className="rounded-[1.6rem] bg-[rgba(245,249,255,0.9)] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                      Address
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
+                      {contact.address}
+                    </p>
+                  </article>
+                ) : null}
               </div>
-
-              {socialLinks.length ? (
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {socialLinks.map((link) => (
-                    <Link
-                      key={link.id}
-                      href={link.url}
-                      className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
-                    >
-                      {link.displayName}
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
             </div>
           </div>
         </section>

@@ -1,7 +1,11 @@
 import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
-import { hasPublicSupabaseConfig } from "@/lib/supabase/env";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import {
+  hasPublicSupabaseConfig,
+  hasServiceRoleConfig,
+} from "@/lib/supabase/env";
 import type {
   AdminDashboardData,
   ClientItem,
@@ -134,10 +138,17 @@ type OrderRow = {
   customer_name: string;
   customer_phone: string;
   customer_email: string | null;
+  product_slug: string;
   product_name: string;
   total_amount: number;
+  quantity: number;
   delivery_state: string;
   delivery_address: string;
+  width: string;
+  height: string;
+  selected_color: string;
+  mount_type: string;
+  control_side: string;
   notes: string | null;
   status: OrderItem["status"];
   payment_proof_path: string | null;
@@ -368,10 +379,40 @@ function mapOrder(row: OrderRow): OrderItem {
     status: row.status,
     createdAt: row.created_at,
     productName: row.product_name,
+    productSlug: row.product_slug,
     amount: row.total_amount,
+    quantity: row.quantity,
     deliveryState: row.delivery_state,
+    width: row.width,
+    height: row.height,
+    selectedColor: row.selected_color,
+    mountType: row.mount_type,
+    controlSide: row.control_side,
     paymentProofUploaded: Boolean(row.payment_proof_path),
   };
+}
+
+async function createProofUrl(path: string | null) {
+  if (!path) {
+    return null;
+  }
+
+  const serviceSupabase = createSupabaseServiceClient();
+
+  if (serviceSupabase && hasServiceRoleConfig) {
+    const { data } = await serviceSupabase.storage
+      .from("payment-proofs")
+      .createSignedUrl(path, 60 * 60);
+
+    return data?.signedUrl ?? null;
+  }
+
+  const serverSupabase = await createSupabaseServerClient();
+  const { data } = await serverSupabase.storage
+    .from("payment-proofs")
+    .createSignedUrl(path, 60 * 60);
+
+  return data?.signedUrl ?? null;
 }
 
 export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
@@ -509,7 +550,7 @@ export const getProducts = cache(async (): Promise<Product[]> => {
 
 export const getFeaturedProducts = cache(async (): Promise<Product[]> => {
   const products = await getProducts();
-  return products.slice(0, 4);
+  return products.slice(0, 3);
 });
 
 export async function getProductBySlug(slug: string) {
@@ -669,9 +710,50 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     supabase.from("products").select("*").order("created_at", { ascending: false }),
   ]);
 
+  const mappedOrders = await Promise.all(
+    ((orders as OrderRow[] | null) ?? []).map(async (order) => ({
+      ...mapOrder(order),
+      paymentProofUrl: await createProofUrl(order.payment_proof_path),
+    })),
+  );
+
   return {
     ...landingData,
-    orders: (orders as OrderRow[] | null)?.map(mapOrder) ?? [],
+    orders: mappedOrders,
     products: (products as ProductRow[] | null)?.map(mapProduct) ?? [],
   };
+}
+
+export async function getCustomerOrders(userId: string): Promise<OrderItem[]> {
+  if (!hasPublicSupabaseConfig) {
+    return [];
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("customer_user_id", userId)
+    .order("created_at", { ascending: false });
+
+  return (data as OrderRow[] | null)?.map(mapOrder) ?? [];
+}
+
+export async function getCustomerOrderByReference(
+  userId: string,
+  reference: string,
+): Promise<OrderItem | null> {
+  if (!hasPublicSupabaseConfig) {
+    return null;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("customer_user_id", userId)
+    .eq("reference", reference)
+    .maybeSingle<OrderRow>();
+
+  return data ? mapOrder(data) : null;
 }
