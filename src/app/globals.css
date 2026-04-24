@@ -24,13 +24,13 @@
 
 html {
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--color-secondary) 14%, transparent), transparent 28%),
-    radial-gradient(circle at top right, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 24%),
+    radial-gradient(circle at top left, color-mix(in srgb, var(--color-secondary) 18%, transparent), transparent 32%),
+    radial-gradient(circle at 85% 12%, color-mix(in srgb, var(--color-primary) 18%, transparent), transparent 26%),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-page) 88%, white 12%) 0%,
-      var(--color-page) 40%,
-      color-mix(in srgb, var(--color-page) 92%, var(--color-accent) 8%) 100%
+      color-mix(in srgb, var(--color-page) 82%, white 18%) 0%,
+      color-mix(in srgb, var(--color-page) 94%, var(--color-accent) 6%) 52%,
+      color-mix(in srgb, var(--color-page) 84%, white 16%) 100%
     );
 }
 
@@ -39,6 +39,9 @@ body {
   font-family: var(--font-body), sans-serif;
   color: var(--color-ink);
   min-height: 100vh;
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--color-secondary) 7%, transparent), transparent 18%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
 }
 
 a {
@@ -64,4 +67,30 @@ summary::-webkit-details-marker {
 ::selection {
   background: color-mix(in srgb, var(--color-secondary) 28%, transparent);
   color: var(--color-ink);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: color-mix(in srgb, var(--color-muted) 62%, white 38%);
+}
+
+button,
+input,
+select,
+textarea,
+a {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, white 55%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, white 90%);
 }

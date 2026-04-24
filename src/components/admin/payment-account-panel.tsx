@@ -60,7 +60,7 @@ export function PaymentAccountPanel({
         <button
           type="submit"
           disabled={!actionsEnabled}
-          className="rounded-full bg-[var(--color-ink)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-forest)] disabled:cursor-not-allowed disabled:opacity-60 lg:col-span-2"
+          className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-92 disabled:cursor-not-allowed disabled:opacity-60 lg:col-span-2"
         >
           Save payment account
         </button>

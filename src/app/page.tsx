@@ -72,14 +72,9 @@ function MediaFrame({
   if (mediaUrl && mediaKind === "video") {
     return (
       <div
-        className={`overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
+        className={`overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
       >
-        <video
-          src={mediaUrl}
-          controls
-          playsInline
-          className="h-full w-full object-cover"
-        />
+        <video src={mediaUrl} controls playsInline className="h-full w-full object-cover" />
       </div>
     );
   }
@@ -87,21 +82,16 @@ function MediaFrame({
   if (mediaUrl) {
     return (
       <div
-        className={`overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
+        className={`overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
       >
-        <img
-          src={mediaUrl}
-          alt={alt || label}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
+        <img src={mediaUrl} alt={alt || label} className="h-full w-full object-cover" loading="lazy" />
       </div>
     );
   }
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_38%,white_62%))] ${className}`}
+      className={`relative overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_35%,white_65%))] ${className}`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.24),transparent_34%)]" />
       <div className="absolute inset-y-0 left-[18%] w-px bg-white/30" />
@@ -124,6 +114,7 @@ export default async function Home() {
     teamMembers,
     clients,
     galleryItems,
+    deliveryStates,
   } = await getLandingPageData();
 
   const hero = sections.hero;
@@ -137,17 +128,22 @@ export default async function Home() {
   const contactSection = sections.contact;
 
   const heroMetrics = [
+    { label: "Live Products", value: featuredProducts.length.toString().padStart(2, "0") },
+    { label: "Delivery States", value: deliveryStates.length.toString().padStart(2, "0") },
+    { label: "Service Units", value: services.length.toString().padStart(2, "0") },
+  ];
+  const orderSteps = [
     {
-      label: "Products",
-      value: featuredProducts.length.toString().padStart(2, "0"),
+      title: "Browse products",
+      body: "Open the catalog, compare blinds, and choose a product that fits your room and finish style.",
     },
     {
-      label: servicesSection?.title || "Services",
-      value: services.length.toString().padStart(2, "0"),
+      title: "Confirm your order",
+      body: "Choose colour, quantity, size, delivery state, and installation details from a guided checkout page.",
     },
     {
-      label: team?.title || "Team",
-      value: teamMembers.length.toString().padStart(2, "0"),
+      title: "Pay and track",
+      body: "Transfer to the company account, upload your proof, and come back later to check progress.",
     },
   ];
 
@@ -155,38 +151,31 @@ export default async function Home() {
     <div id="top" className="min-h-screen">
       <SiteHeader />
 
-      <main>
+      <main className="pb-8">
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--color-secondary)_22%,transparent),transparent_36%)]" />
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:px-10 lg:py-24">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--color-secondary)_18%,transparent),transparent_36%)]" />
+          <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 lg:py-20">
             <div className="space-y-8">
+              <div className="inline-flex flex-wrap items-center gap-3 rounded-full border border-[var(--color-line)] bg-white/86 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                <span>Storefront</span>
+                <span className="h-1 w-1 rounded-full bg-[var(--color-secondary)]" />
+                <span>Company profile</span>
+                <span className="h-1 w-1 rounded-full bg-[var(--color-secondary)]" />
+                <span>Easy ordering</span>
+              </div>
+
               <SectionLead
-                eyebrow={hero?.eyebrow}
-                title={hero?.title}
+                eyebrow={hero?.eyebrow || "Premium blind store"}
+                title={hero?.title || "Shop blinds with a clearer path from selection to payment"}
                 subtitle={hero?.subtitle}
                 body={hero?.body || settings?.tagline}
               />
-
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href={hero?.primaryCtaLink || "/products"}
-                  className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white transition hover:opacity-90"
-                >
-                  {hero?.primaryCtaLabel || "Browse products"}
-                </Link>
-                <Link
-                  href={hero?.secondaryCtaLink || "/account"}
-                  className="rounded-full border border-[var(--color-line)] bg-white px-6 py-4 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent)]"
-                >
-                  {hero?.secondaryCtaLabel || "Track my orders"}
-                </Link>
-              </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
                 {heroMetrics.map((metric) => (
                   <article
                     key={metric.label}
-                    className="rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-surface)_88%,transparent)] p-5"
+                    className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/82 p-5 shadow-[0_25px_55px_-42px_rgba(15,23,42,0.55)]"
                   >
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
                       {metric.label}
@@ -197,6 +186,27 @@ export default async function Home() {
                   </article>
                 ))}
               </div>
+
+              <div className="flex flex-wrap gap-4">
+                <Link
+                  href={hero?.primaryCtaLink || "/products"}
+                  className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white shadow-[0_22px_45px_-24px_rgba(10,37,64,0.78)]"
+                >
+                  {hero?.primaryCtaLabel || "Shop products"}
+                </Link>
+                <Link
+                  href="/checkout/offline"
+                  className="rounded-full border border-[var(--color-line)] bg-white px-6 py-4 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-accent)]"
+                >
+                  Start checkout
+                </Link>
+                <Link
+                  href={hero?.secondaryCtaLink || "/account"}
+                  className="rounded-full border border-[var(--color-line)] bg-transparent px-6 py-4 text-sm font-semibold text-[var(--color-ink)]"
+                >
+                  {hero?.secondaryCtaLabel || "Track orders"}
+                </Link>
+              </div>
             </div>
 
             <div className="grid gap-5">
@@ -205,18 +215,97 @@ export default async function Home() {
                 mediaUrl={hero?.mediaUrl}
                 mediaKind={hero?.mediaKind}
                 alt={hero?.mediaAlt}
-                className="min-h-[28rem]"
+                className="min-h-[32rem]"
               />
 
-              {settings?.tagline ? (
-                <article className="rounded-[2rem] border border-[var(--color-line)] bg-white/90 p-6">
-                  <p className="text-sm leading-8 text-[var(--color-muted)]">
-                    {settings.tagline}
+              <div className="grid gap-4 md:grid-cols-[1.05fr_0.95fr]">
+                <article className="rounded-[2rem] border border-[var(--color-line)] bg-white/90 p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
+                    Shopping Made Simple
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                    Customers should not struggle through forms first. The store now leads
+                    with products, pricing, and a guided order flow.
                   </p>
                 </article>
-              ) : null}
+                <article className="rounded-[2rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-primary)_94%,white_6%)] p-5 text-white">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
+                    Order support
+                  </p>
+                  <p className="mt-3 text-sm leading-7 text-white/82">
+                    {contact?.phone1
+                      ? `Need help before payment? Call ${contact.phone1}.`
+                      : "Need help before payment? Use the contact section below."}
+                  </p>
+                </article>
+              </div>
             </div>
           </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
+          <div className="grid gap-4 lg:grid-cols-3">
+            {orderSteps.map((step, index) => (
+              <article
+                key={step.title}
+                className="rounded-[2rem] border border-[var(--color-line)] bg-white/84 p-6 shadow-[0_22px_50px_-40px_rgba(15,23,42,0.65)]"
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
+                  Step {index + 1}
+                </p>
+                <h3 className="mt-3 text-2xl font-extrabold text-[var(--color-ink)]">
+                  {step.title}
+                </h3>
+                <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                  {step.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="products" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
+            <SectionLead
+              eyebrow={productsSection?.eyebrow || "Featured catalog"}
+              title={productsSection?.title || "Start from the best-selling products"}
+              subtitle={
+                productsSection?.subtitle ||
+                "A proper store should help people start quickly. These featured listings do that."
+              }
+              body={productsSection?.body}
+            />
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/products"
+                className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white"
+              >
+                View all products
+              </Link>
+              <Link
+                href="/checkout/offline"
+                className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
+              >
+                Go to checkout
+              </Link>
+            </div>
+          </div>
+
+          {featuredProducts.length ? (
+            <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/70 p-10">
+              <h2 className="font-display text-4xl">Products will appear here soon</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
+                Once live products are listed in Supabase, the homepage will show
+                featured products here.
+              </p>
+            </div>
+          )}
         </section>
 
         <section id="about" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
@@ -253,56 +342,22 @@ export default async function Home() {
               mediaUrl={about?.mediaUrl}
               mediaKind={about?.mediaKind}
               alt={about?.mediaAlt}
-              className="min-h-[24rem]"
+              className="min-h-[25rem]"
             />
           </div>
-        </section>
-
-        <section id="products" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
-            <SectionLead
-              eyebrow={productsSection?.eyebrow || "Products"}
-              title={productsSection?.title || "Featured products"}
-              subtitle={
-                productsSection?.subtitle ||
-                "See a few current listings, then move into the full browse view."
-              }
-              body={productsSection?.body}
-            />
-            <Link
-              href="/products"
-              className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)] transition hover:bg-[var(--color-accent)]"
-            >
-              Browse more
-            </Link>
-          </div>
-
-          {featuredProducts.length ? (
-            <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-[rgba(255,249,241,0.74)] p-10">
-              <h2 className="font-display text-4xl">Products will appear here soon</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                Once live products are listed in Supabase, the home page will show
-                the latest three here.
-              </p>
-            </div>
-          )}
         </section>
 
         <section id="services" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <SectionLead
-            eyebrow={servicesSection?.eyebrow}
-            title={servicesSection?.title}
-            subtitle={servicesSection?.subtitle}
-            body={servicesSection?.body}
-          />
+          <div className="mb-8">
+            <SectionLead
+              eyebrow={servicesSection?.eyebrow}
+              title={servicesSection?.title}
+              subtitle={servicesSection?.subtitle}
+              body={servicesSection?.body}
+            />
+          </div>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {services.map((service) => (
               <article
                 key={service.id}
@@ -315,7 +370,9 @@ export default async function Home() {
                     className="h-56 w-full object-cover"
                     loading="lazy"
                   />
-                ) : null}
+                ) : (
+                  <div className="h-56 bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_34%,white_66%))]" />
+                )}
                 <div className="p-6">
                   <h3 className="text-2xl font-extrabold text-[var(--color-ink)]">
                     {service.title}
@@ -330,10 +387,10 @@ export default async function Home() {
         </section>
 
         <section className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <div className="grid gap-6 rounded-[2.4rem] bg-[linear-gradient(150deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_70%,black_30%))] px-8 py-10 text-white lg:grid-cols-[1fr_0.9fr]">
+          <div className="grid gap-6 rounded-[2.5rem] bg-[linear-gradient(150deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_72%,black_28%))] px-8 py-10 text-white lg:grid-cols-[1fr_0.95fr]">
             <SectionLead
               eyebrow={reliability?.eyebrow}
-              title={reliability?.title}
+              title={reliability?.title || "Order confidence"}
               subtitle={reliability?.subtitle}
               body={reliability?.body}
               inverse
@@ -342,20 +399,20 @@ export default async function Home() {
             <div className="grid gap-4 sm:grid-cols-2">
               <article className="rounded-[1.8rem] border border-white/15 bg-white/8 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/65">
-                  Order path
+                  Product-first flow
                 </p>
                 <p className="mt-3 text-sm leading-7 text-white/82">
-                  Browse products, move into offline checkout, upload proof of
-                  payment, and wait for admin confirmation.
+                  Customers see product details, pricing, and guidance before they ever
+                  face the order form.
                 </p>
               </article>
               <article className="rounded-[1.8rem] border border-white/15 bg-white/8 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/65">
-                  Customer access
+                  Manual verification
                 </p>
                 <p className="mt-3 text-sm leading-7 text-white/82">
-                  Account login is optional, but signed-in customers can track
-                  status and open receipts later.
+                  Offline payments remain supported while proof upload and order tracking
+                  stay visible to both the business and the customer.
                 </p>
               </article>
             </div>
@@ -472,19 +529,19 @@ export default async function Home() {
         ) : null}
 
         <section className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <div className="rounded-[2.4rem] border border-[var(--color-line)] bg-white/92 px-8 py-10">
+          <div className="rounded-[2.5rem] border border-[var(--color-line)] bg-white/92 px-8 py-10">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                  Next step
+                  Ready to order
                 </p>
                 <h2 className="mt-2 font-display text-5xl leading-none">
-                  Ready to place an order?
+                  Move from browsing to payment without confusion.
                 </h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                  Move into the product browse area to choose a listing, then open
-                  the offline checkout page when you are ready to pay and upload
-                  your proof.
+                  Customers can open the catalog, choose a product, and place orders
+                  through a more realistic checkout experience while the landing page still
+                  tells the company story.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -492,13 +549,13 @@ export default async function Home() {
                   href="/products"
                   className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white"
                 >
-                  Browse products
+                  Shop now
                 </Link>
                 <Link
-                  href="/account"
+                  href="/checkout/offline"
                   className="rounded-full border border-[var(--color-line)] px-6 py-4 text-sm font-semibold"
                 >
-                  Open account
+                  Go to checkout
                 </Link>
               </div>
             </div>
@@ -566,4 +623,3 @@ export default async function Home() {
     </div>
   );
 }
-
