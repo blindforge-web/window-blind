@@ -117,6 +117,7 @@ create table public.products (
   collection text not null,
   short_description text not null,
   description text not null,
+  image_url text,
   base_price integer not null,
   sale_price integer,
   lead_time text not null,

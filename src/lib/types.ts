@@ -126,6 +126,7 @@ export type Product = {
   collection: string;
   shortDescription: string;
   description: string;
+  imageUrl: string | null;
   basePrice: number;
   salePrice: number | null;
   leadTime: string;

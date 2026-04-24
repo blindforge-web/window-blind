@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   deleteClient,
@@ -45,6 +46,45 @@ const editableSections = [
   "clients",
   "contact",
 ] as const;
+
+const dashboardViews = [
+  {
+    id: "overview",
+    label: "Overview",
+    description: "Snapshot of content, catalog, and order activity.",
+  },
+  {
+    id: "brand",
+    label: "Brand",
+    description: "Branding, theme settings, and contact information.",
+  },
+  {
+    id: "content",
+    label: "Content",
+    description: "Homepage sections, navigation, media, and supporting content blocks.",
+  },
+  {
+    id: "catalog",
+    label: "Catalog",
+    description: "Create, edit, price, and list products.",
+  },
+  {
+    id: "operations",
+    label: "Operations",
+    description: "Payment setup, delivery states, and order handling.",
+  },
+  {
+    id: "security",
+    label: "Security",
+    description: "Restricted admin-only account tools.",
+  },
+] as const;
+
+type DashboardViewId = (typeof dashboardViews)[number]["id"];
+
+function isDashboardView(value?: string): value is DashboardViewId {
+  return dashboardViews.some((view) => view.id === value);
+}
 
 function PanelHeading({
   eyebrow,
@@ -256,7 +296,12 @@ function SectionForm({ section }: { section?: SiteSection }) {
   );
 }
 
-export default async function AdminDashboardPage() {
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
+  const params = await searchParams;
   const admin = hasPublicSupabaseConfig ? await getCurrentAdmin() : null;
 
   if (hasPublicSupabaseConfig && !admin) {
@@ -268,6 +313,8 @@ export default async function AdminDashboardPage() {
   const pendingOrders = dashboard.orders.filter(
     (order) => order.status !== "paid_delivered",
   ).length;
+  const selectedView = isDashboardView(params.view) ? params.view : "overview";
+  const activeView = dashboardViews.find((view) => view.id === selectedView) ?? dashboardViews[0];
 
   return (
     <div className="min-h-screen">
@@ -299,6 +346,45 @@ export default async function AdminDashboardPage() {
           </div>
         ) : null}
 
+        <section className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+          <aside className="h-fit rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-4 lg:sticky lg:top-24">
+            <p className="px-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
+              Admin Views
+            </p>
+            <nav className="mt-3 space-y-2">
+              {dashboardViews.map((view) => {
+                const isActive = selectedView === view.id;
+                return (
+                  <Link
+                    key={view.id}
+                    href={`/admin/dashboard?view=${view.id}`}
+                    className={`block rounded-2xl border px-3 py-3 transition ${
+                      isActive
+                        ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+                        : "border-[var(--color-line)] bg-white text-[var(--color-ink)]"
+                    }`}
+                  >
+                    <p className="text-sm font-bold">{view.label}</p>
+                    <p className={`mt-1 text-xs leading-5 ${isActive ? "text-white/80" : "text-[var(--color-muted)]"}`}>
+                      {view.description}
+                    </p>
+                  </Link>
+                );
+              })}
+            </nav>
+          </aside>
+
+          <div className="space-y-8">
+            <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
+                {activeView.label}
+              </p>
+              <h2 className="mt-2 font-display text-4xl leading-none">
+                {activeView.description}
+              </h2>
+            </section>
+
+        {selectedView === "overview" ? (
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {[
             ["Services", formatCompactNumber(dashboard.services.length)],
@@ -317,9 +403,39 @@ export default async function AdminDashboardPage() {
             </article>
           ))}
         </section>
+        ) : null}
 
-        {admin?.role === "super_admin" ? <AdminPasswordResetPanel /> : null}
+        {selectedView === "overview" ? (
+          <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
+            <PanelHeading
+              eyebrow="Quick Access"
+              title="Jump into editing"
+              body="Open one focused workspace at a time so content editing stays organized."
+            />
+            <div className="grid gap-3 md:grid-cols-2">
+              {dashboardViews
+                .filter((view) => view.id !== "overview")
+                .map((view) => (
+                  <Link
+                    key={view.id}
+                    href={`/admin/dashboard?view=${view.id}`}
+                    className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:border-[var(--color-primary)]"
+                  >
+                    {view.label}
+                  </Link>
+                ))}
+            </div>
+          </section>
+        ) : null}
 
+        {selectedView === "security" && admin?.role === "super_admin" ? <AdminPasswordResetPanel /> : null}
+        {selectedView === "security" && admin?.role !== "super_admin" ? (
+          <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6 text-sm text-[var(--color-muted)]">
+            Only `super_admin` accounts can access security tools.
+          </section>
+        ) : null}
+
+        {selectedView === "brand" ? (
         <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
             <PanelHeading
@@ -567,7 +683,10 @@ export default async function AdminDashboardPage() {
             </form>
           </section>
         </section>
+        ) : null}
 
+        {selectedView === "content" ? (
+        <>
         <section className="space-y-5">
           <PanelHeading
             eyebrow="Sections"
@@ -1501,9 +1620,14 @@ export default async function AdminDashboardPage() {
             </form>
           </div>
         </section>
+        </>
+        ) : null}
 
+        {selectedView === "catalog" ? (
         <CreateProductPanel actionsEnabled={actionsEnabled} />
+        ) : null}
 
+        {selectedView === "operations" ? (
         <PaymentAccountPanel
           paymentAccount={
             dashboard.paymentAccount ?? {
@@ -1515,7 +1639,9 @@ export default async function AdminDashboardPage() {
           }
           actionsEnabled={actionsEnabled}
         />
+        ) : null}
 
+        {selectedView === "catalog" ? (
         <section className="space-y-5">
           <PanelHeading
             eyebrow="Catalog"
@@ -1542,7 +1668,9 @@ export default async function AdminDashboardPage() {
             </div>
           )}
         </section>
+        ) : null}
 
+        {selectedView === "operations" ? (
         <section className="space-y-5">
           <PanelHeading
             eyebrow="Delivery"
@@ -1560,7 +1688,9 @@ export default async function AdminDashboardPage() {
             ))}
           </div>
         </section>
+        ) : null}
 
+        {selectedView === "operations" ? (
         <section className="space-y-5">
           <PanelHeading
             eyebrow="Orders"
@@ -1587,6 +1717,9 @@ export default async function AdminDashboardPage() {
               </p>
             </div>
           )}
+        </section>
+        ) : null}
+          </div>
         </section>
       </main>
     </div>

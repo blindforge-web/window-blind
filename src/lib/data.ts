@@ -162,6 +162,7 @@ type ProductRow = {
   collection: string;
   short_description: string;
   description: string;
+  image_url: string | null;
   base_price: number;
   sale_price: number | null;
   lead_time: string;
@@ -232,6 +233,7 @@ function mapProduct(row: ProductRow): Product {
     collection: row.collection,
     shortDescription: row.short_description,
     description: row.description,
+    imageUrl: row.image_url,
     basePrice: row.base_price,
     salePrice: row.sale_price,
     leadTime: row.lead_time,

@@ -11,7 +11,7 @@ export async function SiteHeader() {
     getCurrentUser(),
     getCurrentAdmin(),
   ]);
-  const brandLabel = settings?.shortName || settings?.brandName || "BlindForge";
+  const brandLabel = settings?.shortName || settings?.brandName || "Sunpilot";
   const navItems = navigation.length
     ? navigation
     : [
@@ -126,3 +126,4 @@ export async function SiteHeader() {
     </header>
   );
 }
+

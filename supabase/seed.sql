@@ -20,11 +20,11 @@ insert into public.site_settings (
 )
 values (
   'default',
-  'BlindForge',
-  'BlindForge',
+  'Sunpilot',
+  'Sunpilot',
   'Made-to-measure blinds for homes, offices, and commercial interiors.',
   null,
-  'BlindForge manages product selection, measurement guidance, offline payment confirmation, and delivery coordination from one workflow.',
+  'Sunpilot manages product selection, measurement guidance, offline payment confirmation, and delivery coordination from one workflow.',
   '',
   '',
   '',
@@ -135,7 +135,7 @@ values
     'hero',
     'Blind systems and interior finishing',
     'Custom blinds built for practical spaces and clean installation',
-    'BlindForge helps homes, offices, and project teams move from product selection to offline payment and delivery confirmation with less friction.',
+    'Sunpilot helps homes, offices, and project teams move from product selection to offline payment and delivery confirmation with less friction.',
     'Browse the live catalog, choose a product, pay offline, upload your proof, and wait for admin confirmation.',
     'Browse products',
     '/products',
@@ -143,14 +143,14 @@ values
     '/account',
     null,
     'image',
-    'BlindForge hero media',
+    'Sunpilot hero media',
     true
   ),
   (
     'about',
-    'About BlindForge',
+    'About Sunpilot',
     'A workshop-focused brand for made-to-measure blinds',
-    'BlindForge operates from Onitsha and supports residential, office, and commercial blind orders that need clear communication from selection through delivery.',
+    'Sunpilot operates from Onitsha and supports residential, office, and commercial blind orders that need clear communication from selection through delivery.',
     'The business combines measurement support, product guidance, and practical order handling so customers can buy with more confidence.',
     null,
     null,
@@ -158,7 +158,7 @@ values
     null,
     null,
     'image',
-    'About BlindForge',
+    'About Sunpilot',
     true
   ),
   (
@@ -173,14 +173,14 @@ values
     '/account',
     null,
     'image',
-    'BlindForge products',
+    'Sunpilot products',
     true
   ),
   (
     'services',
     'What we handle',
     'Service areas around the product workflow',
-    'BlindForge supports customers before, during, and after product selection.',
+    'Sunpilot supports customers before, during, and after product selection.',
     'These sections can be edited from the admin dashboard as the business focus changes.',
     null,
     null,
@@ -188,7 +188,7 @@ values
     null,
     null,
     'image',
-    'BlindForge services',
+    'Sunpilot services',
     true
   ),
   (
@@ -203,7 +203,7 @@ values
     null,
     null,
     'image',
-    'BlindForge reliability',
+    'Sunpilot reliability',
     true
   ),
   (
@@ -216,8 +216,9 @@ values
     null,
     null,
     null,
+    null,
     'image',
-    'BlindForge gallery',
+    'Sunpilot gallery',
     true
   ),
   (
@@ -230,8 +231,9 @@ values
     null,
     null,
     null,
+    null,
     'image',
-    'BlindForge team',
+    'Sunpilot team',
     true
   ),
   (
@@ -244,8 +246,9 @@ values
     null,
     null,
     null,
+    null,
     'image',
-    'BlindForge clients',
+    'Sunpilot clients',
     true
   ),
   (
@@ -258,8 +261,9 @@ values
     null,
     null,
     null,
+    null,
     'image',
-    'BlindForge contact',
+    'Sunpilot contact',
     true
   )
 on conflict (section_key) do update
@@ -523,3 +527,4 @@ set
   image_url = excluded.image_url,
   sort_order = excluded.sort_order,
   is_active = excluded.is_active;
+

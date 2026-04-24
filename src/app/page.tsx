@@ -201,7 +201,7 @@ export default async function Home() {
 
             <div className="grid gap-5">
               <MediaFrame
-                label={hero?.title || settings?.brandName || "BlindForge"}
+                label={hero?.title || settings?.brandName || "Sunpilot"}
                 mediaUrl={hero?.mediaUrl}
                 mediaKind={hero?.mediaKind}
                 alt={hero?.mediaAlt}
@@ -566,3 +566,4 @@ export default async function Home() {
     </div>
   );
 }
+

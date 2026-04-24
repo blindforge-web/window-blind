@@ -44,6 +44,15 @@ function revalidateSite() {
   revalidatePath("/admin/login");
 }
 
+function revalidateCatalog(slug?: string | null) {
+  revalidateSite();
+  revalidatePath("/catalog");
+  if (slug) {
+    revalidatePath(`/products/${slug}`);
+    revalidatePath(`/blinds/${slug}`);
+  }
+}
+
 function getRedirectPath(formData: FormData, fallback: string) {
   const redirectTo = getText(formData, "redirectTo");
   return redirectTo || fallback;
@@ -133,6 +142,70 @@ function splitList(rawValue: FormDataEntryValue | null) {
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
+}
+
+async function buildProductInput({
+  supabase,
+  formData,
+}: {
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>;
+  formData: FormData;
+}) {
+  const name = getText(formData, "name");
+  const collection = getText(formData, "collection");
+  const shortDescription = getText(formData, "shortDescription");
+  const description = getText(formData, "description");
+  const leadTime = getText(formData, "leadTime");
+  const slug = getText(formData, "slug") || slugify(name);
+  const basePrice = getNumber(formData, "basePrice");
+
+  if (
+    !name ||
+    !slug ||
+    !collection ||
+    !shortDescription ||
+    !description ||
+    !leadTime ||
+    !basePrice
+  ) {
+    return null;
+  }
+
+  const imageUrl = await resolveMediaUrl({
+    supabase,
+    formData,
+    fileKey: "imageFile",
+    urlKey: "imageUrl",
+    currentUrlKey: "currentImageUrl",
+    folder: "products",
+    removeKey: "removeImage",
+  });
+
+  return {
+    slug,
+    name,
+    collection,
+    short_description: shortDescription,
+    description,
+    image_url: imageUrl,
+    base_price: basePrice,
+    sale_price: getText(formData, "salePrice")
+      ? Number(getText(formData, "salePrice"))
+      : null,
+    lead_time: leadTime,
+    rating: getNumber(formData, "rating") || 5,
+    review_count: getNumber(formData, "reviewCount"),
+    badge: getText(formData, "badge") || null,
+    is_listed: isChecked(formData, "isListed"),
+    measurements: splitList(formData.get("measurements")),
+    colors: splitList(formData.get("colors")),
+    features: splitList(formData.get("features")),
+    ideal_for: splitList(formData.get("idealFor")),
+    visual_from: getText(formData, "visualFrom") || "#d7e3f1",
+    visual_to: getText(formData, "visualTo") || "#0A2540",
+    visual_accent: getText(formData, "visualAccent") || "#D4AF37",
+    visual_label: getText(formData, "visualLabel") || collection,
+  };
 }
 
 export async function submitOfflineOrder(
@@ -553,6 +626,7 @@ export async function saveProductPricing(formData: FormData) {
   const productId = getText(formData, "productId");
   const basePrice = getNumber(formData, "basePrice");
   const rawSalePrice = getText(formData, "salePrice");
+  const slug = getText(formData, "slug");
 
   if (!supabase || !productId) {
     return;
@@ -566,10 +640,7 @@ export async function saveProductPricing(formData: FormData) {
     })
     .eq("id", productId);
 
-  revalidatePath("/");
-  revalidatePath("/catalog");
-  revalidatePath("/products");
-  revalidatePath("/admin/dashboard");
+  revalidateCatalog(slug);
 }
 
 export async function createProduct(formData: FormData) {
@@ -579,61 +650,62 @@ export async function createProduct(formData: FormData) {
     return;
   }
 
-  const name = getText(formData, "name");
-  const slug = getText(formData, "slug");
-  const collection = getText(formData, "collection");
-  const shortDescription = getText(formData, "shortDescription");
-  const description = getText(formData, "description");
-  const leadTime = getText(formData, "leadTime");
-  const badge = getText(formData, "badge");
-  const basePrice = getNumber(formData, "basePrice");
-  const rawSalePrice = getText(formData, "salePrice");
+  const input = await buildProductInput({ supabase, formData });
 
-  if (
-    !name ||
-    !slug ||
-    !collection ||
-    !shortDescription ||
-    !description ||
-    !leadTime ||
-    !basePrice
-  ) {
+  if (!input) {
     return;
   }
 
-  await supabase.from("products").insert({
-    name,
-    slug,
-    collection,
-    short_description: shortDescription,
-    description,
-    base_price: basePrice,
-    sale_price: rawSalePrice ? Number(rawSalePrice) : null,
-    lead_time: leadTime,
-    badge: badge || null,
-    is_listed: true,
-    rating: 5,
-    review_count: 0,
-    measurements: splitList(formData.get("measurements")),
-    colors: splitList(formData.get("colors")),
-    features: splitList(formData.get("features")),
-    ideal_for: splitList(formData.get("idealFor")),
-    visual_from: getText(formData, "visualFrom") || "#d7e3f1",
-    visual_to: getText(formData, "visualTo") || "#0A2540",
-    visual_accent: getText(formData, "visualAccent") || "#D4AF37",
-    visual_label: getText(formData, "visualLabel") || collection,
-  });
+  await supabase.from("products").insert(input);
+  revalidateCatalog(input.slug);
+}
 
-  revalidatePath("/");
-  revalidatePath("/catalog");
-  revalidatePath("/products");
-  revalidatePath("/admin/dashboard");
+export async function upsertProduct(formData: FormData) {
+  const supabase = await requireAdminSupabase();
+  const productId = getText(formData, "id");
+  const currentSlug = getText(formData, "currentSlug");
+
+  if (!supabase) {
+    return;
+  }
+
+  const input = await buildProductInput({ supabase, formData });
+
+  if (!input) {
+    return;
+  }
+
+  if (productId) {
+    await supabase.from("products").update(input).eq("id", productId);
+  } else {
+    await supabase.from("products").insert(input);
+  }
+
+  revalidateCatalog(input.slug);
+
+  if (currentSlug && currentSlug !== input.slug) {
+    revalidateCatalog(currentSlug);
+  }
+}
+
+export async function deleteProduct(formData: FormData) {
+  const supabase = await requireAdminSupabase();
+  const productId = getText(formData, "id");
+  const slug = getText(formData, "currentSlug") || getText(formData, "slug");
+
+  if (!supabase || !productId) {
+    return;
+  }
+
+  await supabase.from("products").delete().eq("id", productId);
+  revalidateCatalog(slug);
 }
 
 export async function toggleProductListing(formData: FormData) {
   const supabase = await requireAdminSupabase();
   const productId = getText(formData, "productId");
   const nextState = getText(formData, "nextState") === "true";
+  const slug = getText(formData, "slug");
 
   if (!supabase || !productId) {
     return;
@@ -641,10 +713,7 @@ export async function toggleProductListing(formData: FormData) {
 
   await supabase.from("products").update({ is_listed: nextState }).eq("id", productId);
 
-  revalidatePath("/");
-  revalidatePath("/catalog");
-  revalidatePath("/products");
-  revalidatePath("/admin/dashboard");
+  revalidateCatalog(slug);
 }
 
 export async function toggleDeliveryState(formData: FormData) {
@@ -661,6 +730,44 @@ export async function toggleDeliveryState(formData: FormData) {
     .update({ is_active: nextState })
     .eq("code", code);
 
+  revalidatePath("/checkout/offline");
+  revalidatePath("/admin/dashboard");
+}
+
+export async function upsertDeliveryState(formData: FormData) {
+  const supabase = await requireAdminSupabase();
+  const oldCode = getText(formData, "oldCode");
+  const name = getText(formData, "name");
+  const code = getText(formData, "code") || slugify(name);
+
+  if (!supabase || !name || !code) {
+    return;
+  }
+
+  await supabase.from("delivery_states").upsert({
+    code,
+    name,
+    eta: getText(formData, "eta") || "3 to 6 working days",
+    is_active: isChecked(formData, "isActive"),
+  });
+
+  if (oldCode && oldCode !== code) {
+    await supabase.from("delivery_states").delete().eq("code", oldCode);
+  }
+
+  revalidatePath("/checkout/offline");
+  revalidatePath("/admin/dashboard");
+}
+
+export async function deleteDeliveryState(formData: FormData) {
+  const supabase = await requireAdminSupabase();
+  const code = getText(formData, "oldCode") || getText(formData, "code");
+
+  if (!supabase || !code) {
+    return;
+  }
+
+  await supabase.from("delivery_states").delete().eq("code", code);
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
 }

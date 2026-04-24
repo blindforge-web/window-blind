@@ -1,4 +1,4 @@
-# BlindForge Web
+# Sunpilot Web
 
 Professional booking and e-commerce website for a window blind company.
 
