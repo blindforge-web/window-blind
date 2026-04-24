@@ -37,7 +37,7 @@ function SectionLead({
       {subtitle ? (
         <p
           className={`max-w-3xl text-lg leading-8 ${
-            inverse ? "text-white/80" : "text-[var(--color-muted)]"
+            inverse ? "text-white/82" : "text-[var(--color-muted)]"
           }`}
         >
           {subtitle}
@@ -46,7 +46,7 @@ function SectionLead({
       {body ? (
         <p
           className={`max-w-3xl text-sm leading-7 ${
-            inverse ? "text-white/72" : "text-[var(--color-muted)]"
+            inverse ? "text-white/76" : "text-[var(--color-muted)]"
           }`}
         >
           {body}
@@ -71,9 +71,7 @@ function MediaFrame({
 }) {
   if (mediaUrl && mediaKind === "video") {
     return (
-      <div
-        className={`overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
-      >
+      <div className={`overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}>
         <video src={mediaUrl} controls playsInline className="h-full w-full object-cover" />
       </div>
     );
@@ -81,9 +79,7 @@ function MediaFrame({
 
   if (mediaUrl) {
     return (
-      <div
-        className={`overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}
-      >
+      <div className={`overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[var(--color-surface)] ${className}`}>
         <img src={mediaUrl} alt={alt || label} className="h-full w-full object-cover" loading="lazy" />
       </div>
     );
@@ -127,168 +123,154 @@ export default async function Home() {
   const clientsSection = sections.clients;
   const contactSection = sections.contact;
 
-  const heroMetrics = [
-    { label: "Live Products", value: featuredProducts.length.toString().padStart(2, "0") },
-    { label: "Delivery States", value: deliveryStates.length.toString().padStart(2, "0") },
-    { label: "Service Units", value: services.length.toString().padStart(2, "0") },
-  ];
-  const orderSteps = [
-    {
-      title: "Browse products",
-      body: "Open the catalog, compare blinds, and choose a product that fits your room and finish style.",
-    },
-    {
-      title: "Confirm your order",
-      body: "Choose colour, quantity, size, delivery state, and installation details from a guided checkout page.",
-    },
-    {
-      title: "Pay and track",
-      body: "Transfer to the company account, upload your proof, and come back later to check progress.",
-    },
+  const collections = Array.from(new Set(featuredProducts.map((product) => product.collection)));
+  const heroStats = [
+    { label: "Live products", value: featuredProducts.length.toString().padStart(2, "0") },
+    { label: "Delivery states", value: deliveryStates.length.toString().padStart(2, "0") },
+    { label: "Support units", value: services.length.toString().padStart(2, "0") },
   ];
 
   return (
     <div id="top" className="min-h-screen">
       <SiteHeader />
 
-      <main className="pb-8">
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,color-mix(in_srgb,var(--color-secondary)_18%,transparent),transparent_36%)]" />
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 lg:py-20">
-            <div className="space-y-8">
-              <div className="inline-flex flex-wrap items-center gap-3 rounded-full border border-[var(--color-line)] bg-white/86 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                <span>Storefront</span>
-                <span className="h-1 w-1 rounded-full bg-[var(--color-secondary)]" />
-                <span>Company profile</span>
-                <span className="h-1 w-1 rounded-full bg-[var(--color-secondary)]" />
-                <span>Easy ordering</span>
-              </div>
-
-              <SectionLead
-                eyebrow={hero?.eyebrow || "Premium blind store"}
-                title={hero?.title || "Shop blinds with a clearer path from selection to payment"}
-                subtitle={hero?.subtitle}
-                body={hero?.body || settings?.tagline}
-              />
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                {heroMetrics.map((metric) => (
-                  <article
-                    key={metric.label}
-                    className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/82 p-5 shadow-[0_25px_55px_-42px_rgba(15,23,42,0.55)]"
+      <main className="pb-10">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
+          <div className="grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)]">
+            <aside className="space-y-4 rounded-[2.4rem] border border-[var(--color-line)] bg-white/92 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
+                Shop by category
+              </p>
+              <div className="space-y-2">
+                {collections.map((collection) => (
+                  <Link
+                    key={collection}
+                    href={`/products?collection=${encodeURIComponent(collection)}`}
+                    className="block rounded-2xl border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-3 text-sm font-semibold text-[var(--color-ink)]"
                   >
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      {metric.label}
-                    </p>
-                    <p className="mt-3 font-display text-4xl text-[var(--color-ink)]">
-                      {metric.value}
-                    </p>
-                  </article>
+                    {collection}
+                  </Link>
                 ))}
               </div>
-
-              <div className="flex flex-wrap gap-4">
-                <Link
-                  href={hero?.primaryCtaLink || "/products"}
-                  className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white shadow-[0_22px_45px_-24px_rgba(10,37,64,0.78)]"
-                >
-                  {hero?.primaryCtaLabel || "Shop products"}
-                </Link>
-                <Link
-                  href="/checkout/offline"
-                  className="rounded-full border border-[var(--color-line)] bg-white px-6 py-4 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-accent)]"
-                >
-                  Start checkout
-                </Link>
-                <Link
-                  href={hero?.secondaryCtaLink || "/account"}
-                  className="rounded-full border border-[var(--color-line)] bg-transparent px-6 py-4 text-sm font-semibold text-[var(--color-ink)]"
-                >
-                  {hero?.secondaryCtaLabel || "Track orders"}
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid gap-5">
-              <MediaFrame
-                label={hero?.title || settings?.brandName || "Sunpilot"}
-                mediaUrl={hero?.mediaUrl}
-                mediaKind={hero?.mediaKind}
-                alt={hero?.mediaAlt}
-                className="min-h-[32rem]"
-              />
-
-              <div className="grid gap-4 md:grid-cols-[1.05fr_0.95fr]">
-                <article className="rounded-[2rem] border border-[var(--color-line)] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                    Shopping Made Simple
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Customers should not struggle through forms first. The store now leads
-                    with products, pricing, and a guided order flow.
-                  </p>
-                </article>
-                <article className="rounded-[2rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-primary)_94%,white_6%)] p-5 text-white">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
-                    Order support
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-white/82">
-                    {contact?.phone1
-                      ? `Need help before payment? Call ${contact.phone1}.`
-                      : "Need help before payment? Use the contact section below."}
-                  </p>
-                </article>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-6 py-8 lg:px-10">
-          <div className="grid gap-4 lg:grid-cols-3">
-            {orderSteps.map((step, index) => (
-              <article
-                key={step.title}
-                className="rounded-[2rem] border border-[var(--color-line)] bg-white/84 p-6 shadow-[0_22px_50px_-40px_rgba(15,23,42,0.65)]"
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                  Step {index + 1}
+              <div className="rounded-[1.8rem] bg-[color-mix(in_srgb,var(--color-secondary)_12%,white_88%)] p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                  Marketplace note
                 </p>
-                <h3 className="mt-3 text-2xl font-extrabold text-[var(--color-ink)]">
-                  {step.title}
-                </h3>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                  {step.body}
+                  Browse by category, open a product, then continue to guided checkout.
                 </p>
-              </article>
-            ))}
+              </div>
+            </aside>
+
+            <div className="space-y-6">
+              <section className="overflow-hidden rounded-[2.8rem] border border-[var(--color-line)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--color-primary)_96%,black_4%),color-mix(in_srgb,var(--color-primary)_78%,black_22%))] text-white">
+                <div className="grid gap-8 px-8 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-10">
+                  <div className="space-y-8">
+                    <div className="inline-flex flex-wrap items-center gap-3 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/84">
+                      <span>Marketplace storefront</span>
+                      <span className="h-1 w-1 rounded-full bg-white/70" />
+                      <span>Admin listed only</span>
+                    </div>
+
+                    <SectionLead
+                      eyebrow={hero?.eyebrow || "Blinds and interior finishing"}
+                      title={hero?.title || "Shop window blinds with a stronger marketplace experience"}
+                      subtitle={hero?.subtitle || settings?.tagline}
+                      body={hero?.body}
+                      inverse
+                    />
+
+                    <form action="/products" className="flex flex-wrap gap-3">
+                      <input
+                        type="search"
+                        name="q"
+                        placeholder="Search roller, zebra, roman, office blinds..."
+                        className="min-w-[18rem] flex-1 rounded-2xl border border-white/12 bg-white px-5 py-4 text-[var(--color-ink)] outline-none"
+                      />
+                      <button
+                        type="submit"
+                        className="rounded-2xl bg-[var(--color-secondary)] px-6 py-4 text-sm font-semibold text-[var(--color-ink)]"
+                      >
+                        Search products
+                      </button>
+                    </form>
+
+                    <div className="flex flex-wrap gap-3">
+                      <Link
+                        href={hero?.primaryCtaLink || "/products"}
+                        className="rounded-2xl bg-white px-6 py-4 text-sm font-semibold text-[var(--color-ink)]"
+                      >
+                        {hero?.primaryCtaLabel || "Browse catalog"}
+                      </Link>
+                      <Link
+                        href="/checkout/offline"
+                        className="rounded-2xl border border-white/18 px-6 py-4 text-sm font-semibold text-white"
+                      >
+                        Start checkout
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4">
+                    <MediaFrame
+                      label={hero?.title || settings?.brandName || "Sunpilot"}
+                      mediaUrl={hero?.mediaUrl}
+                      mediaKind={hero?.mediaKind}
+                      alt={hero?.mediaAlt}
+                      className="min-h-[24rem] border-white/12"
+                    />
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      {heroStats.map((item) => (
+                        <article
+                          key={item.label}
+                          className="rounded-[1.6rem] border border-white/12 bg-white/8 p-4"
+                        >
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/68">
+                            {item.label}
+                          </p>
+                          <p className="mt-2 font-display text-3xl">{item.value}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="grid gap-4 md:grid-cols-3">
+                {[
+                  "Category-led browsing",
+                  "Admin-controlled listings",
+                  "Offline checkout with tracking",
+                ].map((item) => (
+                  <article
+                    key={item}
+                    className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5 text-sm font-semibold text-[var(--color-ink)]"
+                  >
+                    {item}
+                  </article>
+                ))}
+              </section>
+            </div>
           </div>
         </section>
 
-        <section id="products" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <section id="products" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
             <SectionLead
-              eyebrow={productsSection?.eyebrow || "Featured catalog"}
-              title={productsSection?.title || "Start from the best-selling products"}
+              eyebrow={productsSection?.eyebrow || "Featured listings"}
+              title={productsSection?.title || "Popular marketplace picks"}
               subtitle={
                 productsSection?.subtitle ||
-                "A proper store should help people start quickly. These featured listings do that."
+                "Start with the products customers are most likely to open first."
               }
               body={productsSection?.body}
             />
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/products"
-                className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white"
-              >
-                View all products
-              </Link>
-              <Link
-                href="/checkout/offline"
-                className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
-              >
-                Go to checkout
-              </Link>
-            </div>
+            <Link
+              href="/products"
+              className="rounded-2xl bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white"
+            >
+              View all products
+            </Link>
           </div>
 
           {featuredProducts.length ? (
@@ -297,18 +279,10 @@ export default async function Home() {
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
-          ) : (
-            <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/70 p-10">
-              <h2 className="font-display text-4xl">Products will appear here soon</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                Once live products are listed in Supabase, the homepage will show
-                featured products here.
-              </p>
-            </div>
-          )}
+          ) : null}
         </section>
 
-        <section id="about" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <section id="about" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
             <div className="space-y-6">
               <SectionLead
@@ -347,7 +321,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section id="services" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <section id="services" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
           <div className="mb-8">
             <SectionLead
               eyebrow={servicesSection?.eyebrow}
@@ -374,19 +348,15 @@ export default async function Home() {
                   <div className="h-56 bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_34%,white_66%))]" />
                 )}
                 <div className="p-6">
-                  <h3 className="text-2xl font-extrabold text-[var(--color-ink)]">
-                    {service.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    {service.description}
-                  </p>
+                  <h3 className="text-2xl font-extrabold text-[var(--color-ink)]">{service.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{service.description}</p>
                 </div>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <section className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
           <div className="grid gap-6 rounded-[2.5rem] bg-[linear-gradient(150deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_72%,black_28%))] px-8 py-10 text-white lg:grid-cols-[1fr_0.95fr]">
             <SectionLead
               eyebrow={reliability?.eyebrow}
@@ -399,20 +369,18 @@ export default async function Home() {
             <div className="grid gap-4 sm:grid-cols-2">
               <article className="rounded-[1.8rem] border border-white/15 bg-white/8 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/65">
-                  Product-first flow
+                  Checkout path
                 </p>
                 <p className="mt-3 text-sm leading-7 text-white/82">
-                  Customers see product details, pricing, and guidance before they ever
-                  face the order form.
+                  Open product, continue to checkout, transfer, upload proof, and track from account.
                 </p>
               </article>
               <article className="rounded-[1.8rem] border border-white/15 bg-white/8 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/65">
-                  Manual verification
+                  Admin listing control
                 </p>
                 <p className="mt-3 text-sm leading-7 text-white/82">
-                  Offline payments remain supported while proof upload and order tracking
-                  stay visible to both the business and the customer.
+                  Customers can browse and order, but only admins publish live listings.
                 </p>
               </article>
             </div>
@@ -420,7 +388,7 @@ export default async function Home() {
         </section>
 
         {galleryItems.length ? (
-          <section id="gallery" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+          <section id="gallery" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
             <div className="mb-8">
               <SectionLead
                 eyebrow={gallery?.eyebrow}
@@ -456,11 +424,11 @@ export default async function Home() {
           </section>
         ) : null}
 
-        <section id="team" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <section id="team" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
           <div className="mb-8">
             <SectionLead
-              eyebrow={team?.eyebrow}
-              title={team?.title}
+              eyebrow={team?.eyebrow || "Team"}
+              title={team?.title || "The people behind the marketplace"}
               subtitle={team?.subtitle}
               body={team?.body}
             />
@@ -487,9 +455,7 @@ export default async function Home() {
                   </p>
                   <h3 className="mt-2 text-2xl font-extrabold">{member.name}</h3>
                   {member.bio ? (
-                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      {member.bio}
-                    </p>
+                    <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{member.bio}</p>
                   ) : null}
                 </div>
               </article>
@@ -498,7 +464,7 @@ export default async function Home() {
         </section>
 
         {clients.length ? (
-          <section id="clients" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+          <section id="clients" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
             <div className="mb-8">
               <SectionLead
                 eyebrow={clientsSection?.eyebrow}
@@ -528,41 +494,7 @@ export default async function Home() {
           </section>
         ) : null}
 
-        <section className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-          <div className="rounded-[2.5rem] border border-[var(--color-line)] bg-white/92 px-8 py-10">
-            <div className="flex flex-wrap items-end justify-between gap-6">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                  Ready to order
-                </p>
-                <h2 className="mt-2 font-display text-5xl leading-none">
-                  Move from browsing to payment without confusion.
-                </h2>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                  Customers can open the catalog, choose a product, and place orders
-                  through a more realistic checkout experience while the landing page still
-                  tells the company story.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/products"
-                  className="rounded-full bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white"
-                >
-                  Shop now
-                </Link>
-                <Link
-                  href="/checkout/offline"
-                  className="rounded-full border border-[var(--color-line)] px-6 py-4 text-sm font-semibold"
-                >
-                  Go to checkout
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="contact" className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <section id="contact" className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
           <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
             <SectionLead
               eyebrow={contactSection?.eyebrow}
@@ -578,9 +510,7 @@ export default async function Home() {
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                       Phone
                     </p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
-                      {contact.phone1}
-                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">{contact.phone1}</p>
                   </article>
                 ) : null}
                 {contact?.phone2 ? (
@@ -588,9 +518,7 @@ export default async function Home() {
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                       Alternate
                     </p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
-                      {contact.phone2}
-                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">{contact.phone2}</p>
                   </article>
                 ) : null}
                 {contact?.email ? (
@@ -598,9 +526,7 @@ export default async function Home() {
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                       Email
                     </p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
-                      {contact.email}
-                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">{contact.email}</p>
                   </article>
                 ) : null}
                 {contact?.address ? (
@@ -608,9 +534,7 @@ export default async function Home() {
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                       Address
                     </p>
-                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">
-                      {contact.address}
-                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-ink)]">{contact.address}</p>
                   </article>
                 ) : null}
               </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { saveContactInfo } from "@/app/actions";
+import { deleteTeamMember, saveContactInfo, upsertTeamMember } from "@/app/actions";
 import { AdminPasswordResetPanel } from "@/components/admin/admin-password-reset-panel";
 import { CreateProductPanel } from "@/components/admin/create-product-panel";
 import { DeliveryStateCard } from "@/components/admin/delivery-state-card";
@@ -35,6 +35,11 @@ const dashboardViews = [
     id: "setup",
     label: "Store Setup",
     description: "Payment account, delivery states, and contact info.",
+  },
+  {
+    id: "team",
+    label: "Team",
+    description: "Restore and manage the team section.",
   },
   {
     id: "security",
@@ -416,6 +421,155 @@ export default async function AdminDashboardPage({
                   contact={dashboard.contact}
                 />
               </>
+            ) : null}
+
+            {selectedView === "team" ? (
+              <section className="space-y-5">
+                <PanelHeading
+                  eyebrow="Team"
+                  title="Team section management"
+                  body="This restores the team side so admins can keep the public team section current."
+                />
+
+                <div className="grid gap-5 xl:grid-cols-2">
+                  {dashboard.teamMembers.map((member) => (
+                    <form
+                      key={member.id}
+                      action={upsertTeamMember}
+                      className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5"
+                    >
+                      <input type="hidden" name="id" value={member.id} />
+                      <input type="hidden" name="currentImageUrl" value={member.imageUrl ?? ""} />
+                      <div className="grid gap-4">
+                        <input
+                          name="name"
+                          defaultValue={member.name}
+                          disabled={!actionsEnabled}
+                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                        />
+                        <input
+                          name="role"
+                          defaultValue={member.role}
+                          disabled={!actionsEnabled}
+                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                        />
+                        <textarea
+                          name="bio"
+                          rows={4}
+                          defaultValue={member.bio ?? ""}
+                          disabled={!actionsEnabled}
+                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                        />
+                        <input
+                          name="imageUrl"
+                          defaultValue=""
+                          placeholder={member.imageUrl ?? "Direct image URL"}
+                          disabled={!actionsEnabled}
+                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                        />
+                        <input
+                          type="file"
+                          name="imageFile"
+                          accept="image/*"
+                          disabled={!actionsEnabled}
+                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60"
+                        />
+                        <input
+                          type="number"
+                          name="sortOrder"
+                          defaultValue={member.sortOrder}
+                          disabled={!actionsEnabled}
+                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                        />
+                        <label className="flex items-center gap-2 text-sm font-semibold">
+                          <input
+                            type="checkbox"
+                            name="isActive"
+                            defaultChecked={member.isActive}
+                            disabled={!actionsEnabled}
+                          />
+                          Active
+                        </label>
+                        <div className="flex flex-wrap gap-3">
+                          <button
+                            type="submit"
+                            disabled={!actionsEnabled}
+                            className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                          >
+                            Save team member
+                          </button>
+                          <button
+                            type="submit"
+                            formAction={deleteTeamMember}
+                            disabled={!actionsEnabled}
+                            className="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 disabled:opacity-60"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  ))}
+
+                  <form
+                    action={upsertTeamMember}
+                    className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/92 p-5"
+                  >
+                    <h3 className="font-display text-3xl leading-none">Add team member</h3>
+                    <div className="mt-4 grid gap-4">
+                      <input
+                        name="name"
+                        placeholder="Team member name"
+                        disabled={!actionsEnabled}
+                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                      />
+                      <input
+                        name="role"
+                        placeholder="Role"
+                        disabled={!actionsEnabled}
+                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                      />
+                      <textarea
+                        name="bio"
+                        rows={4}
+                        disabled={!actionsEnabled}
+                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                      />
+                      <input
+                        name="imageUrl"
+                        placeholder="Direct image URL"
+                        disabled={!actionsEnabled}
+                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                      />
+                      <input
+                        type="file"
+                        name="imageFile"
+                        accept="image/*"
+                        disabled={!actionsEnabled}
+                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60"
+                      />
+                      <input
+                        type="number"
+                        name="sortOrder"
+                        defaultValue={dashboard.teamMembers.length + 1}
+                        disabled={!actionsEnabled}
+                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                      />
+                      <label className="flex items-center gap-2 text-sm font-semibold">
+                        <input type="checkbox" name="isActive" defaultChecked disabled={!actionsEnabled} />
+                        Active
+                      </label>
+                      <button
+                        type="submit"
+                        disabled={!actionsEnabled}
+                        className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                      >
+                        Add team member
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </section>
             ) : null}
 
             {selectedView === "security" && admin?.role === "super_admin" ? (
