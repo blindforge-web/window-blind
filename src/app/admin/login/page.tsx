@@ -13,12 +13,12 @@ export default async function AdminLoginPage() {
             Admin Access
           </p>
           <h1 className="mt-4 font-display text-6xl leading-none">
-            Manage products, content, and offline payment orders.
+            Manage products, orders, and store operations.
           </h1>
           <ul className="mt-8 space-y-4 text-sm leading-7 text-white/80">
-            <li>Branding, navbar links, gallery media, and company sections are editable.</li>
-            <li>Products, delivery states, and offline payment account details are managed here.</li>
-            <li>Orders can move from pending to paid or paid delivered after proof review.</li>
+            <li>Products are the main focus, with simpler listing management.</li>
+            <li>Orders move from pending to paid or paid delivered after proof review.</li>
+            <li>Store setup covers payment account, delivery states, and contact details.</li>
           </ul>
         </section>
 
