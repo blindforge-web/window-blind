@@ -40,6 +40,45 @@ const sectionOrder = [
   { key: "contact", label: "Contact" },
 ] as const;
 
+const settingsViews = [
+  {
+    id: "identity",
+    label: "Identity",
+    description: "Brand name, logo, colours, and core brand copy.",
+  },
+  {
+    id: "business",
+    label: "Business",
+    description: "Contact details, payment details, navigation, and social links.",
+  },
+  {
+    id: "homepage",
+    label: "Homepage",
+    description: "Landing page sections and highlight cards.",
+  },
+  {
+    id: "catalog",
+    label: "Catalog",
+    description: "Service cards shown on the public site.",
+  },
+  {
+    id: "people",
+    label: "People",
+    description: "Team members and client references.",
+  },
+  {
+    id: "media",
+    label: "Media",
+    description: "Gallery items and uploaded showcase visuals.",
+  },
+] as const;
+
+type SettingsViewId = (typeof settingsViews)[number]["id"];
+
+function isSettingsView(value?: string): value is SettingsViewId {
+  return settingsViews.some((view) => view.id === value);
+}
+
 function PanelHeading({
   eyebrow,
   title,
@@ -280,7 +319,12 @@ function GalleryCard({
   );
 }
 
-export default async function AdminSiteSettingsPage() {
+export default async function AdminSiteSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>;
+}) {
+  const params = await searchParams;
   const admin = hasPublicSupabaseConfig ? await getCurrentAdmin() : null;
 
   if (hasPublicSupabaseConfig && !admin) {
@@ -289,6 +333,8 @@ export default async function AdminSiteSettingsPage() {
 
   const dashboard = await getAdminDashboardData();
   const actionsEnabled = Boolean(admin);
+  const selectedView = isSettingsView(params.view) ? params.view : "identity";
+  const activeView = settingsViews.find((view) => view.id === selectedView) ?? settingsViews[0];
   const settings = dashboard.settings ?? {
     brandName: "",
     shortName: "",
@@ -360,138 +406,154 @@ export default async function AdminSiteSettingsPage() {
             <p className="px-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
               Settings Areas
             </p>
-            <nav className="mt-3 space-y-2 text-sm font-semibold text-[var(--color-ink)]">
-              {[
-                ["branding", "Branding"],
-                ["contact", "Contact and payment"],
-                ["navigation", "Navigation and socials"],
-                ["sections", "Page sections"],
-                ["highlights", "Highlights"],
-                ["services", "Services"],
-                ["team", "Team"],
-                ["clients", "Clients"],
-                ["gallery", "Gallery"],
-              ].map(([key, label]) => (
-                <a
-                  key={key}
-                  href={`#${key}`}
-                  className="block rounded-2xl border border-[var(--color-line)] bg-white px-3 py-3"
-                >
-                  {label}
-                </a>
-              ))}
+            <nav className="mt-3 space-y-2">
+              {settingsViews.map((view) => {
+                const isActive = selectedView === view.id;
+
+                return (
+                  <Link
+                    key={view.id}
+                    href={`/admin/site-settings?view=${view.id}`}
+                    className={`block rounded-2xl border px-3 py-3 transition ${
+                      isActive
+                        ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+                        : "border-[var(--color-line)] bg-white text-[var(--color-ink)]"
+                    }`}
+                  >
+                    <p className="text-sm font-bold">{view.label}</p>
+                    <p
+                      className={`mt-1 text-xs leading-5 ${
+                        isActive ? "text-white/80" : "text-[var(--color-muted)]"
+                      }`}
+                    >
+                      {view.description}
+                    </p>
+                  </Link>
+                );
+              })}
             </nav>
           </aside>
 
           <div className="space-y-8">
-            <section
-              id="branding"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
-              <PanelHeading
-                eyebrow="Branding"
-                title="Site identity and colour system"
-                body="This is the main site settings form. It controls the public brand, logo, footer note, and theme colours."
-              />
-              <form action={saveSiteSettings} className="grid gap-4 lg:grid-cols-2">
-                <Field
-                  label="Brand name"
-                  name="brandName"
-                  defaultValue={settings.brandName}
-                  disabled={!actionsEnabled}
-                />
-                <Field
-                  label="Short name"
-                  name="shortName"
-                  defaultValue={settings.shortName}
-                  disabled={!actionsEnabled}
-                />
-                <label className="space-y-2 lg:col-span-2">
-                  <span className="text-sm font-semibold">Tagline</span>
-                  <input
-                    name="tagline"
-                    defaultValue={settings.tagline}
-                    disabled={!actionsEnabled}
-                    className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                  />
-                </label>
-                <TextareaField
-                  label="Footer note"
-                  name="footerNote"
-                  defaultValue={settings.footerNote}
-                  rows={4}
-                  disabled={!actionsEnabled}
-                />
-                <div className="grid gap-4">
-                  <Field
-                    label="Primary colour"
-                    name="primaryColor"
-                    defaultValue={settings.primaryColor}
-                    disabled={!actionsEnabled}
-                  />
-                  <Field
-                    label="Secondary colour"
-                    name="secondaryColor"
-                    defaultValue={settings.secondaryColor}
-                    disabled={!actionsEnabled}
-                  />
-                </div>
-                <Field
-                  label="Accent colour"
-                  name="accentColor"
-                  defaultValue={settings.accentColor}
-                  disabled={!actionsEnabled}
-                />
-                <Field
-                  label="Page colour"
-                  name="pageColor"
-                  defaultValue={settings.pageColor}
-                  disabled={!actionsEnabled}
-                />
-                <Field
-                  label="Surface colour"
-                  name="surfaceColor"
-                  defaultValue={settings.surfaceColor}
-                  disabled={!actionsEnabled}
-                />
-                <Field
-                  label="Ink colour"
-                  name="inkColor"
-                  defaultValue={settings.inkColor}
-                  disabled={!actionsEnabled}
-                />
-                <Field
-                  label="Muted colour"
-                  name="mutedColor"
-                  defaultValue={settings.mutedColor}
-                  disabled={!actionsEnabled}
-                />
-                <Field
-                  label="Line colour"
-                  name="lineColor"
-                  defaultValue={settings.lineColor}
-                  disabled={!actionsEnabled}
-                />
-                <MediaFields
-                  currentUrl={settings.logoUrl}
-                  urlName="logoUrl"
-                  currentUrlName="currentLogoUrl"
-                  fileName="logoFile"
-                  removeName="removeLogo"
-                  label="Current logo"
-                  disabled={!actionsEnabled}
-                />
-                <button
-                  type="submit"
-                  disabled={!actionsEnabled}
-                  className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60 lg:col-span-2"
-                >
-                  Save site settings
-                </button>
-              </form>
+            <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
+                {activeView.label}
+              </p>
+              <h2 className="mt-2 font-display text-4xl leading-none">{activeView.label}</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
+                {activeView.description}
+              </p>
             </section>
 
-            <section id="contact" className="grid gap-6 xl:grid-cols-2">
+            {selectedView === "identity" ? (
+              <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
+                <PanelHeading
+                  eyebrow="Branding"
+                  title="Site identity and colour system"
+                  body="This is the main site settings form. It controls the public brand, logo, footer note, and theme colours."
+                />
+                <form action={saveSiteSettings} className="grid gap-4 lg:grid-cols-2">
+                  <Field
+                    label="Brand name"
+                    name="brandName"
+                    defaultValue={settings.brandName}
+                    disabled={!actionsEnabled}
+                  />
+                  <Field
+                    label="Short name"
+                    name="shortName"
+                    defaultValue={settings.shortName}
+                    disabled={!actionsEnabled}
+                  />
+                  <label className="space-y-2 lg:col-span-2">
+                    <span className="text-sm font-semibold">Tagline</span>
+                    <input
+                      name="tagline"
+                      defaultValue={settings.tagline}
+                      disabled={!actionsEnabled}
+                      className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+                    />
+                  </label>
+                  <TextareaField
+                    label="Footer note"
+                    name="footerNote"
+                    defaultValue={settings.footerNote}
+                    rows={4}
+                    disabled={!actionsEnabled}
+                  />
+                  <div className="grid gap-4">
+                    <Field
+                      label="Primary colour"
+                      name="primaryColor"
+                      defaultValue={settings.primaryColor}
+                      disabled={!actionsEnabled}
+                    />
+                    <Field
+                      label="Secondary colour"
+                      name="secondaryColor"
+                      defaultValue={settings.secondaryColor}
+                      disabled={!actionsEnabled}
+                    />
+                  </div>
+                  <Field
+                    label="Accent colour"
+                    name="accentColor"
+                    defaultValue={settings.accentColor}
+                    disabled={!actionsEnabled}
+                  />
+                  <Field
+                    label="Page colour"
+                    name="pageColor"
+                    defaultValue={settings.pageColor}
+                    disabled={!actionsEnabled}
+                  />
+                  <Field
+                    label="Surface colour"
+                    name="surfaceColor"
+                    defaultValue={settings.surfaceColor}
+                    disabled={!actionsEnabled}
+                  />
+                  <Field
+                    label="Ink colour"
+                    name="inkColor"
+                    defaultValue={settings.inkColor}
+                    disabled={!actionsEnabled}
+                  />
+                  <Field
+                    label="Muted colour"
+                    name="mutedColor"
+                    defaultValue={settings.mutedColor}
+                    disabled={!actionsEnabled}
+                  />
+                  <Field
+                    label="Line colour"
+                    name="lineColor"
+                    defaultValue={settings.lineColor}
+                    disabled={!actionsEnabled}
+                  />
+                  <MediaFields
+                    currentUrl={settings.logoUrl}
+                    urlName="logoUrl"
+                    currentUrlName="currentLogoUrl"
+                    fileName="logoFile"
+                    removeName="removeLogo"
+                    label="Current logo"
+                    disabled={!actionsEnabled}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!actionsEnabled}
+                    className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60 lg:col-span-2"
+                  >
+                    Save site settings
+                  </button>
+                </form>
+              </section>
+            ) : null}
+
+            {selectedView === "business" ? (
+              <>
+                <section className="grid gap-6 xl:grid-cols-2">
               <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
                 <PanelHeading
                   eyebrow="Contact"
@@ -585,12 +647,9 @@ export default async function AdminSiteSettingsPage() {
                   </button>
                 </form>
               </section>
-            </section>
+                </section>
 
-            <section
-              id="navigation"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
+                <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Navigation"
                 title="Navbar and social links"
@@ -684,11 +743,12 @@ export default async function AdminSiteSettingsPage() {
                 </div>
               </div>
             </section>
+              </>
+            ) : null}
 
-            <section
-              id="sections"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
+            {selectedView === "homepage" ? (
+              <>
+                <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Sections"
                 title="Homepage and landing sections"
@@ -810,10 +870,7 @@ export default async function AdminSiteSettingsPage() {
               </div>
             </section>
 
-            <section
-              id="highlights"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
+                <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Highlights"
                 title="Site highlight cards"
@@ -857,11 +914,11 @@ export default async function AdminSiteSettingsPage() {
                 </form>
               </div>
             </section>
+              </>
+            ) : null}
 
-            <section
-              id="services"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
+            {selectedView === "catalog" ? (
+              <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Services"
                 title="Service cards with editable images"
@@ -923,11 +980,11 @@ export default async function AdminSiteSettingsPage() {
                 </form>
               </div>
             </section>
+            ) : null}
 
-            <section
-              id="team"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
+            {selectedView === "people" ? (
+              <>
+                <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Team"
                 title="Team members with editable images"
@@ -992,10 +1049,7 @@ export default async function AdminSiteSettingsPage() {
               </div>
             </section>
 
-            <section
-              id="clients"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
+                <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Clients"
                 title="Client logos and references"
@@ -1057,11 +1111,11 @@ export default async function AdminSiteSettingsPage() {
                 </form>
               </div>
             </section>
+              </>
+            ) : null}
 
-            <section
-              id="gallery"
-              className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6"
-            >
+            {selectedView === "media" ? (
+              <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Gallery"
                 title="Gallery media"
@@ -1074,6 +1128,7 @@ export default async function AdminSiteSettingsPage() {
                 <GalleryCard actionsEnabled={actionsEnabled} />
               </div>
             </section>
+            ) : null}
           </div>
         </section>
       </main>
