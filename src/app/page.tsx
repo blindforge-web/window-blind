@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { ArrowRight, Check, MapPin, MoveRight, Phone } from "lucide-react";
+import { InteractiveMedia } from "@/components/media/interactive-media";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { ProductCard } from "@/components/store/product-card";
@@ -61,48 +62,6 @@ function SectionLead({
           {body}
         </p>
       ) : null}
-    </div>
-  );
-}
-
-function MediaFrame({
-  label,
-  mediaUrl,
-  mediaKind,
-  alt,
-  className = "",
-}: {
-  label: string;
-  mediaUrl?: string | null;
-  mediaKind?: "image" | "video";
-  alt?: string | null;
-  className?: string;
-}) {
-  if (mediaUrl && mediaKind === "video") {
-    return (
-      <div className={`overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 ${className}`}>
-        <video src={mediaUrl} controls playsInline className="h-full w-full object-cover" />
-      </div>
-    );
-  }
-
-  if (mediaUrl) {
-    return (
-      <div className={`overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 ${className}`}>
-        <img src={mediaUrl} alt={alt || label} className="h-full w-full object-cover" loading="lazy" />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className={`relative overflow-hidden rounded-[2rem] border border-white/40 bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_34%,white_66%))] ${className}`}
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.36))]" />
-      <div className="absolute bottom-5 left-5 right-5 rounded-[1.4rem] border border-white/24 bg-white/10 px-4 py-4 text-white backdrop-blur-xl">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/74">{label}</p>
-      </div>
     </div>
   );
 }
@@ -206,13 +165,29 @@ export default async function Home() {
             </div>
 
             <div className="grid gap-6">
-              <MediaFrame
-                label={hero?.title || settings?.brandName || "Sunpilot"}
-                mediaUrl={hero?.mediaUrl}
-                mediaKind={hero?.mediaKind}
-                alt={hero?.mediaAlt}
-                className="min-h-[22rem] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.38)]"
-              />
+              {hero?.mediaUrl ? (
+                <InteractiveMedia
+                  label={hero?.title || settings?.brandName || "Sunpilot"}
+                  mediaUrl={hero?.mediaUrl}
+                  mediaKind={hero?.mediaKind}
+                  alt={hero?.mediaAlt}
+                  previewHint={
+                    hero?.mediaKind === "video" ? "Open brand video" : "Open feature image"
+                  }
+                  className="min-h-[22rem] rounded-[2rem] border border-white/40 bg-white/70 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.38)]"
+                  mediaClassName="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="relative min-h-[22rem] overflow-hidden rounded-[2rem] border border-white/40 bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_34%,white_66%))] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.38)]">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%)]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.36))]" />
+                  <div className="absolute bottom-5 left-5 right-5 rounded-[1.4rem] border border-white/24 bg-white/10 px-4 py-4 text-white backdrop-blur-xl">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/74">
+                      {hero?.title || settings?.brandName || "Sunpilot"}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <article className="rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_84%,white_16%)] p-5 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.35)]">
@@ -294,13 +269,24 @@ export default async function Home() {
             </div>
 
             <div className="grid gap-4">
-              <MediaFrame
-                label={about?.title || settings?.brandName || "About"}
-                mediaUrl={about?.mediaUrl}
-                mediaKind={about?.mediaKind}
-                alt={about?.mediaAlt}
-                className="min-h-[18rem] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.38)]"
-              />
+              {about?.mediaUrl ? (
+                <InteractiveMedia
+                  label={about?.title || settings?.brandName || "About"}
+                  mediaUrl={about?.mediaUrl}
+                  mediaKind={about?.mediaKind}
+                  alt={about?.mediaAlt}
+                  previewHint={
+                    about?.mediaKind === "video" ? "Open section video" : "Open section image"
+                  }
+                  className="min-h-[18rem] rounded-[2rem] border border-white/40 bg-white/70 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.38)]"
+                  mediaClassName="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="relative min-h-[18rem] overflow-hidden rounded-[2rem] border border-white/40 bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-primary)_92%,white_8%),color-mix(in_srgb,var(--color-secondary)_34%,white_66%))] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.38)]">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%)]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(15,23,42,0.36))]" />
+                </div>
+              )}
               {highlights.length ? (
                 <div className="grid gap-4 sm:grid-cols-3">
                   {highlights.map((item) => (
@@ -339,11 +325,14 @@ export default async function Home() {
                 className="overflow-hidden rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_84%,white_16%)] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.28)]"
               >
                 {service.imageUrl ? (
-                  <img
-                    src={service.imageUrl}
+                  <InteractiveMedia
+                    label={service.title}
+                    mediaUrl={service.imageUrl}
+                    mediaKind="image"
                     alt={service.title}
-                    className="h-56 w-full object-cover"
-                    loading="lazy"
+                    previewHint="Open service image"
+                    className="h-56 rounded-none border-0"
+                    mediaClassName="h-full w-full object-cover"
                   />
                 ) : (
                   <div
@@ -418,12 +407,16 @@ export default async function Home() {
                   key={item.id}
                   className="overflow-hidden rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_82%,white_18%)] shadow-[0_20px_50px_-36px_rgba(15,23,42,0.3)]"
                 >
-                  <MediaFrame
+                  <InteractiveMedia
                     label={item.title}
                     mediaUrl={item.mediaUrl}
                     mediaKind={item.mediaKind}
                     alt={item.title}
+                    previewHint={
+                      item.mediaKind === "video" ? "Open gallery video" : "Open gallery image"
+                    }
                     className="h-72 rounded-none border-0"
+                    mediaClassName="h-full w-full object-cover"
                   />
                   <div className="p-6">
                     <h3 className="text-2xl font-extrabold tracking-[-0.04em]">{item.title}</h3>
@@ -455,11 +448,14 @@ export default async function Home() {
                 className="overflow-hidden rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_84%,white_16%)] shadow-[0_20px_50px_-36px_rgba(15,23,42,0.28)]"
               >
                 {member.imageUrl ? (
-                  <img
-                    src={member.imageUrl}
+                  <InteractiveMedia
+                    label={member.name}
+                    mediaUrl={member.imageUrl}
+                    mediaKind="image"
                     alt={member.name}
-                    className="h-72 w-full object-cover"
-                    loading="lazy"
+                    previewHint="Open team photo"
+                    className="h-72 rounded-none border-0"
+                    mediaClassName="h-full w-full object-cover"
                   />
                 ) : (
                   <div
@@ -500,16 +496,19 @@ export default async function Home() {
               {clients.map((client) => (
                 <article
                   key={client.id}
-                  className="rounded-[1.8rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_82%,white_18%)] p-6 text-center shadow-[0_18px_45px_-34px_rgba(15,23,42,0.25)]"
-                >
-                  {client.logoUrl ? (
-                    <img
-                      src={client.logoUrl}
-                      alt={client.name}
-                      className="mx-auto h-16 w-auto max-w-full object-contain"
-                      loading="lazy"
-                    />
-                  ) : null}
+                className="rounded-[1.8rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_82%,white_18%)] p-6 text-center shadow-[0_18px_45px_-34px_rgba(15,23,42,0.25)]"
+              >
+                {client.logoUrl ? (
+                  <InteractiveMedia
+                    label={client.name}
+                    mediaUrl={client.logoUrl}
+                    mediaKind="image"
+                    alt={client.name}
+                    previewHint="Open brand image"
+                    className="mx-auto h-16 w-full rounded-none border-0"
+                    mediaClassName="mx-auto h-full w-full object-contain"
+                  />
+                ) : null}
                   <p className="mt-4 text-lg font-extrabold tracking-[-0.03em]">{client.name}</p>
                 </article>
               ))}
