@@ -107,9 +107,9 @@ export default async function AdminDashboardPage({
                 Product-first admin workspace
               </h1>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
-                This dashboard is now focused on the work that matters most every day:
-                products, orders, payment setup, delivery coverage, and contact details.
-                Public-site content and branding now live in a separate site settings screen.
+                This workspace focuses on daily commercial operations: product listings,
+                order review, delivery coverage, and account-level administration. Brand and
+                website presentation are managed separately in the content studio.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -231,13 +231,13 @@ export default async function AdminDashboardPage({
 
                   <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
                     <PanelHeading
-                      eyebrow="Scope"
-                      title="What moved"
-                      body="Homepage sections, service imagery, team imagery, navigation, social links, branding, gallery, and client content now live on the dedicated site settings screen."
+                      eyebrow="Content studio"
+                      title="Website presentation is managed separately"
+                      body="Homepage storytelling, navigation, brand visuals, gallery media, social links, services, team profiles, and client references are maintained in the site settings workspace."
                     />
                     <p className="text-sm leading-7 text-[var(--color-muted)]">
-                      The workflow is now simpler: keep daily operational work here, and use the
-                      dedicated site settings screen for public-site content management.
+                      Use this dashboard for operational work and open site settings when you
+                      need to adjust customer-facing website content.
                     </p>
                   </section>
                 </section>
@@ -281,8 +281,8 @@ export default async function AdminDashboardPage({
               <section className="space-y-5">
                 <PanelHeading
                   eyebrow="Orders"
-                  title="Offline order queue"
-                  body="Incoming orders appear here so admins can verify payment proof and update status quickly."
+                  title="Incoming order queue"
+                  body="New orders appear here for receipt review, confirmation, and delivery-status updates."
                 />
 
                 {dashboard.orders.length ? (
@@ -311,8 +311,8 @@ export default async function AdminDashboardPage({
                 <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
                   <PanelHeading
                     eyebrow="Scope"
-                    title="Site-managed settings moved out"
-                    body="Payment account details, contact information, navigation, team, gallery, services, and other public-site content now live only in the dedicated site settings screen."
+                    title="Customer-facing content is managed separately"
+                    body="Payment instructions, contact information, navigation, team, gallery, services, and other website content are managed in site settings."
                   />
                   <Link
                     href="/admin/site-settings"

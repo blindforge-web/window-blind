@@ -47,10 +47,10 @@ export function OrderAdminRow({
             rel="noreferrer"
             className="font-semibold text-[var(--color-primary)]"
           >
-            View payment proof
+            View receipt
           </a>
         ) : order.paymentProofUploaded ? (
-          <p>Payment proof uploaded</p>
+          <p>Receipt uploaded</p>
         ) : null}
         <p className="text-xs uppercase tracking-[0.16em]">
           {formatDateTime(order.createdAt)}

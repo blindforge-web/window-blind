@@ -49,7 +49,7 @@ const settingsViews = [
   {
     id: "business",
     label: "Business",
-    description: "Contact details, payment details, navigation, and social links.",
+    description: "Contact channels, transfer instructions, navigation, and social links.",
   },
   {
     id: "homepage",
@@ -251,7 +251,7 @@ function GalleryCard({
       <PanelHeading
         eyebrow={isNew ? "New gallery item" : "Gallery item"}
         title={isNew ? "Add gallery media" : item.title}
-        body="This controls the optional project gallery section on the public site."
+        body="Use this to manage the project gallery shown on the public website."
       />
       <div className="grid gap-4">
         <Field label="Title" name="title" defaultValue={item?.title} disabled={!actionsEnabled} />
@@ -374,12 +374,11 @@ export default async function AdminSiteSettingsPage({
                 Admin Site Settings
               </p>
               <h1 className="mt-2 font-display text-6xl leading-none">
-                Manage public-site content and branding
+                Manage the live website experience
               </h1>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
-                This is the separate screen for the public site. It exposes the editable
-                Supabase-backed content, including logo, section media, service images, team
-                images, navigation, social links, gallery, and client items.
+                Update the customer-facing website here, including brand assets, homepage
+                sections, navigation, contact details, gallery media, and supporting content.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -1119,7 +1118,7 @@ export default async function AdminSiteSettingsPage({
               <PanelHeading
                 eyebrow="Gallery"
                 title="Gallery media"
-                body="Upload gallery images or videos so the gallery section can be managed without opening the database."
+                body="Upload gallery visuals here so the website showcase stays current without direct database edits."
               />
               <div className="grid gap-5 xl:grid-cols-2">
                 {dashboard.galleryItems.map((item) => (

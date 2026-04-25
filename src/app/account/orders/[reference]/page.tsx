@@ -93,12 +93,12 @@ export default async function AccountOrderReceiptPage({
               </span>
               {order.paymentProofUploaded ? (
                 <span className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)]">
-                  Payment proof uploaded
+                  Receipt uploaded
                 </span>
               ) : null}
             </div>
             <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-              Orders stay visible here while the admin confirms payment and updates delivery.
+              Orders stay visible here while the team reviews the receipt and updates delivery.
             </p>
           </article>
 

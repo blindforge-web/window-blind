@@ -1,5 +1,5 @@
--- Replace the payment account fields below before go-live, or update them from the admin dashboard
--- after the initial seed has been applied.
+-- Replace the transfer-account fields below before go-live, or update them from the
+-- admin workspace after the initial seed has been applied.
 
 insert into public.site_settings (
   id,
@@ -31,7 +31,7 @@ values (
   '',
   '',
   '',
-  'Pay by bank transfer, then upload your receipt. Orders are confirmed after payment is verified.',
+  'Complete payment by bank transfer, then attach your receipt so the order can move into confirmation.',
   '#0A2540',
   '#D4AF37',
   '#F5F5F5',
@@ -139,7 +139,7 @@ values
     'Made-to-measure blinds',
     'Custom blinds for homes, offices, and commercial spaces',
     'Sunpilot helps customers choose the right blind style, confirm measurements, and place orders with confidence.',
-    'Explore the collection, request the right finish for your space, and complete your order with guided offline payment.',
+    'Explore the collection, request the right finish for your space, and complete your order through a guided transfer-confirmation flow.',
     'Shop blinds',
     '/products',
     'Track your order',
@@ -197,8 +197,8 @@ values
   (
     'reliability',
     'Why customers trust us',
-    'A clear order process from payment confirmation to delivery updates',
-    'After payment is made, proof of transfer is reviewed and the order is updated as it moves through confirmation and delivery.',
+    'A clear order process from receipt review to delivery updates',
+    'After payment is made, the transfer receipt is reviewed and the order is updated as it moves through confirmation and delivery.',
     'Customers can return to their account to review submitted details and follow the latest order status.',
     null,
     null,
@@ -219,7 +219,6 @@ values
     null,
     null,
     null,
-    null,
     'image',
     'Sunpilot gallery',
     false
@@ -229,7 +228,6 @@ values
     'Team',
     'The people behind every order',
     'Our support, production, and installation teams work together to keep each order moving smoothly.',
-    null,
     null,
     null,
     null,
@@ -249,7 +247,6 @@ values
     null,
     null,
     null,
-    null,
     'image',
     'Sunpilot clients',
     false
@@ -260,7 +257,6 @@ values
     'Talk to us about your space',
     'Reach out for product enquiries, measurement guidance, and order support',
     'Contact the team to discuss your preferred blind style, ask questions, or confirm the next step for your order.',
-    null,
     null,
     null,
     null,
@@ -296,7 +292,7 @@ values
   ),
   (
     'highlight-offline-verification',
-    'Verified payment process',
+    'Verified transfer review',
     'Transfer receipts are reviewed before orders move into confirmation and fulfilment.',
     2,
     true
@@ -531,4 +527,3 @@ set
   image_url = excluded.image_url,
   sort_order = excluded.sort_order,
   is_active = excluded.is_active;
-

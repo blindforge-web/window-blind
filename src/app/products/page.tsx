@@ -151,10 +151,10 @@ export default async function ProductsPage({
               </h2>
             </div>
             <Link
-              href="/checkout/offline"
+              href="/checkout/order"
               className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white/72 px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
             >
-              Start checkout
+              Place an order
               <ArrowRight size={16} />
             </Link>
           </div>

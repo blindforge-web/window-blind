@@ -177,7 +177,7 @@ export default async function ProductDetailPage({
                 </div>
                 <div className="flex items-start gap-3 rounded-[1.2rem] border border-[var(--color-line)] bg-white/70 px-4 py-3 text-sm text-[var(--color-muted)]">
                   <ShieldCheck size={16} className="mt-1 shrink-0 text-[var(--color-ink)]" />
-                  <span>Offline transfer with proof upload and manual verification.</span>
+                  <span>Transfer confirmation with receipt upload and manual review.</span>
                 </div>
                 <div className="flex items-start gap-3 rounded-[1.2rem] border border-[var(--color-line)] bg-white/70 px-4 py-3 text-sm text-[var(--color-muted)]">
                   <Check size={16} className="mt-1 shrink-0 text-[var(--color-ink)]" />
@@ -187,7 +187,7 @@ export default async function ProductDetailPage({
 
               <div className="mt-6 grid gap-3">
                 <Link
-                  href={`/checkout/offline?product=${product.slug}`}
+                  href={`/checkout/order?product=${product.slug}`}
                   className="rounded-[1.2rem] bg-[var(--color-primary)] px-6 py-4 text-center text-sm font-semibold text-white"
                 >
                   Order this product

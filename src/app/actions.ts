@@ -261,14 +261,14 @@ export async function submitOfflineOrder(
     if (!(paymentProof instanceof File) || paymentProof.size === 0) {
       return {
         status: "error",
-        message: "Upload your proof of payment before submitting the order.",
+        message: "Attach your transfer receipt before submitting the order.",
       };
     }
 
     if (paymentProof.size > 5 * 1024 * 1024) {
       return {
         status: "error",
-        message: "Payment proof must be 5MB or less.",
+        message: "The receipt file must be 5MB or less.",
       };
     }
 
@@ -278,7 +278,7 @@ export async function submitOfflineOrder(
       return {
         status: "success",
         message:
-          "Preview mode recorded the order flow. Add the Supabase service key to persist real orders and uploads.",
+          "Preview mode recorded the order flow. Add the Supabase service key to store live orders and uploads.",
         orderReference: reference,
       };
     }
@@ -306,7 +306,7 @@ export async function submitOfflineOrder(
     if (uploadError) {
       return {
         status: "error",
-        message: "Payment proof upload failed. Try again.",
+        message: "Receipt upload failed. Try again.",
       };
     }
 
@@ -341,6 +341,7 @@ export async function submitOfflineOrder(
     }
 
     revalidatePath("/admin/dashboard");
+    revalidatePath("/checkout/order");
     revalidatePath("/checkout/offline");
     revalidatePath("/account");
 
@@ -443,7 +444,7 @@ export async function signInCustomer(
   if (error) {
     return {
       status: "error",
-      message: "Sign-in failed. Check the credentials and try again.",
+      message: "Account access failed. Check the credentials and try again.",
     };
   }
 
@@ -509,7 +510,7 @@ export async function signUpCustomer(
     return {
       status: "success",
       message:
-        "Account created. Confirm your email if required, then sign in to view future orders.",
+        "Account created. Confirm your email if required, then access your account to view future orders.",
     };
   }
 
@@ -741,6 +742,7 @@ export async function toggleDeliveryState(formData: FormData) {
     .update({ is_active: nextState })
     .eq("code", code);
 
+  revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
 }
@@ -766,6 +768,7 @@ export async function upsertDeliveryState(formData: FormData) {
     await supabase.from("delivery_states").delete().eq("code", oldCode);
   }
 
+  revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
 }
@@ -779,6 +782,7 @@ export async function deleteDeliveryState(formData: FormData) {
   }
 
   await supabase.from("delivery_states").delete().eq("code", code);
+  revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
 }
@@ -806,6 +810,7 @@ export async function savePaymentAccount(formData: FormData) {
     payment_note: getText(formData, "paymentNote"),
   });
 
+  revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
   revalidatePath("/admin/site-settings");

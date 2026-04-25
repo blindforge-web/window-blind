@@ -220,7 +220,7 @@ export default async function Home() {
                     Payment flow
                   </p>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Offline transfer with proof upload and manual confirmation.
+                    Transfer confirmation with receipt upload and manual review.
                   </p>
                 </article>
                 <article className="rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_84%,white_16%)] p-5 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.35)]">
@@ -241,7 +241,7 @@ export default async function Home() {
             {[
               "Measurement-first ordering for homes, offices, and projects.",
               "A cleaner catalog with stronger product discovery and modern cards.",
-              "Account-based tracking once payment proof has been reviewed.",
+              "Account-based tracking once the transfer receipt has been reviewed.",
             ].map((item) => (
               <article
                 key={item}
@@ -383,8 +383,8 @@ export default async function Home() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {[
-                "Open a product, place the order, transfer offline, upload proof, and track progress later.",
-                "Admins review proof manually, so customers always know there is a human confirmation step.",
+                "Open a product, place the order, complete the transfer, attach the receipt, and track progress later.",
+                "The team reviews each receipt manually, so customers always know there is a human confirmation step.",
                 "Orders stay visible from the account area instead of disappearing after checkout.",
                 "Delivery coordination can be updated by state as orders move forward.",
               ].map((item) => (

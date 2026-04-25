@@ -59,10 +59,10 @@ export async function SiteFooter() {
                 Product catalog
               </Link>
               <Link
-                href="/checkout/offline"
+                href="/checkout/order"
                 className="rounded-[1rem] border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-white/86"
               >
-                Checkout
+                Place order
               </Link>
               <Link
                 href="/account"

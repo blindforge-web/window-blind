@@ -9,11 +9,11 @@ export const siteConfig = {
     bankName: "Sterling Bank",
     accountName: "Sunpilot Studio Ltd",
     accountNumber: "0029416831",
-    note: "Transfer to the account, then upload your proof of payment. Admins verify payments manually before production starts.",
+    note: "Transfer to the account, then upload your receipt. Orders move forward after payment review.",
   },
   highlights: [
-    "Guest browsing with no forced signup",
-    "Offline-first checkout with proof-of-payment upload",
-    "Admin-only dashboard for products, states, pricing, and orders",
+    "Guest browsing with optional account access",
+    "Guided order checkout with receipt upload",
+    "Operational dashboard for products, delivery coverage, pricing, and orders",
   ],
 };

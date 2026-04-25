@@ -16,47 +16,57 @@ export function CustomerSignUpForm({
   );
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-5">
       <input type="hidden" name="redirectTo" value={redirectTo} />
-      <label className="space-y-2">
-        <span className="text-sm font-semibold">Full name</span>
+      <div className="rounded-[1.5rem] border border-[var(--color-line)] bg-white/78 p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+          Customer name
+        </p>
         <input
           type="text"
           name="fullName"
           required
-          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+          placeholder="Full name"
+          className="mt-3 w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
         />
-      </label>
-      <label className="space-y-2">
-        <span className="text-sm font-semibold">Email address</span>
+      </div>
+      <div className="rounded-[1.5rem] border border-[var(--color-line)] bg-white/78 p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+          Email
+        </p>
         <input
           type="email"
           name="email"
           required
-          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+          placeholder="you@example.com"
+          className="mt-3 w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
         />
-      </label>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">Password</span>
+        <div className="rounded-[1.5rem] border border-[var(--color-line)] bg-white/78 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Password
+          </p>
           <input
             type="password"
             name="password"
             required
             minLength={8}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+            className="mt-3 w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
           />
-        </label>
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">Confirm password</span>
+        </div>
+        <div className="rounded-[1.5rem] border border-[var(--color-line)] bg-white/78 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Confirm password
+          </p>
           <input
             type="password"
             name="confirmPassword"
             required
             minLength={8}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+            className="mt-3 w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
           />
-        </label>
+        </div>
       </div>
       {state.message ? (
         <div
@@ -69,7 +79,7 @@ export function CustomerSignUpForm({
           {state.message}
         </div>
       ) : null}
-      <SubmitButton label="Create account" pendingLabel="Creating..." />
+      <SubmitButton label="Create customer profile" pendingLabel="Creating profile..." />
     </form>
   );
 }

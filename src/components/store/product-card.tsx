@@ -8,12 +8,17 @@ export function ProductCard({ product }: { product: Product }) {
   const currentPrice = product.salePrice ?? product.basePrice;
 
   return (
-    <article className="group overflow-hidden rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_86%,white_14%)] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.32)] backdrop-blur-sm">
+    <article className="group relative overflow-hidden rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_86%,white_14%)] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.32)] backdrop-blur-sm">
+      <Link
+        href={`/products/${product.slug}`}
+        aria-label={`Open ${product.name}`}
+        className="absolute inset-0 z-0"
+      />
       <div className="p-3">
         <ProductVisual product={product} className="h-72 rounded-[1.65rem]" />
       </div>
 
-      <div className="space-y-5 px-5 pb-5">
+      <div className="relative z-10 space-y-5 px-5 pb-5">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
@@ -86,10 +91,10 @@ export function ProductCard({ product }: { product: Product }) {
             href={`/products/${product.slug}`}
             className="rounded-[1.1rem] border border-[var(--color-line)] bg-white/72 px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]"
           >
-            View details
+            Product details
           </Link>
           <Link
-            href={`/checkout/offline?product=${product.slug}`}
+            href={`/checkout/order?product=${product.slug}`}
             className="rounded-[1.1rem] bg-[var(--color-primary)] px-4 py-3 text-center text-sm font-semibold text-white"
           >
             Order now

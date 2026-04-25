@@ -16,26 +16,32 @@ export function CustomerSignInForm({
   );
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-5">
       <input type="hidden" name="redirectTo" value={redirectTo} />
-      <label className="space-y-2">
-        <span className="text-sm font-semibold">Email address</span>
+      <div className="rounded-[1.5rem] border border-[var(--color-line)] bg-white/78 p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+          Email
+        </p>
         <input
           type="email"
           name="email"
           required
-          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+          placeholder="you@example.com"
+          className="mt-3 w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
         />
-      </label>
-      <label className="space-y-2">
-        <span className="text-sm font-semibold">Password</span>
+      </div>
+      <div className="rounded-[1.5rem] border border-[var(--color-line)] bg-white/78 p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+          Password
+        </p>
         <input
           type="password"
           name="password"
           required
-          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+          placeholder="Enter your password"
+          className="mt-3 w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
         />
-      </label>
+      </div>
       {state.message ? (
         <div
           className={`rounded-2xl border px-4 py-3 text-sm ${
@@ -47,7 +53,7 @@ export function CustomerSignInForm({
           {state.message}
         </div>
       ) : null}
-      <SubmitButton label="Sign in" pendingLabel="Signing in..." />
+      <SubmitButton label="Continue to account" pendingLabel="Opening account..." />
     </form>
   );
 }

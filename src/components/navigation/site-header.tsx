@@ -117,7 +117,7 @@ export async function SiteHeader() {
                     href="/account"
                     className="rounded-[1.1rem] border border-[var(--color-line)] px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]"
                   >
-                    {currentUser ? "My account" : "Sign in"}
+                    {currentUser ? "My account" : "Account access"}
                   </Link>
                 </div>
               </div>

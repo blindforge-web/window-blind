@@ -57,15 +57,15 @@ export function OfflineOrderForm({
       <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-            Order form
+            Guided order details
           </p>
           <h2 className="mt-3 text-2xl font-extrabold text-[var(--color-ink)]">
-            Complete the form once and keep the order easy to review.
+            Build the final order brief in one clean pass.
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-            The form is grouped into customer details, blind configuration, delivery
-            information, and payment proof so the order feels closer to a marketplace
-            checkout than a long raw form.
+            Customer details, blind specification, delivery information, and transfer
+            receipt are grouped into separate cards so the process reads like a checkout
+            summary instead of a long admin-style form.
           </p>
         </div>
 
@@ -88,14 +88,14 @@ export function OfflineOrderForm({
               "This order will be connected to your account so you can track changes later."
             ) : (
               <>
-                Guest checkout is allowed.{" "}
+                You can continue without signing in.{" "}
                 <Link
-                  href={`/account?next=/checkout/offline?product=${product.slug}`}
+                  href={`/account?next=/checkout/order?product=${product.slug}`}
                   className="font-semibold text-white underline underline-offset-4"
                 >
-                  Sign in first
+                  Access your account first
                 </Link>{" "}
-                if you want the order to appear directly in your account history.
+                if you want this order saved directly into your order history.
               </>
             )}
           </p>
@@ -109,7 +109,7 @@ export function OfflineOrderForm({
               1. Customer details
             </p>
             <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              These details are used for delivery coordination and follow-up.
+              These details are used for delivery coordination, status updates, and final confirmation.
             </p>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
@@ -138,7 +138,7 @@ export function OfflineOrderForm({
           <label className="block md:col-span-2">
             <FieldLabel
               title="Email address"
-              helper="Optional, but useful for follow-up and account-based receipt access."
+              helper="Optional, but recommended for updates, receipts, and future order access."
             />
             <input
               name="email"
@@ -157,7 +157,7 @@ export function OfflineOrderForm({
               2. Product setup
             </p>
             <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              Confirm the exact blind configuration you want the team to produce.
+              Confirm the exact blind specification you want prepared for production.
             </p>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
@@ -270,7 +270,7 @@ export function OfflineOrderForm({
               Marketplace tip
             </p>
             <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-              Use the product page if you need to compare details again before placing the order.
+              Need another look? Open the product page to review visuals, finishes, and use cases.
             </p>
           </div>
         </div>
@@ -283,7 +283,7 @@ export function OfflineOrderForm({
               3. Delivery details
             </p>
             <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              Choose the delivery area and provide the address clearly.
+              Choose the delivery destination and provide the address as clearly as possible.
             </p>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
@@ -344,7 +344,7 @@ export function OfflineOrderForm({
               4. Payment proof and notes
             </p>
             <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              Upload the transfer proof and add any production or installation notes.
+              Attach your transfer receipt and include any production or installation notes.
             </p>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
@@ -367,10 +367,10 @@ export function OfflineOrderForm({
 
           <div className="rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-primary)_5%,white_95%)] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Upload payment proof
+              Receipt upload
             </p>
             <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-              Upload the receipt or screenshot for{" "}
+              Attach the receipt or transfer screenshot for{" "}
               <span className="font-bold text-[var(--color-ink)]">
                 {formatCurrency(totalAmount)}
               </span>
@@ -378,7 +378,7 @@ export function OfflineOrderForm({
             </p>
             {!liveMode ? (
               <p className="mt-2 text-xs font-semibold text-[var(--color-secondary)]">
-                Supabase service mode is not connected yet. Submission currently runs in preview mode.
+                Live order storage is not connected yet. This screen is currently running in preview mode.
               </p>
             ) : null}
             <input
@@ -425,12 +425,12 @@ export function OfflineOrderForm({
               {formatCurrency(totalAmount)}
             </p>
             <p className="text-sm leading-7 text-[var(--color-muted)]">
-              Submit the order after completing the transfer and uploading the proof.
+              Submit after completing the transfer and attaching the receipt.
             </p>
           </div>
           <SubmitButton
-            label="Place offline order"
-            pendingLabel="Submitting order..."
+            label="Submit order"
+            pendingLabel="Submitting..."
             className="px-7 py-4"
           />
         </div>
