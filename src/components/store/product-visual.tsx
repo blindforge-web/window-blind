@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import type { Product } from "@/lib/types";
 
 export function ProductVisual({
@@ -11,7 +12,7 @@ export function ProductVisual({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-[2rem] border border-white/50 ${className}`}
+      className={`relative overflow-hidden rounded-[2rem] border border-white/40 ${className}`}
       style={{
         background: hasImage
           ? undefined
@@ -26,15 +27,14 @@ export function ProductVisual({
           loading="lazy"
         />
       ) : null}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%)]" />
-      <div className="absolute inset-y-0 left-[12%] w-[18%] bg-white/12 blur-3xl" />
-      <div className="absolute inset-y-0 left-[44%] w-px bg-white/30" />
-      <div className="absolute inset-y-0 left-[56%] w-px bg-black/10" />
-      <div className="absolute bottom-5 left-5 right-5 rounded-[1.6rem] border border-white/30 bg-[rgba(17,15,13,0.22)] px-4 py-3 text-white backdrop-blur-md">
-        <p className="text-[10px] uppercase tracking-[0.26em] text-white/75">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.32),transparent_32%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_20%,rgba(15,23,42,0.1)_62%,rgba(15,23,42,0.48)_100%)]" />
+      <div className="absolute -right-10 top-8 h-32 w-32 rounded-full bg-white/14 blur-3xl" />
+      <div className="absolute bottom-5 left-5 right-5 rounded-[1.6rem] border border-white/24 bg-white/10 px-4 py-4 text-white backdrop-blur-xl">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/70">
           {product.visual.label}
         </p>
-        <p className="font-display text-2xl leading-none">{product.name}</p>
+        <p className="mt-2 text-2xl font-extrabold tracking-[-0.04em]">{product.name}</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight, Search, SlidersHorizontal } from "lucide-react";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { ProductCard } from "@/components/store/product-card";
@@ -39,36 +40,38 @@ export default async function ProductsPage({
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
-        <section className="rounded-[2.8rem] border border-[var(--color-line)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(244,247,251,0.9))] p-8 lg:p-10">
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <main className="mx-auto max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-10">
+        <section className="overflow-hidden rounded-[2.4rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_82%,white_18%)] p-6 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.28)] sm:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                Marketplace Catalog
+              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[var(--color-secondary)]">
+                Product Catalog
               </p>
-              <h1 className="mt-3 font-display text-6xl leading-none">
-                Shop blinds and interiors by type, colour, and room fit.
+              <h1 className="mt-3 max-w-3xl text-5xl font-extrabold tracking-[-0.06em] text-[var(--color-ink)] sm:text-6xl">
+                A cleaner browse experience for blinds and interior fittings.
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                This catalog now behaves more like a marketplace browse screen:
-                category-led discovery, search-first navigation, stronger product cards,
-                and clearer next steps into checkout and tracking.
+              <p className="mt-5 max-w-2xl text-sm leading-8 text-[var(--color-muted)] sm:text-base">
+                Search by room, finish, collection, or feature. The customer side now behaves
+                like a modern catalog instead of a basic product list.
               </p>
 
               <form action="/products" className="mt-6 flex flex-wrap gap-3">
-                <input
-                  type="search"
-                  name="q"
-                  defaultValue={params.q ?? ""}
-                  placeholder="Search by product, colour, feature, room..."
-                  className="min-w-[18rem] flex-1 rounded-2xl border border-[var(--color-line)] bg-white px-5 py-4 outline-none"
-                />
+                <div className="flex min-w-[18rem] flex-1 items-center gap-3 rounded-[1.2rem] border border-[var(--color-line)] bg-white/80 px-4 py-3">
+                  <Search size={18} className="text-[var(--color-muted)]" />
+                  <input
+                    type="search"
+                    name="q"
+                    defaultValue={params.q ?? ""}
+                    placeholder="Search product, room, feature, colour..."
+                    className="min-w-0 flex-1 border-0 bg-transparent outline-none"
+                  />
+                </div>
                 {selectedCollection ? (
                   <input type="hidden" name="collection" value={selectedCollection} />
                 ) : null}
                 <button
                   type="submit"
-                  className="rounded-2xl bg-[var(--color-primary)] px-6 py-4 text-sm font-semibold text-white"
+                  className="rounded-[1.2rem] bg-[var(--color-ink)] px-6 py-3 text-sm font-semibold text-white"
                 >
                   Search catalog
                 </button>
@@ -76,24 +79,30 @@ export default async function ProductsPage({
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <article className="rounded-[2rem] border border-[var(--color-line)] bg-white p-5">
+              <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/72 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                  Live listings
+                  Live products
                 </p>
-                <p className="mt-3 font-display text-4xl">{products.length}</p>
+                <p className="mt-3 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
+                  {products.length}
+                </p>
               </article>
-              <article className="rounded-[2rem] border border-[var(--color-line)] bg-white p-5">
+              <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/72 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
                   Collections
                 </p>
-                <p className="mt-3 font-display text-4xl">{collections.length}</p>
+                <p className="mt-3 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
+                  {collections.length}
+                </p>
               </article>
-              <article className="rounded-[2rem] border border-[var(--color-line)] bg-white p-5 sm:col-span-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                  Marketplace rules
+              <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-secondary)_10%,white_90%)] p-5 sm:col-span-2">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                  <SlidersHorizontal size={14} />
+                  Active filters
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                  Customers browse and order. Only admins create and list products.
+                  {selectedCollection ? `Collection: ${selectedCollection}. ` : "All collections. "}
+                  {searchTerm ? `Search: ${params.q}.` : "No search query applied."}
                 </p>
               </article>
             </div>
@@ -105,7 +114,7 @@ export default async function ProductsPage({
               className={`rounded-full px-4 py-2 text-sm font-semibold ${
                 !selectedCollection
                   ? "bg-[var(--color-ink)] text-white"
-                  : "border border-[var(--color-line)] bg-white text-[var(--color-ink)]"
+                  : "border border-[var(--color-line)] bg-white/72 text-[var(--color-ink)]"
               }`}
             >
               All products
@@ -121,7 +130,7 @@ export default async function ProductsPage({
                   className={`rounded-full px-4 py-2 text-sm font-semibold ${
                     selectedCollection === collection
                       ? "bg-[var(--color-ink)] text-white"
-                      : "border border-[var(--color-line)] bg-white text-[var(--color-ink)]"
+                      : "border border-[var(--color-line)] bg-white/72 text-[var(--color-ink)]"
                   }`}
                 >
                   {collection}
@@ -131,70 +140,47 @@ export default async function ProductsPage({
           </div>
         </section>
 
-        <section className="mt-10 grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <aside className="space-y-5">
-            <article className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-                Browse by use
+        <section className="mt-10">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-muted)]">
+                Showing
               </p>
-              <div className="mt-4 space-y-2 text-sm font-semibold text-[var(--color-ink)]">
-                <p>Bedrooms</p>
-                <p>Living rooms</p>
-                <p>Offices</p>
-                <p>Reception areas</p>
-                <p>Kitchens</p>
-              </div>
-            </article>
-
-            <article className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-                Why shop here
-              </p>
-              <div className="mt-4 space-y-3 text-sm leading-7 text-[var(--color-muted)]">
-                <p>Marketplace-style product discovery</p>
-                <p>Admin-controlled live listings only</p>
-                <p>Offline checkout with order tracking</p>
-              </div>
-            </article>
-          </aside>
-
-          <section>
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-muted)]">
-                  Showing
-                </p>
-                <h2 className="mt-2 font-display text-5xl leading-none">
-                  {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"}
-                </h2>
-              </div>
-              <div className="text-sm leading-7 text-[var(--color-muted)]">
-                {selectedCollection ? <p>Collection: {selectedCollection}</p> : null}
-                {searchTerm ? <p>Search: {params.q}</p> : <p>Choose a product to continue.</p>}
-              </div>
+              <h2 className="mt-2 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)] sm:text-5xl">
+                {filteredProducts.length} product{filteredProducts.length === 1 ? "" : "s"}
+              </h2>
             </div>
+            <Link
+              href="/checkout/offline"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white/72 px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
+            >
+              Start checkout
+              <ArrowRight size={16} />
+            </Link>
+          </div>
 
-            {filteredProducts.length ? (
-              <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-                {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/70 p-10">
-                <h2 className="font-display text-4xl">No products match this search</h2>
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                  Try another keyword or switch collections.
-                </p>
-                <Link
-                  href="/products"
-                  className="mt-6 inline-flex rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold"
-                >
-                  Reset catalog
-                </Link>
-              </div>
-            )}
-          </section>
+          {filteredProducts.length ? (
+            <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/62 p-10">
+              <h2 className="text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
+                No products match this search
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
+                Try another keyword, remove the collection filter, or reset the catalog.
+              </p>
+              <Link
+                href="/products"
+                className="mt-6 inline-flex rounded-full border border-[var(--color-line)] bg-white/72 px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
+              >
+                Reset catalog
+              </Link>
+            </div>
+          )}
         </section>
       </main>
       <SiteFooter />

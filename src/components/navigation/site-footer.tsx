@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight, Phone, MapPin, MessageCircle } from "lucide-react";
 import {
   getContactInfo,
   getNavigationItems,
@@ -15,72 +16,98 @@ export async function SiteFooter() {
   ]);
 
   return (
-    <footer className="border-t border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-surface)_90%,transparent)]">
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-        <div className="grid gap-8 rounded-[2.5rem] border border-[var(--color-line)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(244,247,251,0.86))] p-8 lg:grid-cols-[1.15fr_0.75fr_0.9fr]">
-          <div className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
+    <footer className="px-4 pb-6 pt-10 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-[2.2rem] border border-[var(--color-line)] bg-[linear-gradient(140deg,color-mix(in_srgb,var(--color-primary)_96%,black_4%),color-mix(in_srgb,var(--color-primary)_76%,black_24%))] text-white shadow-[0_30px_80px_-40px_rgba(15,23,42,0.85)]">
+        <div className="grid gap-10 px-6 py-8 lg:grid-cols-[1.1fr_0.7fr_0.9fr] lg:px-10 lg:py-10">
+          <div className="space-y-5">
+            <div className="inline-flex rounded-full border border-white/15 bg-white/8 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/72">
               {settings?.brandName || "Sunpilot"}
-            </p>
-            <h2 className="font-display text-5xl leading-none text-[var(--color-ink)]">
-              Built for easy browsing and confident ordering.
+            </div>
+            <h2 className="max-w-xl text-4xl font-extrabold tracking-[-0.05em] sm:text-5xl">
+              Better rooms start with better light control.
             </h2>
-            {settings?.footerNote ? (
-              <p className="max-w-xl text-sm leading-7 text-[var(--color-muted)]">
-                {settings.footerNote}
-              </p>
-            ) : null}
+            <p className="max-w-xl text-sm leading-7 text-white/72">
+              {settings?.footerNote ||
+                "Browse collections, choose a fit, place your order, and track progress from one clean customer flow."}
+            </p>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/products"
-                className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
               >
-                Shop products
+                Browse catalog
+                <ArrowUpRight size={16} />
               </Link>
               <Link
                 href="/account"
-                className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
+                className="rounded-full border border-white/18 px-5 py-3 text-sm font-semibold text-white"
               >
-                Track my order
+                Track orders
               </Link>
             </div>
           </div>
 
-          <div className="space-y-3 text-sm text-[var(--color-muted)]">
-            <p className="font-semibold uppercase tracking-[0.18em] text-[var(--color-ink)]">
+          <div className="space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/62">
               Explore
             </p>
-            <Link href="/products" className="hover:text-[var(--color-ink)]">
-              Product catalog
-            </Link>
-            <Link href="/checkout/offline" className="hover:text-[var(--color-ink)]">
-              Checkout
-            </Link>
-            <Link href="/account" className="hover:text-[var(--color-ink)]">
-              Account
-            </Link>
-            {navigation.map((item) => (
-              <Link key={item.id} href={item.link} className="hover:text-[var(--color-ink)]">
-                {item.title}
+            <div className="grid gap-2">
+              <Link
+                href="/products"
+                className="rounded-[1rem] border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-white/86"
+              >
+                Product catalog
               </Link>
-            ))}
+              <Link
+                href="/checkout/offline"
+                className="rounded-[1rem] border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-white/86"
+              >
+                Checkout
+              </Link>
+              <Link
+                href="/account"
+                className="rounded-[1rem] border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-white/86"
+              >
+                Account
+              </Link>
+              {navigation.map((item) => (
+                <Link
+                  key={item.id}
+                  href={item.link}
+                  className="rounded-[1rem] border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-white/86"
+                >
+                  {item.title}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-4 text-sm text-[var(--color-muted)]">
-            <p className="font-semibold uppercase tracking-[0.18em] text-[var(--color-ink)]">
+          <div className="space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/62">
               Contact
             </p>
-            {contact?.phone1 ? <p>{contact.phone1}</p> : null}
-            {contact?.phone2 ? <p>{contact.phone2}</p> : null}
-            {contact?.email ? <p>{contact.email}</p> : null}
-            {contact?.address ? <p>{contact.address}</p> : null}
+            <div className="space-y-3 text-sm text-white/78">
+              {contact?.phone1 ? (
+                <p className="flex items-start gap-3 rounded-[1rem] border border-white/10 bg-white/6 px-4 py-3">
+                  <Phone size={16} className="mt-0.5 shrink-0" />
+                  <span>{contact.phone1}</span>
+                </p>
+              ) : null}
+              {contact?.address ? (
+                <p className="flex items-start gap-3 rounded-[1rem] border border-white/10 bg-white/6 px-4 py-3">
+                  <MapPin size={16} className="mt-0.5 shrink-0" />
+                  <span>{contact.address}</span>
+                </p>
+              ) : null}
+            </div>
             <div className="flex flex-wrap gap-3 pt-2">
               {socialLinks.map((item) => (
                 <Link
                   key={item.id}
                   href={item.url}
-                  className="rounded-full border border-[var(--color-line)] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-ink)]"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white"
                 >
+                  <MessageCircle size={14} />
                   {item.displayName}
                 </Link>
               ))}

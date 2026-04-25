@@ -1,23 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
+import { ArrowRight, Menu, Phone, ShoppingBag } from "lucide-react";
 import { getCurrentAdmin, getCurrentUser } from "@/lib/auth";
-import { getContactInfo, getNavigationItems, getSiteSettings } from "@/lib/data";
+import { getNavigationItems, getSiteSettings } from "@/lib/data";
 import { getInitials } from "@/lib/utils";
 
-const quickCategories = [
-  { href: "/products?collection=Roller%20Blinds", label: "Roller" },
-  { href: "/products?collection=Zebra%20Blinds", label: "Zebra" },
-  { href: "/products?collection=Roman%20Blinds", label: "Roman" },
-  { href: "/products?collection=Venetian%20Blinds", label: "Venetian" },
-];
-
 export async function SiteHeader() {
-  const [settings, navigation, currentUser, currentAdmin, contact] = await Promise.all([
+  const [settings, navigation, currentUser, currentAdmin] = await Promise.all([
     getSiteSettings(),
     getNavigationItems(),
     getCurrentUser(),
     getCurrentAdmin(),
-    getContactInfo(),
   ]);
 
   const brandLabel = settings?.shortName || settings?.brandName || "Sunpilot";
@@ -33,182 +26,103 @@ export async function SiteHeader() {
       ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-surface)_90%,transparent)] backdrop-blur-2xl">
-      <div className="border-b border-[color-mix(in_srgb,var(--color-line)_70%,transparent)] bg-[color-mix(in_srgb,var(--color-primary)_96%,black_4%)] text-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] lg:px-10">
-          <div className="flex flex-wrap items-center gap-3 text-white/82">
-            <span>Official blinds and interiors store</span>
-            {contact?.phone1 ? <span>Support {contact.phone1}</span> : null}
-          </div>
-          <div className="flex flex-wrap items-center gap-4 text-white/82">
-            <Link href="/account" className="hover:text-white">
-              {currentUser ? "My account" : "Sign in"}
-            </Link>
-            <Link href="/checkout/offline" className="hover:text-white">
-              Checkout
-            </Link>
-            {currentAdmin ? (
-              <Link href="/admin/dashboard" className="hover:text-white">
-                Admin
-              </Link>
-            ) : null}
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto grid max-w-7xl gap-4 px-6 py-4 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:px-10">
-        <Link href="/" className="flex min-w-0 items-center gap-3">
-          {settings?.logoUrl ? (
-            <img
-              src={settings.logoUrl}
-              alt={settings.brandName}
-              className="h-12 w-12 rounded-2xl object-cover ring-4 ring-white/80"
-            />
-          ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(145deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_66%,black_34%))] text-sm font-extrabold tracking-[0.24em] text-white">
-              {getInitials(brandLabel)}
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="truncate font-display text-3xl leading-none text-[var(--color-ink)]">
-              {brandLabel}
-            </p>
-            <p className="truncate text-xs font-medium text-[var(--color-muted)]">
-              Marketplace for blinds and interior finishing
-            </p>
-          </div>
-        </Link>
-
-        <form action="/products" className="hidden lg:block">
-          <div className="flex items-center gap-2 rounded-[1.4rem] border border-[var(--color-line)] bg-white p-2 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)]">
-            <input
-              type="search"
-              name="q"
-              placeholder="Search roller, zebra, roman, venetian blinds..."
-              className="min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 py-2 outline-none"
-            />
-            <button
-              type="submit"
-              className="rounded-xl bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white"
-            >
-              Search
-            </button>
-          </div>
-        </form>
-
-        <div className="hidden items-center gap-3 lg:flex">
-          <Link
-            href="/account"
-            className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm font-semibold text-[var(--color-ink)]"
-          >
-            {currentUser ? "Orders" : "Account"}
-          </Link>
-          <Link
-            href="/checkout/offline"
-            className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm font-semibold text-[var(--color-ink)]"
-          >
-            Checkout
-          </Link>
-          <Link
-            href="/products"
-            className="rounded-2xl bg-[var(--color-secondary)] px-4 py-3 text-sm font-semibold text-[var(--color-ink)]"
-          >
-            Shop now
-          </Link>
-        </div>
-
-        <form action="/products" className="lg:hidden">
-          <div className="flex items-center gap-2 rounded-[1.2rem] border border-[var(--color-line)] bg-white p-2">
-            <input
-              type="search"
-              name="q"
-              placeholder="Search blinds..."
-              className="min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 py-2 outline-none"
-            />
-            <button
-              type="submit"
-              className="rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white"
-            >
-              Go
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div className="border-t border-[color-mix(in_srgb,var(--color-line)_70%,transparent)]">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-3 lg:px-10">
-          <nav className="hidden flex-wrap items-center gap-2 xl:flex">
-            {quickCategories.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-full border border-[var(--color-line)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
-              >
-                {item.label}
-              </Link>
-            ))}
-            {navItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.link}
-                className="rounded-full px-3 py-2 text-sm font-semibold text-[var(--color-muted)] hover:bg-white hover:text-[var(--color-ink)]"
-              >
-                {item.title}
-              </Link>
-            ))}
-          </nav>
-
-          <details className="relative xl:hidden">
-            <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-[var(--color-line)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-ink)]">
-              Browse menu
-            </summary>
-            <div className="absolute left-0 top-14 z-10 w-[21rem] rounded-[2rem] border border-[var(--color-line)] bg-[var(--color-surface)] p-4 shadow-[0_30px_70px_-30px_rgba(15,23,42,0.45)]">
-              <div className="space-y-3">
-                <div className="rounded-[1.5rem] bg-[color-mix(in_srgb,var(--color-secondary)_16%,white_84%)] p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[var(--color-muted)]">
-                    Quick categories
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {quickCategories.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="rounded-full border border-[var(--color-line)] bg-white px-3 py-2 text-xs font-semibold text-[var(--color-ink)]"
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
+    <header className="sticky top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10">
+      <div className="mx-auto max-w-7xl">
+        <div className="rounded-[1.9rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_82%,transparent)] px-4 py-3 shadow-[0_24px_60px_-38px_rgba(15,23,42,0.5)] backdrop-blur-2xl sm:px-5">
+          <div className="flex items-center justify-between gap-4">
+            <Link href="/" className="flex min-w-0 items-center gap-3">
+              {settings?.logoUrl ? (
+                <img
+                  src={settings.logoUrl}
+                  alt={settings.brandName}
+                  className="h-12 w-12 rounded-[1.2rem] object-cover shadow-[0_12px_30px_-20px_rgba(15,23,42,0.55)]"
+                />
+              ) : (
+                <div className="flex h-12 w-12 items-center justify-center rounded-[1.2rem] bg-[linear-gradient(135deg,var(--color-primary),color-mix(in_srgb,var(--color-secondary)_58%,var(--color-primary)_42%))] text-sm font-extrabold tracking-[0.22em] text-white shadow-[0_14px_30px_-18px_rgba(10,37,64,0.75)]">
+                  {getInitials(brandLabel)}
                 </div>
-
-                {navItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={item.link}
-                    className="block rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-accent)]"
-                  >
-                    {item.title}
-                  </Link>
-                ))}
-                <Link
-                  href="/account"
-                  className="block rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-accent)]"
-                >
-                  {currentUser ? "My orders" : "Account"}
-                </Link>
-                <Link
-                  href="/checkout/offline"
-                  className="block rounded-2xl bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white"
-                >
-                  Checkout
-                </Link>
+              )}
+              <div className="min-w-0">
+                <p className="truncate text-lg font-extrabold tracking-[-0.04em] text-[var(--color-ink)] sm:text-xl">
+                  {brandLabel}
+                </p>
+                <p className="truncate text-xs text-[var(--color-muted)]">
+                  Modern blinds for homes and workspaces
+                </p>
               </div>
-            </div>
-          </details>
+            </Link>
 
-          <p className="hidden text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)] lg:block">
-            Only admins can list products
-          </p>
+            <nav className="hidden items-center gap-1 rounded-full border border-[var(--color-line)] bg-white/72 p-1 lg:flex">
+              {navItems.map((item) => (
+                <Link
+                  key={item.id}
+                  href={item.link}
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--color-muted)] hover:bg-[var(--color-accent)] hover:text-[var(--color-ink)]"
+                >
+                  {item.title}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="hidden items-center gap-3 lg:flex">
+              <Link
+                href="/account"
+                className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white/78 px-4 py-2.5 text-sm font-semibold text-[var(--color-ink)]"
+              >
+                <Phone size={16} />
+                {currentUser ? "My account" : "Account"}
+              </Link>
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_-20px_rgba(15,23,42,0.7)]"
+              >
+                <ShoppingBag size={16} />
+                Shop now
+              </Link>
+              {currentAdmin ? (
+                <Link
+                  href="/admin/dashboard"
+                  className="rounded-full border border-[var(--color-line)] bg-white/78 px-4 py-2.5 text-sm font-semibold text-[var(--color-ink)]"
+                >
+                  Admin
+                </Link>
+              ) : null}
+            </div>
+
+            <details className="relative lg:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-center rounded-full border border-[var(--color-line)] bg-white/82 p-3 text-[var(--color-ink)]">
+                <Menu size={18} />
+              </summary>
+              <div className="absolute right-0 top-16 w-[19rem] rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-surface)_94%,white_6%)] p-4 shadow-[0_28px_70px_-28px_rgba(15,23,42,0.5)] backdrop-blur-xl">
+                <div className="space-y-2">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.link}
+                      className="block rounded-[1.1rem] px-4 py-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-accent)]"
+                    >
+                      {item.title}
+                    </Link>
+                  ))}
+                </div>
+                <div className="mt-4 grid gap-2">
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center justify-center gap-2 rounded-[1.1rem] bg-[var(--color-ink)] px-4 py-3 text-sm font-semibold text-white"
+                  >
+                    Browse products
+                    <ArrowRight size={16} />
+                  </Link>
+                  <Link
+                    href="/account"
+                    className="rounded-[1.1rem] border border-[var(--color-line)] px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]"
+                  >
+                    {currentUser ? "My account" : "Sign in"}
+                  </Link>
+                </div>
+              </div>
+            </details>
+          </div>
         </div>
       </div>
     </header>
