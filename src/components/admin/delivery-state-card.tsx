@@ -38,37 +38,55 @@ export function DeliveryStateCard({
           </label>
         </div>
 
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">Code</span>
-          <input
-            name="code"
-            defaultValue={deliveryState?.code ?? ""}
-            placeholder="lagos"
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
+        {!isNew ? (
+          <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/88 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+              Delivery promise
+            </p>
+            <p className="mt-2 text-lg font-extrabold text-[var(--color-ink)]">
+              {deliveryState.eta}
+            </p>
+          </div>
+        ) : null}
 
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">Name</span>
-          <input
-            name="name"
-            defaultValue={deliveryState?.name ?? ""}
-            placeholder="Lagos"
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
+        <details className="rounded-[1.6rem] border border-[var(--color-line)] bg-white/88 p-4" open={isNew}>
+          <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--color-ink)]">
+            {isNew ? "Add delivery coverage" : "Edit delivery coverage"}
+          </summary>
+          <div className="mt-4 grid gap-4">
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Code</span>
+              <input
+                name="code"
+                defaultValue={deliveryState?.code ?? ""}
+                placeholder="lagos"
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">ETA</span>
-          <input
-            name="eta"
-            defaultValue={deliveryState?.eta ?? "3 to 6 working days"}
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Name</span>
+              <input
+                name="name"
+                defaultValue={deliveryState?.name ?? ""}
+                placeholder="Lagos"
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">ETA</span>
+              <input
+                name="eta"
+                defaultValue={deliveryState?.eta ?? "3 to 6 working days"}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+          </div>
+        </details>
 
         <div className="flex flex-wrap gap-3">
           <button

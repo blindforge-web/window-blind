@@ -9,11 +9,11 @@ export function CreateProductPanel({
     <section className="rounded-[2rem] border border-[var(--color-line)] bg-[rgba(255,249,241,0.88)] p-6">
       <div className="mb-5">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-muted)]">
-          New Product
+          New product
         </p>
-        <h2 className="font-display text-4xl leading-none">Create a listing</h2>
+        <h2 className="font-display text-4xl leading-none">Create a launch-ready listing</h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-          Start with the essential selling details. Advanced visual settings are optional.
+          Start with the commercial essentials first. Visual merchandising fields stay available, but secondary details no longer dominate the screen.
         </p>
       </div>
 
@@ -71,11 +71,11 @@ export function CreateProductPanel({
         </label>
 
         <label className="space-y-2">
-          <span className="text-sm font-semibold">Slug</span>
+          <span className="text-sm font-semibold">URL key</span>
           <input
             name="slug"
             disabled={!actionsEnabled}
-            placeholder="Leave blank to generate from name"
+            placeholder="Leave blank to generate from product name"
             className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
           />
         </label>

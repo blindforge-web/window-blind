@@ -1,6 +1,7 @@
 import { deleteProduct, upsertProduct } from "@/app/actions";
 import { ProductVisual } from "@/components/store/product-visual";
 import type { Product } from "@/lib/types";
+import { formatCurrency } from "@/lib/utils";
 
 export function ProductAdminCard({
   product,
@@ -22,6 +23,9 @@ export function ProductAdminCard({
               {product.collection}
             </p>
             <h3 className="font-display text-3xl leading-none">{product.name}</h3>
+            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+              {product.shortDescription}
+            </p>
           </div>
           <label className="flex items-center gap-2 text-sm font-semibold">
             <input
@@ -36,135 +40,180 @@ export function ProductAdminCard({
 
         <ProductVisual product={product} className="min-h-[16rem]" />
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Product name</span>
-            <input
-              name="name"
-              defaultValue={product.name}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Collection</span>
-            <input
-              name="collection"
-              defaultValue={product.collection}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Base price</span>
-            <input
-              type="number"
-              name="basePrice"
-              defaultValue={product.basePrice}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Sale price</span>
-            <input
-              type="number"
-              name="salePrice"
-              defaultValue={product.salePrice ?? ""}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Lead time</span>
-            <input
-              name="leadTime"
-              defaultValue={product.leadTime}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Slug</span>
-            <input
-              name="slug"
-              defaultValue={product.slug}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2 lg:col-span-2">
-            <span className="text-sm font-semibold">Short description</span>
-            <textarea
-              name="shortDescription"
-              rows={3}
-              defaultValue={product.shortDescription}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2 lg:col-span-2">
-            <span className="text-sm font-semibold">Full description</span>
-            <textarea
-              name="description"
-              rows={5}
-              defaultValue={product.description}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Image URL</span>
-            <input
-              name="imageUrl"
-              defaultValue=""
-              placeholder={product.imageUrl ?? "Direct image URL"}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Upload image</span>
-            <input
-              type="file"
-              name="imageFile"
-              accept="image/*"
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Measurements</span>
-            <textarea
-              name="measurements"
-              rows={3}
-              defaultValue={product.measurements.join(", ")}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold">Colours</span>
-            <textarea
-              name="colors"
-              rows={3}
-              defaultValue={product.colors.join(", ")}
-              disabled={!actionsEnabled}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-            />
-          </label>
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/88 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+              Starting price
+            </p>
+            <p className="mt-2 text-2xl font-extrabold text-[var(--color-ink)]">
+              {formatCurrency(product.salePrice ?? product.basePrice)}
+            </p>
+          </div>
+          <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/88 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+              Lead time
+            </p>
+            <p className="mt-2 text-lg font-extrabold text-[var(--color-ink)]">
+              {product.leadTime}
+            </p>
+          </div>
+          <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/88 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+              URL key
+            </p>
+            <p className="mt-2 text-sm font-bold text-[var(--color-ink)]">{product.slug}</p>
+          </div>
         </div>
+
+        <div className="flex flex-wrap gap-3">
+          <a
+            href={`/products/${product.slug}`}
+            className="rounded-full border border-[var(--color-line)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
+          >
+            Open product page
+          </a>
+          <a
+            href={`/checkout/order?product=${product.slug}`}
+            className="rounded-full border border-[var(--color-line)] bg-white px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
+          >
+            Open order flow
+          </a>
+        </div>
+
+        <details className="rounded-[1.6rem] border border-[var(--color-line)] bg-white/88 p-4" open>
+          <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--color-ink)]">
+            Core listing details
+          </summary>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Product name</span>
+              <input
+                name="name"
+                defaultValue={product.name}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Collection</span>
+              <input
+                name="collection"
+                defaultValue={product.collection}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Base price</span>
+              <input
+                type="number"
+                name="basePrice"
+                defaultValue={product.basePrice}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Sale price</span>
+              <input
+                type="number"
+                name="salePrice"
+                defaultValue={product.salePrice ?? ""}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Lead time</span>
+              <input
+                name="leadTime"
+                defaultValue={product.leadTime}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">URL key</span>
+              <input
+                name="slug"
+                defaultValue={product.slug}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2 lg:col-span-2">
+              <span className="text-sm font-semibold">Short description</span>
+              <textarea
+                name="shortDescription"
+                rows={3}
+                defaultValue={product.shortDescription}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2 lg:col-span-2">
+              <span className="text-sm font-semibold">Full description</span>
+              <textarea
+                name="description"
+                rows={5}
+                defaultValue={product.description}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Image URL</span>
+              <input
+                name="imageUrl"
+                defaultValue=""
+                placeholder={product.imageUrl ?? "Direct image URL"}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Upload image</span>
+              <input
+                type="file"
+                name="imageFile"
+                accept="image/*"
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Measurements</span>
+              <textarea
+                name="measurements"
+                rows={3}
+                defaultValue={product.measurements.join(", ")}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-semibold">Colours</span>
+              <textarea
+                name="colors"
+                rows={3}
+                defaultValue={product.colors.join(", ")}
+                disabled={!actionsEnabled}
+                className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
+              />
+            </label>
+          </div>
+        </details>
 
         <details className="rounded-[1.6rem] border border-[var(--color-line)] bg-white/88 p-4">
           <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--color-ink)]">

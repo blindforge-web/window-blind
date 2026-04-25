@@ -556,7 +556,7 @@ export default async function AdminSiteSettingsPage({
               <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
                 <PanelHeading
                   eyebrow="Contact"
-                  title="Business contact details"
+                  title="Public contact details"
                   body="Keep phone numbers, email, and address current so the public site stays accurate."
                 />
                 <form action={saveContactInfo} className="grid gap-4 lg:grid-cols-2">
@@ -607,7 +607,7 @@ export default async function AdminSiteSettingsPage({
                 <PanelHeading
                   eyebrow="Payment"
                   title="Transfer account details"
-                  body="These fields are seeded in `site_settings` and are used on the checkout flow."
+                  body="These details appear in the customer order flow and should match the live business account."
                 />
                 <form action={savePaymentAccount} className="grid gap-4 lg:grid-cols-2">
                   <Field
@@ -651,8 +651,8 @@ export default async function AdminSiteSettingsPage({
                 <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
               <PanelHeading
                 eyebrow="Navigation"
-                title="Navbar and social links"
-                body="These control the public navigation and footer/header social buttons."
+                title="Navigation and social presence"
+                body="These control the main website navigation and the social links shown in customer-facing areas."
               />
               <div className="grid gap-6 xl:grid-cols-2">
                 <div className="space-y-4">

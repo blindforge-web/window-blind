@@ -57,19 +57,32 @@ export function OrderAdminRow({
         </p>
       </div>
 
-      <div>
+      <div className="space-y-3">
         <span className="rounded-full bg-[rgba(212,175,55,0.14)] px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-secondary)]">
           {formatStatusLabel(order.status)}
         </span>
+        {order.paymentProofUrl ? (
+          <a
+            href={order.paymentProofUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="block rounded-[1.2rem] border border-[var(--color-line)] bg-[rgba(248,250,252,0.84)] px-4 py-3 text-sm font-semibold text-[var(--color-ink)]"
+          >
+            Open receipt
+          </a>
+        ) : null}
       </div>
 
-      <form action={updateOrderStatus} className="flex gap-3">
+      <form action={updateOrderStatus} className="space-y-3">
         <input type="hidden" name="orderId" value={order.id} />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+          Update status
+        </p>
         <select
           name="status"
           defaultValue={order.status}
           disabled={!actionsEnabled}
-          className="min-w-0 flex-1 rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm outline-none disabled:opacity-60"
+          className="min-w-0 w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm outline-none disabled:opacity-60"
         >
           {statusOptions.map((status) => (
             <option key={status} value={status}>
@@ -80,9 +93,9 @@ export function OrderAdminRow({
         <button
           type="submit"
           disabled={!actionsEnabled}
-          className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-full bg-[var(--color-primary)] px-4 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Update
+          Save status
         </button>
       </form>
     </article>

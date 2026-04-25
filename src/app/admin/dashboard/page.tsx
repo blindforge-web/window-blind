@@ -41,6 +41,25 @@ const dashboardViews = [
   },
 ] as const;
 
+const overviewMetrics = [
+  {
+    label: "Listed products",
+    view: "products",
+  },
+  {
+    label: "All products",
+    view: "products",
+  },
+  {
+    label: "Pending orders",
+    view: "orders",
+  },
+  {
+    label: "Delivery states",
+    view: "setup",
+  },
+] as const;
+
 type DashboardViewId = (typeof dashboardViews)[number]["id"];
 
 function isDashboardView(value?: string): value is DashboardViewId {
@@ -176,22 +195,32 @@ export default async function AdminDashboardPage({
             {selectedView === "overview" ? (
               <>
                 <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  {[
-                    ["Listed products", formatCompactNumber(activeProducts)],
-                    ["All products", formatCompactNumber(dashboard.products.length)],
-                    ["Pending orders", formatCompactNumber(pendingOrders)],
-                    ["Delivery states", formatCompactNumber(dashboard.deliveryStates.length)],
-                  ].map(([label, value]) => (
-                    <article
-                      key={label}
-                      className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/90 p-5"
-                    >
+                  {overviewMetrics.map(({ label, view }) => {
+                    const value =
+                      label === "Listed products"
+                        ? formatCompactNumber(activeProducts)
+                        : label === "All products"
+                          ? formatCompactNumber(dashboard.products.length)
+                          : label === "Pending orders"
+                            ? formatCompactNumber(pendingOrders)
+                            : formatCompactNumber(dashboard.deliveryStates.length);
+
+                    return (
+                      <Link
+                        key={label}
+                        href={`/admin/dashboard?view=${view}`}
+                        className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/90 p-5 transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-32px_rgba(15,23,42,0.35)]"
+                      >
                       <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-muted)]">
                         {label}
                       </p>
                       <p className="mt-3 font-display text-4xl">{value}</p>
-                    </article>
-                  ))}
+                      <p className="mt-3 text-sm font-semibold text-[var(--color-secondary)]">
+                        Open {view}
+                      </p>
+                      </Link>
+                    );
+                  })}
                 </section>
 
                 <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
@@ -201,30 +230,30 @@ export default async function AdminDashboardPage({
                       title="Main admin actions"
                       body="Most admin work should happen in these three areas."
                     />
-                    <div className="grid gap-3 md:grid-cols-3">
+                    <div className="grid gap-3 md:grid-cols-2">
                       <Link
                         href="/admin/dashboard?view=products"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold"
+                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
                       >
-                        Manage products
+                        Product library
                       </Link>
                       <Link
                         href="/admin/dashboard?view=orders"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold"
+                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
                       >
-                        Review orders
+                        Order queue
                       </Link>
                       <Link
                         href="/admin/dashboard?view=setup"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold"
+                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
                       >
-                        Delivery setup
+                        Delivery coverage
                       </Link>
                       <Link
                         href="/admin/site-settings"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold"
+                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
                       >
-                        Site settings
+                        Content studio
                       </Link>
                     </div>
                   </section>

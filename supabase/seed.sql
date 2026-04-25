@@ -219,6 +219,7 @@ values
     null,
     null,
     null,
+    null,
     'image',
     'Sunpilot gallery',
     false
@@ -233,6 +234,7 @@ values
     null,
     null,
     null,
+    null,
     'image',
     'Sunpilot team',
     true
@@ -242,6 +244,7 @@ values
     'Who we serve',
     'Trusted for residential, office, and project-based blind supply',
     'Sunpilot supports private homes, business spaces, and interior projects that need dependable blind supply and coordinated delivery.',
+    null,
     null,
     null,
     null,
