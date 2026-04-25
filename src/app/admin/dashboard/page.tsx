@@ -201,10 +201,18 @@ export default async function AdminDashboardPage({
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
                 This dashboard is now focused on the work that matters most every day:
                 products, orders, payment setup, delivery coverage, and contact details.
-                Unnecessary homepage-content editing has been removed from this main admin flow.
+                Public-site content and branding now live in a separate site settings screen.
               </p>
             </div>
-            {admin ? <SignOutButton /> : null}
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/admin/site-settings"
+                className="rounded-full border border-[var(--color-line)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
+              >
+                Open site settings
+              </Link>
+              {admin ? <SignOutButton /> : null}
+            </div>
           </div>
         </section>
 
@@ -304,18 +312,24 @@ export default async function AdminDashboardPage({
                       >
                         Store setup
                       </Link>
+                      <Link
+                        href="/admin/site-settings"
+                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold"
+                      >
+                        Site settings
+                      </Link>
                     </div>
                   </section>
 
                   <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
                     <PanelHeading
                       eyebrow="Scope"
-                      title="What was removed"
-                      body="The admin side no longer centers on editing every homepage section, gallery block, client logo, social link, or full branding surface."
+                      title="What moved"
+                      body="Homepage sections, service imagery, team imagery, navigation, social links, branding, gallery, and client content now live on the dedicated site settings screen."
                     />
                     <p className="text-sm leading-7 text-[var(--color-muted)]">
-                      The workflow is now simpler and better aligned with a real ecommerce
-                      operation. Daily admin effort should stay focused on catalog and order handling.
+                      The workflow is now simpler: keep daily operational work here, and use the
+                      dedicated site settings screen for public-site content management.
                     </p>
                   </section>
                 </section>

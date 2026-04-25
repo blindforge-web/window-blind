@@ -41,6 +41,7 @@ function revalidateSite() {
   revalidatePath("/");
   revalidatePath("/products");
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/site-settings");
   revalidatePath("/admin/login");
 }
 
