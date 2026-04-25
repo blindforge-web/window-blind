@@ -213,142 +213,152 @@ export async function submitOfflineOrder(
   _previousState: OfflineOrderActionState,
   formData: FormData,
 ): Promise<OfflineOrderActionState> {
-  const sessionSupabase = hasPublicSupabaseConfig
-    ? await createSupabaseServerClient()
-    : null;
-  const {
-    data: { user },
-  } = sessionSupabase ? await sessionSupabase.auth.getUser() : { data: { user: null } };
-  const customerName = getText(formData, "customerName");
-  const phone = getText(formData, "phone");
-  const email = getText(formData, "email");
-  const location = getText(formData, "location");
-  const state = getText(formData, "state");
-  const width = getText(formData, "width");
-  const height = getText(formData, "height");
-  const quantity = getNumber(formData, "quantity") || 1;
-  const color = getText(formData, "color");
-  const mountType = getText(formData, "mountType");
-  const controlSide = getText(formData, "controlSide");
-  const notes = getText(formData, "notes");
-  const productId = getText(formData, "productId");
-  const productSlug = getText(formData, "productSlug");
-  const productName = getText(formData, "productName");
-  const unitAmount = getNumber(formData, "unitAmount");
-  const totalAmount = unitAmount * quantity;
-  const paymentProof = formData.get("paymentProof");
+  try {
+    const sessionSupabase = hasPublicSupabaseConfig
+      ? await createSupabaseServerClient()
+      : null;
+    const {
+      data: { user },
+    } = sessionSupabase ? await sessionSupabase.auth.getUser() : { data: { user: null } };
+    const customerName = getText(formData, "customerName");
+    const phone = getText(formData, "phone");
+    const email = getText(formData, "email");
+    const location = getText(formData, "location");
+    const state = getText(formData, "state");
+    const width = getText(formData, "width");
+    const height = getText(formData, "height");
+    const quantity = getNumber(formData, "quantity") || 1;
+    const color = getText(formData, "color");
+    const mountType = getText(formData, "mountType");
+    const controlSide = getText(formData, "controlSide");
+    const notes = getText(formData, "notes");
+    const productId = getText(formData, "productId");
+    const productSlug = getText(formData, "productSlug");
+    const productName = getText(formData, "productName");
+    const unitAmount = getNumber(formData, "unitAmount");
+    const totalAmount = unitAmount * quantity;
+    const paymentProof = formData.get("paymentProof");
 
-  if (
-    !customerName ||
-    !phone ||
-    !location ||
-    !state ||
-    !width ||
-    !height ||
-    !color ||
-    !mountType ||
-    !controlSide ||
-    !productId ||
-    !productName
-  ) {
-    return {
-      status: "error",
-      message: "Fill every required order field before submitting.",
-    };
-  }
+    if (
+      !customerName ||
+      !phone ||
+      !location ||
+      !state ||
+      !width ||
+      !height ||
+      !color ||
+      !mountType ||
+      !controlSide ||
+      !productId ||
+      !productName
+    ) {
+      return {
+        status: "error",
+        message: "Fill every required order field before submitting.",
+      };
+    }
 
-  if (!(paymentProof instanceof File) || paymentProof.size === 0) {
-    return {
-      status: "error",
-      message: "Upload your proof of payment before submitting the order.",
-    };
-  }
+    if (!(paymentProof instanceof File) || paymentProof.size === 0) {
+      return {
+        status: "error",
+        message: "Upload your proof of payment before submitting the order.",
+      };
+    }
 
-  if (paymentProof.size > 5 * 1024 * 1024) {
-    return {
-      status: "error",
-      message: "Payment proof must be 5MB or less.",
-    };
-  }
+    if (paymentProof.size > 5 * 1024 * 1024) {
+      return {
+        status: "error",
+        message: "Payment proof must be 5MB or less.",
+      };
+    }
 
-  const reference = buildOrderReference();
+    const reference = buildOrderReference();
 
-  if (!hasServiceRoleConfig) {
+    if (!hasServiceRoleConfig) {
+      return {
+        status: "success",
+        message:
+          "Preview mode recorded the order flow. Add the Supabase service key to persist real orders and uploads.",
+        orderReference: reference,
+      };
+    }
+
+    const supabase = createSupabaseServiceClient();
+
+    if (!supabase) {
+      return {
+        status: "error",
+        message: "Supabase service connection is unavailable.",
+      };
+    }
+
+    const safeName = sanitizeFileName(paymentProof.name || "payment-proof");
+    const uploadPath = `${reference}/${Date.now()}-${safeName}`;
+    const proofBuffer = Buffer.from(await paymentProof.arrayBuffer());
+
+    const { error: uploadError } = await supabase.storage
+      .from("payment-proofs")
+      .upload(uploadPath, proofBuffer, {
+        contentType: paymentProof.type || "application/octet-stream",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      return {
+        status: "error",
+        message: "Payment proof upload failed. Try again.",
+      };
+    }
+
+    const { error: insertError } = await supabase.from("orders").insert({
+      reference,
+      customer_user_id: user?.id ?? null,
+      customer_name: customerName,
+      customer_phone: phone,
+      customer_email: email || user?.email || null,
+      product_id: productId,
+      product_slug: productSlug,
+      product_name: productName,
+      total_amount: totalAmount,
+      quantity,
+      delivery_state: state,
+      delivery_address: location,
+      width,
+      height,
+      selected_color: color,
+      mount_type: mountType,
+      control_side: controlSide,
+      notes: notes || null,
+      payment_proof_path: uploadPath,
+      status: "pending",
+    });
+
+    if (insertError) {
+      return {
+        status: "error",
+        message: "Order could not be saved. Check Supabase table setup and try again.",
+      };
+    }
+
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/checkout/offline");
+    revalidatePath("/account");
+
     return {
       status: "success",
       message:
-        "Preview mode recorded the order flow. Add the Supabase service key to persist real orders and uploads.",
+        "Order received. Our admin team will verify your payment and continue processing.",
       orderReference: reference,
     };
-  }
+  } catch (error) {
+    console.error("submitOfflineOrder failed", error);
 
-  const supabase = createSupabaseServiceClient();
-
-  if (!supabase) {
     return {
       status: "error",
-      message: "Supabase service connection is unavailable.",
+      message:
+        "Order submission failed before it could complete. Try again, and use a smaller proof file if the issue continues.",
     };
   }
-
-  const safeName = sanitizeFileName(paymentProof.name || "payment-proof");
-  const uploadPath = `${reference}/${Date.now()}-${safeName}`;
-  const proofBuffer = Buffer.from(await paymentProof.arrayBuffer());
-
-  const { error: uploadError } = await supabase.storage
-    .from("payment-proofs")
-    .upload(uploadPath, proofBuffer, {
-      contentType: paymentProof.type || "application/octet-stream",
-      upsert: false,
-    });
-
-  if (uploadError) {
-    return {
-      status: "error",
-      message: "Payment proof upload failed. Try again.",
-    };
-  }
-
-  const { error: insertError } = await supabase.from("orders").insert({
-    reference,
-    customer_user_id: user?.id ?? null,
-    customer_name: customerName,
-    customer_phone: phone,
-    customer_email: email || user?.email || null,
-    product_id: productId,
-    product_slug: productSlug,
-    product_name: productName,
-    total_amount: totalAmount,
-    quantity,
-    delivery_state: state,
-    delivery_address: location,
-    width,
-    height,
-    selected_color: color,
-    mount_type: mountType,
-    control_side: controlSide,
-    notes: notes || null,
-    payment_proof_path: uploadPath,
-    status: "pending",
-  });
-
-  if (insertError) {
-    return {
-      status: "error",
-      message: "Order could not be saved. Check Supabase table setup and try again.",
-    };
-  }
-
-  revalidatePath("/admin/dashboard");
-  revalidatePath("/checkout/offline");
-  revalidatePath("/account");
-
-  return {
-    status: "success",
-    message:
-      "Order received. Our admin team will verify your payment and continue processing.",
-    orderReference: reference,
-  };
 }
 
 export async function signInAdmin(
@@ -790,6 +800,7 @@ export async function savePaymentAccount(formData: FormData) {
 
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/site-settings");
 }
 
 export async function saveSiteSettings(formData: FormData) {

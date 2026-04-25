@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { deleteTeamMember, saveContactInfo, upsertTeamMember } from "@/app/actions";
 import { AdminPasswordResetPanel } from "@/components/admin/admin-password-reset-panel";
 import { CreateProductPanel } from "@/components/admin/create-product-panel";
 import { DeliveryStateCard } from "@/components/admin/delivery-state-card";
 import { OrderAdminRow } from "@/components/admin/order-admin-row";
 import { OrdersRealtimeRefresh } from "@/components/admin/orders-realtime-refresh";
-import { PaymentAccountPanel } from "@/components/admin/payment-account-panel";
 import { ProductAdminCard } from "@/components/admin/product-admin-card";
 import { SignOutButton } from "@/components/admin/sign-out-button";
 import { SiteHeader } from "@/components/navigation/site-header";
@@ -34,12 +32,7 @@ const dashboardViews = [
   {
     id: "setup",
     label: "Store Setup",
-    description: "Payment account, delivery states, and contact info.",
-  },
-  {
-    id: "team",
-    label: "Team",
-    description: "Restore and manage the team section.",
+    description: "Delivery coverage and links to site settings.",
   },
   {
     id: "security",
@@ -75,91 +68,6 @@ function PanelHeading({
         </p>
       ) : null}
     </div>
-  );
-}
-
-function ContactInfoPanel({
-  actionsEnabled,
-  contact,
-}: {
-  actionsEnabled: boolean;
-  contact: {
-    phone1: string;
-    phone2: string | null;
-    whatsappNumber: string;
-    email: string | null;
-    address: string;
-  } | null;
-}) {
-  return (
-    <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
-      <PanelHeading
-        eyebrow="Contact"
-        title="Business contact details"
-        body="Keep the phone numbers and address current so customer support and delivery communication stay accurate."
-      />
-
-      <form action={saveContactInfo} className="grid gap-4 lg:grid-cols-2">
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">Primary phone</span>
-          <input
-            name="phone1"
-            defaultValue={contact?.phone1 ?? ""}
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
-
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">Alternate phone</span>
-          <input
-            name="phone2"
-            defaultValue={contact?.phone2 ?? ""}
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
-
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">WhatsApp number</span>
-          <input
-            name="whatsappNumber"
-            defaultValue={contact?.whatsappNumber ?? ""}
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
-
-        <label className="space-y-2">
-          <span className="text-sm font-semibold">Email</span>
-          <input
-            name="email"
-            defaultValue={contact?.email ?? ""}
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
-
-        <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-semibold">Address</span>
-          <textarea
-            name="address"
-            rows={3}
-            defaultValue={contact?.address ?? ""}
-            disabled={!actionsEnabled}
-            className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-          />
-        </label>
-
-        <button
-          type="submit"
-          disabled={!actionsEnabled}
-          className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60 lg:col-span-2"
-        >
-          Save contact details
-        </button>
-      </form>
-    </section>
   );
 }
 
@@ -310,7 +218,7 @@ export default async function AdminDashboardPage({
                         href="/admin/dashboard?view=setup"
                         className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold"
                       >
-                        Store setup
+                        Delivery setup
                       </Link>
                       <Link
                         href="/admin/site-settings"
@@ -400,17 +308,19 @@ export default async function AdminDashboardPage({
 
             {selectedView === "setup" ? (
               <>
-                <PaymentAccountPanel
-                  paymentAccount={
-                    dashboard.paymentAccount ?? {
-                      bankName: "",
-                      accountName: "",
-                      accountNumber: "",
-                      note: "",
-                    }
-                  }
-                  actionsEnabled={actionsEnabled}
-                />
+                <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
+                  <PanelHeading
+                    eyebrow="Scope"
+                    title="Site-managed settings moved out"
+                    body="Payment account details, contact information, navigation, team, gallery, services, and other public-site content now live only in the dedicated site settings screen."
+                  />
+                  <Link
+                    href="/admin/site-settings"
+                    className="inline-flex rounded-full border border-[var(--color-line)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
+                  >
+                    Open site settings
+                  </Link>
+                </section>
 
                 <section className="space-y-5">
                   <PanelHeading
@@ -429,161 +339,7 @@ export default async function AdminDashboardPage({
                     ))}
                   </div>
                 </section>
-
-                <ContactInfoPanel
-                  actionsEnabled={actionsEnabled}
-                  contact={dashboard.contact}
-                />
               </>
-            ) : null}
-
-            {selectedView === "team" ? (
-              <section className="space-y-5">
-                <PanelHeading
-                  eyebrow="Team"
-                  title="Team section management"
-                  body="This restores the team side so admins can keep the public team section current."
-                />
-
-                <div className="grid gap-5 xl:grid-cols-2">
-                  {dashboard.teamMembers.map((member) => (
-                    <form
-                      key={member.id}
-                      action={upsertTeamMember}
-                      className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5"
-                    >
-                      <input type="hidden" name="id" value={member.id} />
-                      <input type="hidden" name="currentImageUrl" value={member.imageUrl ?? ""} />
-                      <div className="grid gap-4">
-                        <input
-                          name="name"
-                          defaultValue={member.name}
-                          disabled={!actionsEnabled}
-                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                        />
-                        <input
-                          name="role"
-                          defaultValue={member.role}
-                          disabled={!actionsEnabled}
-                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                        />
-                        <textarea
-                          name="bio"
-                          rows={4}
-                          defaultValue={member.bio ?? ""}
-                          disabled={!actionsEnabled}
-                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                        />
-                        <input
-                          name="imageUrl"
-                          defaultValue=""
-                          placeholder={member.imageUrl ?? "Direct image URL"}
-                          disabled={!actionsEnabled}
-                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                        />
-                        <input
-                          type="file"
-                          name="imageFile"
-                          accept="image/*"
-                          disabled={!actionsEnabled}
-                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60"
-                        />
-                        <input
-                          type="number"
-                          name="sortOrder"
-                          defaultValue={member.sortOrder}
-                          disabled={!actionsEnabled}
-                          className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                        />
-                        <label className="flex items-center gap-2 text-sm font-semibold">
-                          <input
-                            type="checkbox"
-                            name="isActive"
-                            defaultChecked={member.isActive}
-                            disabled={!actionsEnabled}
-                          />
-                          Active
-                        </label>
-                        <div className="flex flex-wrap gap-3">
-                          <button
-                            type="submit"
-                            disabled={!actionsEnabled}
-                            className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                          >
-                            Save team member
-                          </button>
-                          <button
-                            type="submit"
-                            formAction={deleteTeamMember}
-                            disabled={!actionsEnabled}
-                            className="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 disabled:opacity-60"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  ))}
-
-                  <form
-                    action={upsertTeamMember}
-                    className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/92 p-5"
-                  >
-                    <h3 className="font-display text-3xl leading-none">Add team member</h3>
-                    <div className="mt-4 grid gap-4">
-                      <input
-                        name="name"
-                        placeholder="Team member name"
-                        disabled={!actionsEnabled}
-                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                      />
-                      <input
-                        name="role"
-                        placeholder="Role"
-                        disabled={!actionsEnabled}
-                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                      />
-                      <textarea
-                        name="bio"
-                        rows={4}
-                        disabled={!actionsEnabled}
-                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                      />
-                      <input
-                        name="imageUrl"
-                        placeholder="Direct image URL"
-                        disabled={!actionsEnabled}
-                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                      />
-                      <input
-                        type="file"
-                        name="imageFile"
-                        accept="image/*"
-                        disabled={!actionsEnabled}
-                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60"
-                      />
-                      <input
-                        type="number"
-                        name="sortOrder"
-                        defaultValue={dashboard.teamMembers.length + 1}
-                        disabled={!actionsEnabled}
-                        className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60"
-                      />
-                      <label className="flex items-center gap-2 text-sm font-semibold">
-                        <input type="checkbox" name="isActive" defaultChecked disabled={!actionsEnabled} />
-                        Active
-                      </label>
-                      <button
-                        type="submit"
-                        disabled={!actionsEnabled}
-                        className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
-                      >
-                        Add team member
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </section>
             ) : null}
 
             {selectedView === "security" && admin?.role === "super_admin" ? (
