@@ -790,8 +790,16 @@ export async function savePaymentAccount(formData: FormData) {
     return;
   }
 
+  const { data: existingSettings } = await supabase
+    .from("site_settings")
+    .select("brand_name, short_name")
+    .eq("id", "default")
+    .maybeSingle();
+
   await supabase.from("site_settings").upsert({
     id: "default",
+    brand_name: existingSettings?.brand_name ?? "Sunpilot",
+    short_name: existingSettings?.short_name ?? "Sunpilot",
     bank_name: getText(formData, "bankName"),
     account_name: getText(formData, "accountName"),
     account_number: getText(formData, "accountNumber"),
