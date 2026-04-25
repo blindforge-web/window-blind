@@ -12,6 +12,7 @@ drop table if exists public.navbar cascade;
 drop table if exists public.contact_info cascade;
 drop table if exists public.site_settings cascade;
 drop table if exists public.delivery_states cascade;
+drop table if exists public.product_media cascade;
 drop table if exists public.products cascade;
 drop table if exists public.admin_profiles cascade;
 
@@ -136,6 +137,22 @@ create table public.products (
   created_at timestamptz not null default now()
 );
 
+create table public.product_media (
+  id text primary key,
+  product_id uuid not null references public.products (id) on delete cascade,
+  title text,
+  media_url text not null,
+  media_kind text not null default 'image' check (media_kind in ('image', 'video')),
+  alt_text text,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  is_featured boolean not null default false,
+  is_detail boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index product_media_product_id_idx on public.product_media (product_id, sort_order);
+
 create table public.delivery_states (
   code text primary key,
   name text not null unique,
@@ -225,6 +242,7 @@ alter table public.site_sections enable row level security;
 alter table public.site_highlights enable row level security;
 alter table public.services enable row level security;
 alter table public.products enable row level security;
+alter table public.product_media enable row level security;
 alter table public.delivery_states enable row level security;
 alter table public.team_members enable row level security;
 alter table public.clients enable row level security;
@@ -285,6 +303,12 @@ create policy "public can read listed products"
 on public.products
 for select
 using (is_listed = true);
+
+drop policy if exists "public can read product media" on public.product_media;
+create policy "public can read product media"
+on public.product_media
+for select
+using (true);
 
 drop policy if exists "public can read delivery states" on public.delivery_states;
 create policy "public can read delivery states"
@@ -376,6 +400,14 @@ with check (public.is_active_admin());
 drop policy if exists "admins manage products" on public.products;
 create policy "admins manage products"
 on public.products
+for all
+to authenticated
+using (public.is_active_admin())
+with check (public.is_active_admin());
+
+drop policy if exists "admins manage product media" on public.product_media;
+create policy "admins manage product media"
+on public.product_media
 for all
 to authenticated
 using (public.is_active_admin())

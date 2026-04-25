@@ -401,6 +401,40 @@ export default async function Home() {
                 body={gallery?.body}
               />
             </div>
+            <div className="mb-6 overflow-x-auto pb-2">
+              <div className="mb-4 flex items-end justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
+                    Recent installations
+                  </p>
+                  <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+                    Fast-moving showcase clips and images from completed spaces.
+                  </p>
+                </div>
+              </div>
+              <div className="flex min-w-max gap-4">
+                {galleryItems.map((item) => (
+                  <InteractiveMedia
+                    key={`${item.id}-strip`}
+                    label={item.title}
+                    mediaUrl={item.mediaUrl}
+                    mediaKind={item.mediaKind}
+                    alt={item.title}
+                    previewHint={item.mediaKind === "video" ? "Open installation reel" : "Open installation photo"}
+                    className="h-40 w-64 shrink-0 rounded-[1.6rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_82%,white_18%)] shadow-[0_16px_40px_-30px_rgba(15,23,42,0.26)]"
+                    mediaClassName="h-full w-full object-cover"
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="mb-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
+                Before and after view
+              </p>
+              <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+                Vertical cards keep installation media easy to scan on mobile and desktop.
+              </p>
+            </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {galleryItems.map((item) => (
                 <article
@@ -415,7 +449,7 @@ export default async function Home() {
                     previewHint={
                       item.mediaKind === "video" ? "Open gallery video" : "Open gallery image"
                     }
-                    className="h-72 rounded-none border-0"
+                    className="aspect-[9/16] rounded-none border-0"
                     mediaClassName="h-full w-full object-cover"
                   />
                   <div className="p-6">

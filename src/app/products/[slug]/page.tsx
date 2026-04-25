@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft, Check, ShieldCheck, Truck } from "lucide-react";
 import { notFound } from "next/navigation";
+import { InteractiveMedia } from "@/components/media/interactive-media";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
-import { ProductVisual } from "@/components/store/product-visual";
+import { ProductMediaGallery } from "@/components/store/product-media-gallery";
 import { getProductBySlug } from "@/lib/data";
 import { formatCurrency } from "@/lib/utils";
 
@@ -47,7 +48,7 @@ export default async function ProductDetailPage({
         <div className="grid gap-8 xl:grid-cols-[1fr_380px]">
           <section className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_0.92fr]">
-              <ProductVisual product={product} className="min-h-[36rem]" />
+              <ProductMediaGallery product={product} />
 
               <div className="rounded-[2.2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_84%,white_16%)] p-6 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.28)] sm:p-7">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
@@ -200,6 +201,28 @@ export default async function ProductDetailPage({
                 </Link>
               </div>
             </article>
+
+            {product.mediaGallery.length ? (
+              <article className="rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_86%,white_14%)] p-5 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.24)]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                  Media gallery
+                </p>
+                <div className="mt-4 grid gap-3 grid-cols-2">
+                  {product.mediaGallery.slice(0, 6).map((item) => (
+                    <InteractiveMedia
+                      key={item.id}
+                      label={item.title || product.name}
+                      mediaUrl={item.mediaUrl}
+                      mediaKind={item.mediaKind}
+                      alt={item.altText || product.name}
+                      previewHint={item.mediaKind === "video" ? "Open video" : "Open image"}
+                      className="aspect-square rounded-[1.3rem] border border-[var(--color-line)] bg-white"
+                      mediaClassName="h-full w-full object-cover"
+                    />
+                  ))}
+                </div>
+              </article>
+            ) : null}
           </aside>
         </div>
       </main>

@@ -17,6 +17,7 @@ import type {
   OrderItem,
   PaymentAccount,
   Product,
+  ProductMediaItem,
   ServiceItem,
   SiteHighlight,
   SiteSection,
@@ -130,6 +131,19 @@ type GalleryItemRow = {
   media_kind: "image" | "video";
   sort_order: number;
   is_active: boolean;
+};
+
+type ProductMediaRow = {
+  id: string;
+  product_id: string;
+  title: string | null;
+  media_url: string;
+  media_kind: "image" | "video";
+  alt_text: string | null;
+  sort_order: number;
+  is_active: boolean;
+  is_featured: boolean;
+  is_detail: boolean;
 };
 
 type OrderRow = {
@@ -251,6 +265,22 @@ function mapProduct(row: ProductRow): Product {
       accent: row.visual_accent ?? "#D4AF37",
       label: row.visual_label ?? row.collection,
     },
+    mediaGallery: row.image_url
+      ? [
+          {
+            id: `${row.id}-primary`,
+            productId: row.id,
+            title: row.name,
+            mediaUrl: row.image_url,
+            mediaKind: "image",
+            altText: row.name,
+            sortOrder: 0,
+            isActive: true,
+            isFeatured: true,
+            isDetail: false,
+          },
+        ]
+      : [],
   };
 }
 
@@ -366,6 +396,57 @@ function mapGalleryItem(row: GalleryItemRow): GalleryItem {
     sortOrder: row.sort_order,
     isActive: row.is_active,
   };
+}
+
+function mapProductMedia(row: ProductMediaRow): ProductMediaItem {
+  return {
+    id: row.id,
+    productId: row.product_id,
+    title: row.title,
+    mediaUrl: row.media_url,
+    mediaKind: row.media_kind,
+    altText: row.alt_text,
+    sortOrder: row.sort_order,
+    isActive: row.is_active,
+    isFeatured: row.is_featured,
+    isDetail: row.is_detail,
+  };
+}
+
+function attachProductMedia(products: Product[], rows: ProductMediaRow[] | null) {
+  const mediaByProduct = ((rows ?? []).map(mapProductMedia)).reduce<Record<string, ProductMediaItem[]>>(
+    (accumulator, item) => {
+      if (!accumulator[item.productId]) {
+        accumulator[item.productId] = [];
+      }
+
+      accumulator[item.productId].push(item);
+      return accumulator;
+    },
+    {},
+  );
+
+  return products.map((product) => {
+    const productMedia = mediaByProduct[product.id]?.filter((item) => item.isActive) ?? [];
+    if (!productMedia.length) {
+      return product;
+    }
+
+    const fallbackPrimary = product.imageUrl
+      ? product.mediaGallery.filter((item) => item.id.endsWith("-primary"))
+      : [];
+
+    return {
+      ...product,
+      mediaGallery: [...productMedia, ...fallbackPrimary].sort((left, right) => {
+        if (left.isFeatured !== right.isFeatured) {
+          return left.isFeatured ? -1 : 1;
+        }
+
+        return left.sortOrder - right.sortOrder;
+      }),
+    };
+  });
 }
 
 function mapOrder(row: OrderRow): OrderItem {
@@ -541,13 +622,19 @@ export const getProducts = cache(async (): Promise<Product[]> => {
     return [];
   }
 
-  const { data } = await supabase
-    .from("products")
-    .select("*")
-    .eq("is_listed", true)
-    .order("created_at", { ascending: false });
+  const [{ data: products }, { data: productMedia }] = await Promise.all([
+    supabase.from("products").select("*").eq("is_listed", true).order("created_at", { ascending: false }),
+    supabase
+      .from("product_media")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true }),
+  ]);
 
-  return (data as ProductRow[] | null)?.map(mapProduct) ?? [];
+  return attachProductMedia(
+    (products as ProductRow[] | null)?.map(mapProduct) ?? [],
+    productMedia as ProductMediaRow[] | null,
+  );
 });
 
 export const getFeaturedProducts = cache(async (): Promise<Product[]> => {
@@ -703,13 +790,17 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   }
 
   const supabase = await createSupabaseServerClient();
-  const [{ data: orders }, { data: products }] = await Promise.all([
+  const [{ data: orders }, { data: products }, { data: productMedia }] = await Promise.all([
     supabase
       .from("orders")
       .select("*")
       .order("created_at", { ascending: false })
       .limit(30),
     supabase.from("products").select("*").order("created_at", { ascending: false }),
+    supabase
+      .from("product_media")
+      .select("*")
+      .order("sort_order", { ascending: true }),
   ]);
 
   const mappedOrders = await Promise.all(
@@ -722,7 +813,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   return {
     ...landingData,
     orders: mappedOrders,
-    products: (products as ProductRow[] | null)?.map(mapProduct) ?? [],
+    products: attachProductMedia(
+      (products as ProductRow[] | null)?.map(mapProduct) ?? [],
+      productMedia as ProductMediaRow[] | null,
+    ),
   };
 }
 

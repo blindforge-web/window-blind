@@ -117,6 +117,19 @@ export type GalleryItem = {
   isActive: boolean;
 };
 
+export type ProductMediaItem = {
+  id: string;
+  productId: string;
+  title: string | null;
+  mediaUrl: string;
+  mediaKind: "image" | "video";
+  altText: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  isFeatured: boolean;
+  isDetail: boolean;
+};
+
 export type OrderStatus = "pending" | "paid" | "paid_delivered";
 
 export type Product = {
@@ -144,6 +157,7 @@ export type Product = {
     accent: string;
     label: string;
   };
+  mediaGallery: ProductMediaItem[];
 };
 
 export type DeliveryState = {

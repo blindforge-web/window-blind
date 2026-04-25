@@ -1,4 +1,4 @@
-import { deleteProduct, upsertProduct } from "@/app/actions";
+import { deleteProduct, deleteProductMedia, upsertProduct, upsertProductMedia } from "@/app/actions";
 import { ProductVisual } from "@/components/store/product-visual";
 import type { Product } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
@@ -343,6 +343,135 @@ export function ProductAdminCard({
           </button>
         </div>
       </form>
+
+      <details className="mt-5 rounded-[1.6rem] border border-[var(--color-line)] bg-white/88 p-4">
+        <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--color-ink)]">
+          Product media gallery
+        </summary>
+        <div className="mt-4 space-y-4">
+          {product.mediaGallery.map((item) => (
+            <form
+              key={item.id}
+              action={upsertProductMedia}
+              className="grid gap-4 rounded-[1.4rem] border border-[var(--color-line)] bg-white p-4"
+            >
+              <input type="hidden" name="id" value={item.id} />
+              <input type="hidden" name="productId" value={product.id} />
+              <input type="hidden" name="productSlug" value={product.slug} />
+              <input type="hidden" name="currentMediaUrl" value={item.mediaUrl} />
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold">Title</span>
+                  <input name="title" defaultValue={item.title ?? ""} disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold">Media type</span>
+                  <select name="mediaKind" defaultValue={item.mediaKind} disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60">
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                  </select>
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold">Media URL</span>
+                  <input name="mediaUrl" defaultValue="" placeholder={item.mediaUrl} disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold">Upload media</span>
+                  <input type="file" name="mediaFile" accept="image/*,video/*" disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60" />
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold">Alt text</span>
+                  <input name="altText" defaultValue={item.altText ?? ""} disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold">Sort order</span>
+                  <input type="number" name="sortOrder" defaultValue={item.sortOrder} disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+                </label>
+              </div>
+
+              <div className="flex flex-wrap gap-4 text-sm font-semibold">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" name="isActive" defaultChecked={item.isActive} disabled={!actionsEnabled} />
+                  Visible
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" name="isFeatured" defaultChecked={item.isFeatured} disabled={!actionsEnabled} />
+                  Featured
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" name="isDetail" defaultChecked={item.isDetail} disabled={!actionsEnabled} />
+                  Detail shot
+                </label>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button type="submit" disabled={!actionsEnabled} className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                  Save media
+                </button>
+                <button type="submit" formAction={deleteProductMedia} disabled={!actionsEnabled} className="rounded-full border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-700 disabled:opacity-60">
+                  Delete media
+                </button>
+              </div>
+            </form>
+          ))}
+
+          <form action={upsertProductMedia} className="grid gap-4 rounded-[1.4rem] border border-dashed border-[var(--color-line)] bg-white p-4">
+            <input type="hidden" name="productId" value={product.id} />
+            <input type="hidden" name="productSlug" value={product.slug} />
+
+            <p className="text-sm font-semibold text-[var(--color-ink)]">Add new gallery media</p>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-sm font-semibold">Title</span>
+                <input name="title" disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold">Media type</span>
+                <select name="mediaKind" defaultValue="image" disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60">
+                  <option value="image">Image</option>
+                  <option value="video">Video</option>
+                </select>
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold">Media URL</span>
+                <input name="mediaUrl" disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold">Upload media</span>
+                <input type="file" name="mediaFile" accept="image/*,video/*" disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 text-sm disabled:opacity-60" />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold">Alt text</span>
+                <input name="altText" disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+              </label>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold">Sort order</span>
+                <input type="number" name="sortOrder" defaultValue={product.mediaGallery.length + 1} disabled={!actionsEnabled} className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none disabled:opacity-60" />
+              </label>
+            </div>
+            <div className="flex flex-wrap gap-4 text-sm font-semibold">
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="isActive" defaultChecked disabled={!actionsEnabled} />
+                Visible
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="isFeatured" disabled={!actionsEnabled} />
+                Featured
+              </label>
+              <label className="flex items-center gap-2">
+                <input type="checkbox" name="isDetail" disabled={!actionsEnabled} />
+                Detail shot
+              </label>
+            </div>
+            <div>
+              <button type="submit" disabled={!actionsEnabled} className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                Add media
+              </button>
+            </div>
+          </form>
+        </div>
+      </details>
     </article>
   );
 }

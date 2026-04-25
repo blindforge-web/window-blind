@@ -700,6 +700,60 @@ export async function upsertProduct(formData: FormData) {
   }
 }
 
+export async function upsertProductMedia(formData: FormData) {
+  const supabase = await requireAdminSupabase();
+  const productId = getText(formData, "productId");
+  const productSlug = getText(formData, "productSlug");
+  const title = getText(formData, "title");
+
+  if (!supabase || !productId) {
+    return;
+  }
+
+  const mediaUrl = await resolveMediaUrl({
+    supabase,
+    formData,
+    fileKey: "mediaFile",
+    urlKey: "mediaUrl",
+    currentUrlKey: "currentMediaUrl",
+    folder: `products/${productSlug || productId}`,
+  });
+
+  if (!mediaUrl) {
+    return;
+  }
+
+  const id = getText(formData, "id") || buildEntityId("product-media", title || productSlug || productId);
+
+  await supabase.from("product_media").upsert({
+    id,
+    product_id: productId,
+    title: title || null,
+    media_url: mediaUrl,
+    media_kind: getText(formData, "mediaKind") === "video" ? "video" : "image",
+    alt_text: getText(formData, "altText") || null,
+    sort_order: getNumber(formData, "sortOrder"),
+    is_active: isChecked(formData, "isActive"),
+    is_featured: isChecked(formData, "isFeatured"),
+    is_detail: isChecked(formData, "isDetail"),
+  });
+
+  revalidateCatalog(productSlug);
+}
+
+export async function deleteProductMedia(formData: FormData) {
+  const supabase = await requireAdminSupabase();
+  const id = getText(formData, "id");
+  const productSlug = getText(formData, "productSlug");
+
+  if (!supabase || !id) {
+    return;
+  }
+
+  await supabase.from("product_media").delete().eq("id", id);
+  revalidateCatalog(productSlug);
+}
+
 export async function deleteProduct(formData: FormData) {
   const supabase = await requireAdminSupabase();
   const productId = getText(formData, "id");
