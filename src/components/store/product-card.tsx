@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { ProductVisual } from "@/components/store/product-visual";
@@ -8,17 +8,16 @@ export function ProductCard({ product }: { product: Product }) {
   const currentPrice = product.salePrice ?? product.basePrice;
 
   return (
-    <article className="group relative overflow-hidden rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_86%,white_14%)] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.32)] backdrop-blur-sm">
-      <Link
-        href={`/products/${product.slug}`}
-        aria-label={`Open ${product.name}`}
-        className="absolute inset-0 z-0"
-      />
+    <article className="group overflow-hidden rounded-[2rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_94%,white_6%)] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.24)] backdrop-blur-sm">
       <div className="p-3">
-        <ProductVisual product={product} className="h-72 rounded-[1.65rem]" />
+        <ProductVisual
+          product={product}
+          className="h-72 rounded-[1.65rem] bg-[color-mix(in_srgb,var(--color-accent)_65%,white_35%)]"
+          mediaClassName="h-full w-full object-contain p-4"
+        />
       </div>
 
-      <div className="relative z-10 space-y-5 px-5 pb-5">
+      <div className="space-y-5 px-5 pb-5">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
@@ -77,19 +76,12 @@ export function ProductCard({ product }: { product: Product }) {
               ) : null}
             </div>
           </div>
-
-          <Link
-            href={`/products/${product.slug}`}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-ink)] text-white shadow-[0_16px_30px_-18px_rgba(15,23,42,0.8)]"
-          >
-            <ArrowUpRight size={18} />
-          </Link>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
             href={`/products/${product.slug}`}
-            className="rounded-[1.1rem] border border-[var(--color-line)] bg-white/72 px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]"
+            className="rounded-[1.1rem] border border-[var(--color-line)] bg-white px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]"
           >
             Product details
           </Link>

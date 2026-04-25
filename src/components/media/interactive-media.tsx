@@ -102,8 +102,8 @@ export function InteractiveMedia({
           alt={alt}
           mediaClassName={mediaClassName}
         />
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,transparent_40%,rgba(15,23,42,0.52)_100%)]" />
-        <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3 rounded-[1.2rem] border border-white/16 bg-[rgba(15,23,42,0.48)] px-4 py-3 text-white backdrop-blur-xl">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,transparent_58%,rgba(15,23,42,0.36)_100%)]" />
+        <div className="pointer-events-none absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3 rounded-[1.2rem] border border-white/16 bg-[rgba(15,23,42,0.34)] px-4 py-3 text-white backdrop-blur-xl">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/66">
               {mediaKind === "video" ? "Video preview" : "Image preview"}

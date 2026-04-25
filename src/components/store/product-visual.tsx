@@ -5,9 +5,11 @@ import { InteractiveMedia } from "@/components/media/interactive-media";
 export function ProductVisual({
   product,
   className = "",
+  mediaClassName = "h-full w-full object-cover",
 }: {
   product: Product;
   className?: string;
+  mediaClassName?: string;
 }) {
   const hasImage = Boolean(product.imageUrl);
 
@@ -19,6 +21,7 @@ export function ProductVisual({
       alt={product.name}
       previewHint="Open product image"
       className={`relative overflow-hidden rounded-[2rem] border border-white/40 ${className}`}
+      mediaClassName={mediaClassName}
     >
       <div
         className="absolute inset-0"
