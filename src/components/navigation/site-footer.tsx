@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { ArrowUpRight, MapPin, Phone } from "lucide-react";
 import { getContactInfo, getSiteSettings, getSocialLinks } from "@/lib/data";
-import { getInitials } from "@/lib/utils";
 
 const quickLinks = [
   { label: "Home", href: "/" },
@@ -12,6 +11,8 @@ const quickLinks = [
   { label: "Account", href: "/account" },
 ];
 
+const defaultLogoPath = "/sunpilot-logo.jpg";
+
 export async function SiteFooter() {
   const [settings, contact, socialLinks] = await Promise.all([
     getSiteSettings(),
@@ -20,6 +21,7 @@ export async function SiteFooter() {
   ]);
 
   const brandLabel = settings?.shortName || settings?.brandName || "Sunpilot";
+  const logoSrc = defaultLogoPath;
 
   return (
     <footer className="px-4 pb-24 pt-12 sm:px-6 lg:px-10 lg:pb-10">
@@ -27,17 +29,11 @@ export async function SiteFooter() {
         <div className="grid gap-8 lg:grid-cols-[1.15fr_0.8fr_0.9fr]">
           <div className="space-y-5">
             <div className="flex items-center gap-3">
-              {settings?.logoUrl ? (
-                <img
-                  src={settings.logoUrl}
-                  alt={settings.brandName || brandLabel}
-                  className="h-12 w-12 rounded-[1rem] border border-white/12 object-cover"
-                />
-              ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-white/12 text-sm font-extrabold tracking-[0.18em] text-white">
-                  {getInitials(brandLabel)}
-                </div>
-              )}
+              <img
+                src={logoSrc}
+                alt={settings?.brandName || brandLabel}
+                className="h-12 w-12 rounded-[1rem] border border-white/12 object-cover"
+              />
               <div>
                 <p className="text-2xl font-extrabold tracking-[-0.05em]">{brandLabel}</p>
                 <p className="text-sm text-white/72">Made-to-measure blinds for homes, offices, and projects</p>

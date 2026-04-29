@@ -20,6 +20,8 @@ const mobileNav = [
   { id: "mobile-account", title: "Account", link: "/account", icon: UserRound },
 ];
 
+const defaultLogoPath = "/sunpilot-logo.jpg";
+
 export async function SiteHeader() {
   const [settings, currentUser, currentAdmin] = await Promise.all([
     getSiteSettings(),
@@ -28,23 +30,18 @@ export async function SiteHeader() {
   ]);
 
   const brandLabel = settings?.shortName || settings?.brandName || "Sunpilot";
+  const logoSrc = defaultLogoPath;
 
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-[var(--color-line)] bg-[rgba(255,255,255,0.92)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10">
           <Link href="/" className="flex min-w-0 items-center gap-3">
-            {settings?.logoUrl ? (
-              <img
-                src={settings.logoUrl}
-                alt={settings.brandName || brandLabel}
-                className="h-12 w-12 rounded-[1rem] border border-[var(--color-line)] object-cover"
-              />
-            ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[linear-gradient(145deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_74%,white_26%))] text-sm font-extrabold tracking-[0.2em] text-white shadow-[0_16px_30px_-18px_rgba(15,76,151,0.75)]">
-                {getInitials(brandLabel)}
-              </div>
-            )}
+            <img
+              src={logoSrc}
+              alt={settings?.brandName || brandLabel}
+              className="h-12 w-12 rounded-[1rem] border border-[var(--color-line)] object-cover"
+            />
             <div className="min-w-0">
               <p className="truncate text-2xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
                 {brandLabel}

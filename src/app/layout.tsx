@@ -18,10 +18,16 @@ const bodyFont = Manrope({
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
+  const logoSrc = "/sunpilot-logo.jpg";
 
   return {
     title: settings?.brandName || "Website",
     description: settings?.tagline || "Dynamic site powered by Supabase.",
+    icons: {
+      icon: logoSrc,
+      shortcut: logoSrc,
+      apple: logoSrc,
+    },
   };
 }
 
