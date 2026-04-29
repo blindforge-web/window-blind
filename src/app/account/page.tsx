@@ -48,7 +48,7 @@ export default async function AccountPage({
 
         {!hasPublicSupabaseConfig ? (
           <div className="rounded-[1.6rem] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
-            Supabase auth is not configured yet, so account access and saved order history are unavailable until the environment keys are connected.
+            Account access is temporarily unavailable right now. Please try again later if the issue continues.
           </div>
         ) : null}
 

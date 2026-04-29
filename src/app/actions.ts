@@ -316,10 +316,9 @@ export async function submitOfflineOrder(
 
     if (!hasServiceRoleConfig) {
       return {
-        status: "success",
+        status: "error",
         message:
-          "Preview mode recorded the order flow. Add the Supabase service key to store live orders and uploads.",
-        orderReference: reference,
+          "Online ordering is temporarily unavailable. Please contact the Sunpilot team before trying again.",
       };
     }
 
@@ -328,7 +327,7 @@ export async function submitOfflineOrder(
     if (!supabase) {
       return {
         status: "error",
-        message: "Supabase service connection is unavailable.",
+        message: "The order service is temporarily unavailable. Please try again shortly.",
       };
     }
 
@@ -376,7 +375,7 @@ export async function submitOfflineOrder(
     if (insertError) {
       return {
         status: "error",
-        message: "Order could not be saved. Check Supabase table setup and try again.",
+        message: "We could not save your order just now. Please try again or contact the team.",
       };
     }
 
@@ -410,7 +409,7 @@ export async function signInAdmin(
     return {
       status: "error",
       message:
-        "Supabase auth is not configured yet. Add the environment keys to enable admin login.",
+        "Admin sign-in is temporarily unavailable until secure configuration is completed.",
     };
   }
 
@@ -461,7 +460,7 @@ export async function signInCustomer(
   if (!hasPublicSupabaseConfig) {
     return {
       status: "error",
-      message: "Supabase auth is not configured yet.",
+      message: "Account access is temporarily unavailable right now. Please try again later.",
     };
   }
 
@@ -498,7 +497,7 @@ export async function signUpCustomer(
   if (!hasPublicSupabaseConfig) {
     return {
       status: "error",
-      message: "Supabase auth is not configured yet.",
+      message: "Account creation is temporarily unavailable right now. Please try again later.",
     };
   }
 
@@ -582,7 +581,7 @@ export async function resetAdminPassword(
   if (!hasServiceRoleConfig) {
     return {
       status: "error",
-      message: "Add the Supabase service role key to enable password resets.",
+      message: "Password reset is unavailable until secure server configuration is completed.",
     };
   }
 

@@ -395,8 +395,7 @@ export default async function AdminSiteSettingsPage({
 
         {!hasPublicSupabaseConfig ? (
           <div className="rounded-[1.8rem] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
-            Supabase environment values are missing. The settings screen is visible, but live
-            editing is disabled until the public keys are configured.
+            Store configuration is incomplete. Live editing will resume once the secure connection is restored.
           </div>
         ) : null}
 
@@ -921,7 +920,7 @@ export default async function AdminSiteSettingsPage({
               <PanelHeading
                 eyebrow="Services"
                 title="Service cards with editable images"
-                body="This addresses the missing service-image editing problem shown in your screenshot."
+                body="Manage the service cards, descriptions, and visuals shown on the public website."
               />
               <div className="grid gap-5 xl:grid-cols-2">
                 {dashboard.services.map((service) => (
@@ -987,7 +986,7 @@ export default async function AdminSiteSettingsPage({
               <PanelHeading
                 eyebrow="Team"
                 title="Team members with editable images"
-                body="This gives admins a direct UI for the team images and copy shown on the public site."
+                body="Manage the team profiles, images, and supporting copy shown on the public website."
               />
               <div className="grid gap-5 xl:grid-cols-2">
                 {dashboard.teamMembers.map((member) => (
@@ -1118,7 +1117,7 @@ export default async function AdminSiteSettingsPage({
               <PanelHeading
                 eyebrow="Gallery"
                 title="Gallery media"
-                body="Upload gallery visuals here so the website showcase stays current without direct database edits."
+                body="Upload and manage gallery visuals so the public showcase stays current and polished."
               />
               <div className="grid gap-5 xl:grid-cols-2">
                 {dashboard.galleryItems.map((item) => (

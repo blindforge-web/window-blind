@@ -432,7 +432,7 @@ export function OfflineOrderForm({
 
             {!liveMode ? (
               <p className="mt-3 text-sm font-semibold text-[var(--color-secondary)]">
-                Preview mode is on. Orders are not being stored live yet.
+                Online submission is temporarily unavailable. Please contact the team before retrying.
               </p>
             ) : null}
           </div>

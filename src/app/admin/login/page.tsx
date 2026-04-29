@@ -34,8 +34,7 @@ export default async function AdminLoginPage() {
 
           {!hasPublicSupabaseConfig ? (
             <div className="mb-6 rounded-[1.6rem] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
-              Supabase auth keys are not connected yet. Once the environment
-              values are present, this route will use live admin authentication.
+              Admin authentication is currently unavailable. Complete the secure environment setup to restore access.
             </div>
           ) : null}
 

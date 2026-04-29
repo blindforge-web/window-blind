@@ -146,8 +146,7 @@ export default async function AdminDashboardPage({
 
         {!hasPublicSupabaseConfig ? (
           <div className="rounded-[1.8rem] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
-            Supabase environment values are missing. The dashboard shell is visible,
-            but live authentication and editing are disabled until the public keys are configured.
+            Store configuration is incomplete. Live dashboard access and editing will resume once the secure connection is restored.
           </div>
         ) : null}
 
