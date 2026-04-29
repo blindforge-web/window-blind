@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import type { CSSProperties, ReactNode } from "react";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
-import { getSiteSettings } from "@/lib/data";
+import { LiveSupportWidget } from "@/components/support/live-support-widget";
+import { getCurrentAdmin, getCurrentUser } from "@/lib/auth";
+import {
+  getContactInfo,
+  getCustomerSupportConversations,
+  getSiteSettings,
+} from "@/lib/data";
 import "./globals.css";
 
 const displayFont = Cormorant_Garamond({
@@ -36,7 +42,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const settings = await getSiteSettings();
+  const [settings, contact, currentUser, currentAdmin] = await Promise.all([
+    getSiteSettings(),
+    getContactInfo(),
+    getCurrentUser(),
+    getCurrentAdmin(),
+  ]);
+  const supportConversations =
+    currentUser && !currentAdmin
+      ? await getCustomerSupportConversations(currentUser.id)
+      : [];
 
   const themeStyle = {
     "--color-page": settings?.pageColor || "#F7FAFF",
@@ -59,6 +74,13 @@ export default async function RootLayout({
         className="min-h-full bg-[var(--color-page)] text-[var(--color-ink)] antialiased"
       >
         {children}
+        {!currentAdmin ? (
+          <LiveSupportWidget
+            currentUser={currentUser}
+            contact={contact}
+            initialConversations={supportConversations}
+          />
+        ) : null}
       </body>
     </html>
   );

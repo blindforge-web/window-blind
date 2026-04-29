@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
+import { ContactActions } from "@/components/support/contact-actions";
 import { OfflineOrderForm } from "@/components/store/offline-order-form";
 import { ProductVisual } from "@/components/store/product-visual";
 import { getCurrentUser } from "@/lib/auth";
-import { getDeliveryStates, getPaymentAccount, getProducts } from "@/lib/data";
+import { getContactInfo, getDeliveryStates, getPaymentAccount, getProducts } from "@/lib/data";
 import { hasServiceRoleConfig } from "@/lib/supabase/env";
 import { formatCurrency } from "@/lib/utils";
 
@@ -14,10 +15,11 @@ export default async function CheckoutOrderPage({
   searchParams: Promise<{ product?: string }>;
 }) {
   const params = await searchParams;
-  const [products, deliveryStates, currentUser] = await Promise.all([
+  const [products, deliveryStates, currentUser, contact] = await Promise.all([
     getProducts(),
     getDeliveryStates(),
     getCurrentUser(),
+    getContactInfo(),
   ]);
   const paymentAccount = await getPaymentAccount();
   const selectedProduct =
@@ -181,7 +183,16 @@ export default async function CheckoutOrderPage({
                   <Link href="/orders" className="ui-button ui-button-secondary">
                     Track orders
                   </Link>
+                  <Link href="/faq" className="ui-button ui-button-outline">
+                    FAQ
+                  </Link>
                 </div>
+                <ContactActions
+                  contact={contact}
+                  message={`Hello Sunpilot, I need help during checkout${selectedProduct ? ` for ${selectedProduct.name}` : ""}.`}
+                  includeSupport={false}
+                  className="mt-4"
+                />
               </section>
             </aside>
           </div>

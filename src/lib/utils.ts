@@ -69,6 +69,39 @@ export function buildTrackingSlug(productSlug: string, reference: string) {
   return slugify(`${productSlug}-${reference}`);
 }
 
+export function normalizePhoneNumber(value?: string | null) {
+  const digits = String(value ?? "").replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  if (digits.startsWith("00")) {
+    return digits.slice(2);
+  }
+
+  if (digits.startsWith("0") && digits.length >= 10) {
+    return `234${digits.slice(1)}`;
+  }
+
+  return digits;
+}
+
+export function buildTelHref(value?: string | null) {
+  const phone = normalizePhoneNumber(value);
+  return phone ? `tel:+${phone}` : "";
+}
+
+export function buildWhatsAppHref(
+  value?: string | null,
+  message = "Hello Sunpilot, I need help with blinds.",
+) {
+  const phone = normalizePhoneNumber(value);
+  const text = encodeURIComponent(message);
+
+  return phone ? `https://wa.me/${phone}?text=${text}` : "";
+}
+
 export function formatDateTime(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",

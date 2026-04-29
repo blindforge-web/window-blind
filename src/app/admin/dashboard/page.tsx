@@ -8,6 +8,7 @@ import { OrderAdminRow } from "@/components/admin/order-admin-row";
 import { OrdersRealtimeRefresh } from "@/components/admin/orders-realtime-refresh";
 import { ProductAdminCard } from "@/components/admin/product-admin-card";
 import { SignOutButton } from "@/components/admin/sign-out-button";
+import { SupportInbox } from "@/components/admin/support-inbox";
 import { SiteHeader } from "@/components/navigation/site-header";
 import { getCurrentAdmin } from "@/lib/auth";
 import { getAdminDashboardData } from "@/lib/data";
@@ -29,6 +30,11 @@ const dashboardViews = [
     id: "orders",
     label: "Orders",
     description: "Review payments and update delivery status.",
+  },
+  {
+    id: "support",
+    label: "Support",
+    description: "Reply to customer live-support DMs.",
   },
   {
     id: "setup",
@@ -54,6 +60,10 @@ const overviewMetrics = [
   {
     label: "Pending orders",
     view: "orders",
+  },
+  {
+    label: "Open support chats",
+    view: "support",
   },
   {
     label: "Delivery states",
@@ -110,6 +120,9 @@ export default async function AdminDashboardPage({
 
   const pendingOrders = dashboard.orders.filter((order) => order.status === "pending").length;
   const activeProducts = dashboard.products.filter((product) => product.isListed).length;
+  const openSupportChats = dashboard.supportConversations.filter(
+    (conversation) => conversation.status === "open",
+  ).length;
 
   return (
     <div className="min-h-screen">
@@ -203,7 +216,9 @@ export default async function AdminDashboardPage({
                           ? formatCompactNumber(dashboard.products.length)
                           : label === "Pending orders"
                             ? formatCompactNumber(pendingOrders)
-                            : formatCompactNumber(dashboard.deliveryStates.length);
+                            : label === "Open support chats"
+                              ? formatCompactNumber(openSupportChats)
+                              : formatCompactNumber(dashboard.deliveryStates.length);
 
                     return (
                       <Link
@@ -242,6 +257,12 @@ export default async function AdminDashboardPage({
                         className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
                       >
                         Order queue
+                      </Link>
+                      <Link
+                        href="/admin/dashboard?view=support"
+                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
+                      >
+                        Support inbox
                       </Link>
                       <Link
                         href="/admin/dashboard?view=setup"
@@ -332,6 +353,26 @@ export default async function AdminDashboardPage({
                     </p>
                   </div>
                 )}
+              </section>
+            ) : null}
+
+            {selectedView === "support" && admin ? (
+              <section className="space-y-5">
+                <PanelHeading
+                  eyebrow="Live support"
+                  title="Customer DM inbox"
+                  body="Reply to signed-in customers in real time and close conversations when support is complete."
+                />
+                <SupportInbox
+                  admin={admin}
+                  initialConversations={dashboard.supportConversations}
+                />
+              </section>
+            ) : null}
+
+            {selectedView === "support" && !admin ? (
+              <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6 text-sm text-[var(--color-muted)]">
+                Admin access is required for the live support inbox.
               </section>
             ) : null}
 

@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 import { InteractiveMedia } from "@/components/media/interactive-media";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
+import { ContactActions } from "@/components/support/contact-actions";
 import { ProductMediaGallery } from "@/components/store/product-media-gallery";
-import { getProductBySlug } from "@/lib/data";
+import { getContactInfo, getProductBySlug } from "@/lib/data";
 import { formatCurrency } from "@/lib/utils";
 
 export default async function ProductDetailPage({
@@ -14,7 +15,10 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const [product, contact] = await Promise.all([
+    getProductBySlug(slug),
+    getContactInfo(),
+  ]);
 
   if (!product) {
     notFound();
@@ -199,7 +203,19 @@ export default async function ProductDetailPage({
                 >
                   Track orders
                 </Link>
+                <Link
+                  href="/faq"
+                  className="ui-button ui-button-outline w-full rounded-[1.2rem]"
+                >
+                  Read FAQ
+                </Link>
               </div>
+              <ContactActions
+                contact={contact}
+                message={`Hello Sunpilot, I need help with ${product.name}.`}
+                includeSupport={false}
+                className="mt-4 grid"
+              />
             </article>
 
             {product.mediaGallery.length ? (

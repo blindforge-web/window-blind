@@ -24,6 +24,8 @@ import type {
   SiteSection,
   SiteSettings,
   SocialLink,
+  SupportConversation,
+  SupportMessage,
   TeamMember,
 } from "@/lib/types";
 
@@ -202,6 +204,29 @@ type DeliveryStateRow = {
   is_active: boolean;
   eta: string | null;
 };
+
+type SupportConversationRow = {
+  id: string;
+  customer_user_id: string;
+  customer_name: string;
+  customer_email: string | null;
+  subject: string;
+  status: SupportConversation["status"];
+  last_message_at: string;
+  created_at: string;
+};
+
+type SupportMessageRow = {
+  id: string;
+  conversation_id: string;
+  sender_user_id: string | null;
+  sender_role: SupportMessage["senderRole"];
+  sender_name: string;
+  body: string;
+  created_at: string;
+};
+
+type ServerSupabaseClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 
 const EMPTY_LANDING_DATA: LandingPageData = {
   settings: null,
@@ -477,6 +502,87 @@ function mapOrder(row: OrderRow): OrderItem {
     controlSide: row.control_side,
     paymentProofUploaded: Boolean(row.payment_proof_path),
   };
+}
+
+function mapSupportMessage(row: SupportMessageRow): SupportMessage {
+  return {
+    id: row.id,
+    conversationId: row.conversation_id,
+    senderUserId: row.sender_user_id,
+    senderRole: row.sender_role,
+    senderName: row.sender_name,
+    body: row.body,
+    createdAt: row.created_at,
+  };
+}
+
+function mapSupportConversation(
+  row: SupportConversationRow,
+  messagesByConversation: Record<string, SupportMessage[]>,
+): SupportConversation {
+  return {
+    id: row.id,
+    customerUserId: row.customer_user_id,
+    customerName: row.customer_name,
+    customerEmail: row.customer_email,
+    subject: row.subject,
+    status: row.status,
+    lastMessageAt: row.last_message_at,
+    createdAt: row.created_at,
+    messages: messagesByConversation[row.id] ?? [],
+  };
+}
+
+async function loadSupportConversations({
+  supabase,
+  customerUserId,
+  limit = 40,
+}: {
+  supabase: ServerSupabaseClient;
+  customerUserId?: string;
+  limit?: number;
+}): Promise<SupportConversation[]> {
+  let conversationQuery = supabase
+    .from("support_conversations")
+    .select("*")
+    .order("last_message_at", { ascending: false })
+    .limit(limit);
+
+  if (customerUserId) {
+    conversationQuery = conversationQuery.eq("customer_user_id", customerUserId);
+  }
+
+  const { data: conversations, error: conversationError } =
+    await conversationQuery;
+
+  if (conversationError || !conversations?.length) {
+    return [];
+  }
+
+  const conversationIds = (conversations as SupportConversationRow[]).map(
+    (conversation) => conversation.id,
+  );
+
+  const { data: messages } = await supabase
+    .from("support_messages")
+    .select("*")
+    .in("conversation_id", conversationIds)
+    .order("created_at", { ascending: true });
+
+  const messagesByConversation = ((messages as SupportMessageRow[] | null) ?? [])
+    .map(mapSupportMessage)
+    .reduce<Record<string, SupportMessage[]>>((accumulator, message) => {
+      if (!accumulator[message.conversationId]) {
+        accumulator[message.conversationId] = [];
+      }
+
+      accumulator[message.conversationId].push(message);
+      return accumulator;
+    }, {});
+
+  return (conversations as SupportConversationRow[]).map((conversation) =>
+    mapSupportConversation(conversation, messagesByConversation),
+  );
 }
 
 async function createProofUrl(path: string | null) {
@@ -790,6 +896,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       ...landingData,
       orders: [],
       products: [],
+      supportConversations: [],
     };
   }
 
@@ -821,6 +928,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       (products as ProductRow[] | null)?.map(mapProduct) ?? [],
       productMedia as ProductMediaRow[] | null,
     ),
+    supportConversations: await loadSupportConversations({ supabase }),
   };
 }
 
@@ -856,4 +964,15 @@ export async function getCustomerOrderByReference(
     .maybeSingle<OrderRow>();
 
   return data ? mapOrder(data) : null;
+}
+
+export async function getCustomerSupportConversations(
+  userId: string,
+): Promise<SupportConversation[]> {
+  if (!hasPublicSupabaseConfig) {
+    return [];
+  }
+
+  const supabase = await createSupabaseServerClient();
+  return loadSupportConversations({ supabase, customerUserId: userId });
 }

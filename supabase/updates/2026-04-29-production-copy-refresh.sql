@@ -177,14 +177,14 @@ from (
     (
       'service-measurement',
       'Measurement guidance',
-      'Guidance on sizing, quantity planning, and product selection for accurate orders and clean installation results.'
+      'Guidance on sizing, quantity planning, oduct selection for accurate orders and clean installation results.'
     )
 ) as source (id, title, description)
 where target.id = source.id;
 
 update public.products as target
 set
-  short_description = source.short_description,
+  short_description = source.short_description,and pr
   description = source.description
 from (
   values

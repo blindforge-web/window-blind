@@ -2,10 +2,13 @@ import Link from "next/link";
 import { ArrowRight, MapPin, PackageCheck, PhoneCall, Sparkles, Users } from "lucide-react";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
+import { ContactActions } from "@/components/support/contact-actions";
 import { TeamCarousel } from "@/components/team/team-carousel";
 import { ProductCard } from "@/components/store/product-card";
 import { ProductVisual } from "@/components/store/product-visual";
 import { getLandingPageData } from "@/lib/data";
+import { faqItems } from "@/lib/faqs";
+import { buildTelHref } from "@/lib/utils";
 
 function SectionTitle({
   label,
@@ -44,6 +47,7 @@ export default async function Home() {
   const contactSection = sections.contact;
   const teamSection = sections.team;
   const heroProduct = featuredProducts[0];
+  const featuredFaqs = faqItems.slice(0, 6);
   const trustCards = [
     {
       icon: Sparkles,
@@ -127,10 +131,10 @@ export default async function Home() {
             <div className="flex flex-wrap gap-3">
               <span className="ui-pill ui-pill-solid">{hero?.eyebrow || "Made-to-measure blinds"}</span>
               {contact?.phone1 ? (
-                <span className="ui-pill">
+                <a href={buildTelHref(contact.phone1)} className="ui-pill">
                   <PhoneCall size={14} />
                   {contact.phone1}
-                </span>
+                </a>
               ) : null}
             </div>
 
@@ -159,6 +163,12 @@ export default async function Home() {
                 Track Orders
               </Link>
             </div>
+            <ContactActions
+              contact={contact}
+              message="Hello Sunpilot, I need help choosing blinds for my space."
+              includeSupport={false}
+              className="mt-4"
+            />
 
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <article className="ui-panel p-4">
@@ -319,7 +329,7 @@ export default async function Home() {
               {about?.body ||
                 "Every order is handled with attention to fit, finish, measurement accuracy, and practical coordination so customers can buy with confidence."}
             </p>
-            <div className="mt-6 grid gap-3">
+            <div id="services" className="mt-6 grid gap-3">
               {serviceCards.map((service) => (
                 <article key={service.id} className="rounded-[1.25rem] border border-[var(--color-line)] bg-[var(--color-accent)] px-4 py-4">
                   <p className="text-sm font-bold text-[var(--color-ink)]">{service.title}</p>
@@ -353,11 +363,52 @@ export default async function Home() {
               <Link href="/checkout/order" className="ui-button ui-button-primary">
                 Start Order
               </Link>
-              <Link href="/notifications" className="ui-button ui-button-outline">
-                View Updates
+              <Link href="/faq" className="ui-button ui-button-outline">
+                Read FAQ
               </Link>
             </div>
+            <ContactActions
+              contact={contact}
+              message="Hello Sunpilot, I want to speak with someone about blinds."
+              includeSupport={false}
+              includeEmail
+              className="mt-4"
+            />
           </article>
+        </section>
+
+        <section id="faq" className="mx-auto mt-14 max-w-7xl">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <SectionTitle
+              label="FAQ"
+              title="Clear answers before you order"
+              body="Review the essentials for product selection, measurements, delivery, support, and offline transfer payment."
+            />
+            <Link href="/faq" className="ui-button ui-button-primary">
+              View all FAQ
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="mt-8 grid gap-4 lg:grid-cols-2">
+            {featuredFaqs.map((item) => (
+              <details
+                key={item.id}
+                className="rounded-[1.5rem] border border-[var(--color-line)] bg-white/94 p-5 shadow-[0_18px_42px_-36px_rgba(14,42,71,0.18)]"
+              >
+                <summary className="cursor-pointer list-none">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-primary)]">
+                    {item.category}
+                  </p>
+                  <h3 className="mt-2 text-xl font-extrabold tracking-[-0.03em] text-[var(--color-ink)]">
+                    {item.question}
+                  </h3>
+                </summary>
+                <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
         </section>
       </main>
 

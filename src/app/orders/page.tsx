@@ -29,6 +29,9 @@ export default async function OrdersPage() {
               <Link href="/products" className="ui-button ui-button-outline">
                 Browse Products
               </Link>
+              <Link href="/faq" className="ui-button ui-button-outline">
+                FAQ
+              </Link>
             </div>
           </section>
         </main>
@@ -115,6 +118,9 @@ export default async function OrdersPage() {
             <div className="mt-6">
               <Link href="/checkout/order" className="ui-button ui-button-primary">
                 Start An Order
+              </Link>
+              <Link href="/faq" className="ui-button ui-button-outline ml-3">
+                Read FAQ
               </Link>
             </div>
           </section>

@@ -1,12 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { ArrowUpRight, MapPin, Phone } from "lucide-react";
+import { ContactActions } from "@/components/support/contact-actions";
 import { getContactInfo, getSiteSettings, getSocialLinks } from "@/lib/data";
+import { buildTelHref } from "@/lib/utils";
 
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Products", href: "/products" },
   { label: "Team", href: "/team" },
+  { label: "FAQ", href: "/faq" },
   { label: "Orders", href: "/orders" },
   { label: "Account", href: "/account" },
 ];
@@ -53,6 +56,9 @@ export async function SiteFooter() {
               <Link href="/checkout/order" className="ui-button ui-button-secondary">
                 Start order
               </Link>
+              <Link href="/faq" className="ui-button border-white/14 bg-white/10 px-5 py-3 text-white">
+                FAQ
+              </Link>
             </div>
           </div>
 
@@ -75,10 +81,13 @@ export async function SiteFooter() {
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/60">Contact</p>
             <div className="space-y-3 text-sm text-white/80">
               {contact?.phone1 ? (
-                <p className="flex items-start gap-3 rounded-[1rem] border border-white/12 bg-white/8 px-4 py-3">
+                <a
+                  href={buildTelHref(contact.phone1)}
+                  className="flex items-start gap-3 rounded-[1rem] border border-white/12 bg-white/8 px-4 py-3"
+                >
                   <Phone size={16} className="mt-0.5 shrink-0" />
                   <span>{contact.phone1}</span>
-                </p>
+                </a>
               ) : null}
               {contact?.address ? (
                 <p className="flex items-start gap-3 rounded-[1rem] border border-white/12 bg-white/8 px-4 py-3">
@@ -87,6 +96,12 @@ export async function SiteFooter() {
                 </p>
               ) : null}
             </div>
+            <ContactActions
+              contact={contact}
+              message="Hello Sunpilot, I need help from the website footer."
+              includeSupport={false}
+              className="pt-1"
+            />
             <div className="flex flex-wrap gap-3 pt-2">
               {socialLinks.map((item) => (
                 <Link

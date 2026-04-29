@@ -3,8 +3,9 @@ import { CheckCircle2, Clock3, PackageCheck, Truck } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
+import { ContactActions } from "@/components/support/contact-actions";
 import { getCurrentUser } from "@/lib/auth";
-import { getCustomerOrderByReference } from "@/lib/data";
+import { getContactInfo, getCustomerOrderByReference } from "@/lib/data";
 import { formatCurrency, formatDateTime, getOrderStatusMeta } from "@/lib/utils";
 
 export default async function OrderDetailPage({
@@ -19,7 +20,10 @@ export default async function OrderDetailPage({
     redirect(`/account?next=/orders/${reference}`);
   }
 
-  const order = await getCustomerOrderByReference(user.id, reference);
+  const [order, contact] = await Promise.all([
+    getCustomerOrderByReference(user.id, reference),
+    getContactInfo(),
+  ]);
 
   if (!order) {
     notFound();
@@ -169,6 +173,27 @@ export default async function OrderDetailPage({
                 </article>
               );
             })}
+          </div>
+        </section>
+
+        <section className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.18)]">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
+                Support
+              </p>
+              <h2 className="mt-2 text-3xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
+                Need help with this order?
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
+                Share your reference when contacting the team so they can find the order quickly.
+              </p>
+            </div>
+            <ContactActions
+              contact={contact}
+              message={`Hello Sunpilot, I need help with order ${order.reference}.`}
+              includeSupport={false}
+            />
           </div>
         </section>
       </main>

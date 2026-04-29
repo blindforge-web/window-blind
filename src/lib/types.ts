@@ -201,6 +201,32 @@ export type OrderItem = {
   paymentProofUrl?: string | null;
 };
 
+export type SupportConversationStatus = "open" | "closed";
+
+export type SupportMessageSenderRole = "customer" | "admin";
+
+export type SupportMessage = {
+  id: string;
+  conversationId: string;
+  senderUserId: string | null;
+  senderRole: SupportMessageSenderRole;
+  senderName: string;
+  body: string;
+  createdAt: string;
+};
+
+export type SupportConversation = {
+  id: string;
+  customerUserId: string;
+  customerName: string;
+  customerEmail: string | null;
+  subject: string;
+  status: SupportConversationStatus;
+  lastMessageAt: string;
+  createdAt: string;
+  messages: SupportMessage[];
+};
+
 export type LandingPageData = {
   settings: SiteSettings | null;
   contact: ContactInfo | null;
@@ -220,6 +246,7 @@ export type LandingPageData = {
 export type AdminDashboardData = LandingPageData & {
   orders: OrderItem[];
   products: Product[];
+  supportConversations: SupportConversation[];
 };
 
 export type ActionFeedbackState = {

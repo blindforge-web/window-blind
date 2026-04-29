@@ -2,8 +2,10 @@ import Link from "next/link";
 import { ArrowRight, PhoneCall } from "lucide-react";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
+import { ContactActions } from "@/components/support/contact-actions";
 import { ProductCard } from "@/components/store/product-card";
 import { getContactInfo, getProducts, getSiteSettings } from "@/lib/data";
+import { buildTelHref } from "@/lib/utils";
 
 export default async function ProductsPage() {
   const [products, settings, contact] = await Promise.all([
@@ -58,6 +60,14 @@ export default async function ProductsPage() {
                 <p className="mt-3 text-sm leading-7 text-white/80">
                   Ask about measurements, finish selection, or the right blind type before ordering.
                 </p>
+                {contact?.phone1 ? (
+                  <a
+                    href={buildTelHref(contact.phone1)}
+                    className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
+                  >
+                    Call now
+                  </a>
+                ) : null}
               </article>
             </div>
           </div>
@@ -85,14 +95,26 @@ export default async function ProductsPage() {
               <Link href="/orders" className="ui-button ui-button-outline">
                 Track Orders
               </Link>
+              <Link href="/faq" className="ui-button ui-button-outline">
+                FAQ
+              </Link>
             </div>
           </div>
           {contact?.phone1 ? (
-            <p className="mt-4 inline-flex items-center gap-2 text-sm text-[var(--color-muted)]">
+            <a
+              href={buildTelHref(contact.phone1)}
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-primary)]"
+            >
               <PhoneCall size={15} />
               Need help first? Call {contact.phone1}
-            </p>
+            </a>
           ) : null}
+          <ContactActions
+            contact={contact}
+            message="Hello Sunpilot, I need help choosing a blind from the catalog."
+            includeSupport={false}
+            className="mt-4"
+          />
         </section>
       </main>
       <SiteFooter />

@@ -61,10 +61,11 @@ export default async function AccountPage({
                   {user.fullName}
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{user.email}</p>
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                   <Link href="/products" className="ui-button ui-button-outline w-full">Browse Products</Link>
                   <Link href="/orders" className="ui-button ui-button-outline w-full">View Orders</Link>
                   <Link href="/notifications" className="ui-button ui-button-outline w-full">Notifications</Link>
+                  <Link href="/faq" className="ui-button ui-button-outline w-full">FAQ</Link>
                   <Link href="/checkout/order" className="ui-button ui-button-primary w-full">New Order</Link>
                 </div>
                 {admin ? (
@@ -191,6 +192,9 @@ export default async function AccountPage({
                 </Link>
                 <Link href="/products" className="ui-button ui-button-outline">
                   Browse Products
+                </Link>
+                <Link href="/faq" className="ui-button ui-button-outline">
+                  Read FAQ
                 </Link>
               </div>
             </article>

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { Bell, CircleUserRound, House, Package2, ShoppingBag, Users, UserRound } from "lucide-react";
+import { Bell, CircleUserRound, HelpCircle, House, Package2, ShoppingBag, Users, UserRound } from "lucide-react";
 import { getCurrentAdmin, getCurrentUser } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/data";
 import { getInitials } from "@/lib/utils";
@@ -9,6 +9,7 @@ const desktopNav = [
   { id: "home", title: "Home", link: "/" },
   { id: "products", title: "Products", link: "/products" },
   { id: "team", title: "Team", link: "/team" },
+  { id: "faq", title: "FAQ", link: "/faq" },
   { id: "contact", title: "Contact", link: "/#contact" },
 ];
 
@@ -16,6 +17,7 @@ const mobileNav = [
   { id: "mobile-home", title: "Home", link: "/", icon: House },
   { id: "mobile-products", title: "Products", link: "/products", icon: ShoppingBag },
   { id: "mobile-team", title: "Team", link: "/team", icon: Users },
+  { id: "mobile-faq", title: "FAQ", link: "/faq", icon: HelpCircle },
   { id: "mobile-orders", title: "Orders", link: "/orders", icon: Package2 },
   { id: "mobile-account", title: "Account", link: "/account", icon: UserRound },
 ];
@@ -92,16 +94,16 @@ export async function SiteHeader() {
       </header>
 
       <nav className="fixed inset-x-3 bottom-3 z-50 rounded-[1.45rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.98)] px-2 py-2 shadow-[0_26px_60px_-34px_rgba(14,42,71,0.35)] backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-5 gap-1">
+        <div className="grid grid-cols-6 gap-1">
           {mobileNav.map((item) => {
             const Icon = item.icon;
             return (
               <Link
                 key={item.id}
                 href={item.link}
-                className="flex flex-col items-center justify-center rounded-[1rem] px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]"
+                className="flex flex-col items-center justify-center rounded-[1rem] px-1 py-2 text-[9px] font-semibold uppercase tracking-[0.08em] text-[var(--color-muted)]"
               >
-                <span className="mb-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-primary)]">
+                <span className="mb-1 inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-primary)]">
                   <Icon size={18} />
                 </span>
                 {item.title}

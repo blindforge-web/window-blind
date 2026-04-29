@@ -14,8 +14,12 @@ export function OrdersRealtimeRefresh() {
       return;
     }
 
+    const refresh = () => {
+      router.refresh();
+    };
+
     const channel = supabase
-      .channel("admin-orders-refresh")
+      .channel("admin-realtime-refresh")
       .on(
         "postgres_changes",
         {
@@ -23,9 +27,25 @@ export function OrdersRealtimeRefresh() {
           schema: "public",
           table: "orders",
         },
-        () => {
-          router.refresh();
+        refresh,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "support_conversations",
         },
+        refresh,
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "support_messages",
+        },
+        refresh,
       )
       .subscribe();
 

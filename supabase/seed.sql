@@ -92,7 +92,9 @@ values
   ('nav-products', 'Products', '/products', 3, true),
   ('nav-services', 'Services', '/#services', 4, true),
   ('nav-team', 'Team', '/#team', 5, true),
-  ('nav-contact', 'Contact', '/#contact', 6, true)
+  ('nav-contact', 'Contact', '/#contact', 6, true),
+  ('nav-faq', 'FAQ', '/faq', 7, true),
+  ('nav-support', 'Support', '/account?next=/', 8, true)
 on conflict (id) do update
 set
   title = excluded.title,

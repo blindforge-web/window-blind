@@ -2,11 +2,15 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SiteFooter } from "@/components/navigation/site-footer";
 import { SiteHeader } from "@/components/navigation/site-header";
+import { ContactActions } from "@/components/support/contact-actions";
 import { TeamMemberCard } from "@/components/team/team-member-card";
-import { getTeamMembers } from "@/lib/data";
+import { getContactInfo, getTeamMembers } from "@/lib/data";
 
 export default async function TeamPage() {
-  const teamMembers = await getTeamMembers();
+  const [teamMembers, contact] = await Promise.all([
+    getTeamMembers(),
+    getContactInfo(),
+  ]);
 
   return (
     <div className="min-h-screen">
@@ -23,11 +27,22 @@ export default async function TeamPage() {
                 Meet the people who guide product selection, coordinate fabrication, support delivery, and help customers prepare for installation.
               </p>
             </div>
-            <Link href="/checkout/order" className="ui-button ui-button-secondary">
-              Start an order
-              <ArrowRight size={16} />
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/checkout/order" className="ui-button ui-button-secondary">
+                Start an order
+                <ArrowRight size={16} />
+              </Link>
+              <Link href="/faq" className="ui-button ui-button-outline">
+                FAQ
+              </Link>
+            </div>
           </div>
+          <ContactActions
+            contact={contact}
+            message="Hello Sunpilot, I want to talk to the team about blinds."
+            includeSupport={false}
+            className="mt-5"
+          />
         </section>
 
         {teamMembers.length ? (
