@@ -136,6 +136,7 @@ export type Product = {
   id: string;
   slug: string;
   name: string;
+  createdAt: string;
   collection: string;
   shortDescription: string;
   description: string;
@@ -177,6 +178,7 @@ export type PaymentAccount = {
 export type OrderItem = {
   id: string;
   reference: string;
+  trackingSlug?: string;
   name: string;
   phone: string;
   email: string | null;

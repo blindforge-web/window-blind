@@ -26,6 +26,27 @@ export function formatStatusLabel(status: string) {
     .join(" ");
 }
 
+export function getOrderStatusMeta(status: string) {
+  switch (status) {
+    case "paid":
+      return {
+        label: "Payment confirmed",
+        summary: "Your payment has been confirmed and the order is moving into production.",
+      };
+    case "paid_delivered":
+      return {
+        label: "Delivered",
+        summary: "This order has been completed and marked as delivered.",
+      };
+    case "pending":
+    default:
+      return {
+        label: "Payment review",
+        summary: "Your order is in and the receipt is waiting for review by the Sunpilot team.",
+      };
+  }
+}
+
 export function buildOrderReference() {
   const stamp = new Date().toISOString().slice(0, 10).replaceAll("-", "");
   const suffix = Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -42,6 +63,10 @@ export function slugify(value: string) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+export function buildTrackingSlug(productSlug: string, reference: string) {
+  return slugify(`${productSlug}-${reference}`);
 }
 
 export function formatDateTime(value: string) {

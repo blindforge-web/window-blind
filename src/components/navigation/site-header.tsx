@@ -1,130 +1,117 @@
-/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { ArrowRight, Menu, Phone, ShoppingBag } from "lucide-react";
+import { Bell, CircleUserRound, Package2, ShoppingBag, Shield, UserRound } from "lucide-react";
 import { getCurrentAdmin, getCurrentUser } from "@/lib/auth";
-import { getNavigationItems, getSiteSettings } from "@/lib/data";
+import { getSiteSettings } from "@/lib/data";
 import { getInitials } from "@/lib/utils";
 
+const primaryNav = [
+  { id: "home", title: "Home", link: "/" },
+  { id: "products", title: "Products", link: "/products" },
+  { id: "orders", title: "Orders", link: "/orders" },
+  { id: "notifications", title: "Notifications", link: "/notifications" },
+];
+
+const mobileNav = [
+  { id: "mobile-home", title: "Home", link: "/", icon: Shield },
+  { id: "mobile-products", title: "Products", link: "/products", icon: ShoppingBag },
+  { id: "mobile-orders", title: "Orders", link: "/orders", icon: Package2 },
+  { id: "mobile-alerts", title: "Alerts", link: "/notifications", icon: Bell },
+  { id: "mobile-account", title: "Account", link: "/account", icon: UserRound },
+];
+
 export async function SiteHeader() {
-  const [settings, navigation, currentUser, currentAdmin] = await Promise.all([
+  const [settings, currentUser, currentAdmin] = await Promise.all([
     getSiteSettings(),
-    getNavigationItems(),
     getCurrentUser(),
     getCurrentAdmin(),
   ]);
 
   const brandLabel = settings?.shortName || settings?.brandName || "Sunpilot";
-  const navItems = navigation.length
-    ? navigation
-    : [
-        { id: "home", title: "Home", link: "/#top" },
-        { id: "about", title: "About", link: "/#about" },
-        { id: "products", title: "Products", link: "/products" },
-        { id: "services", title: "Services", link: "/#services" },
-        { id: "team", title: "Team", link: "/#team" },
-        { id: "contact", title: "Contact", link: "/#contact" },
-      ];
 
   return (
-    <header className="sticky top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10">
-      <div className="mx-auto max-w-7xl">
-        <div className="rounded-[1.9rem] border border-white/50 bg-[color-mix(in_srgb,var(--color-surface)_82%,transparent)] px-4 py-3 shadow-[0_24px_60px_-38px_rgba(15,23,42,0.5)] backdrop-blur-2xl sm:px-5">
-          <div className="flex items-center justify-between gap-4">
-            <Link href="/" className="flex min-w-0 items-center gap-3">
-              {settings?.logoUrl ? (
-                <img
-                  src={settings.logoUrl}
-                  alt={settings.brandName}
-                  className="h-12 w-12 rounded-[1.2rem] object-cover shadow-[0_12px_30px_-20px_rgba(15,23,42,0.55)]"
-                />
-              ) : (
-                <div className="flex h-12 w-12 items-center justify-center rounded-[1.2rem] bg-[linear-gradient(135deg,var(--color-primary),color-mix(in_srgb,var(--color-secondary)_58%,var(--color-primary)_42%))] text-sm font-extrabold tracking-[0.22em] text-white shadow-[0_14px_30px_-18px_rgba(10,37,64,0.75)]">
-                  {getInitials(brandLabel)}
-                </div>
-              )}
-              <div className="min-w-0">
-                <p className="truncate text-lg font-extrabold tracking-[-0.04em] text-[var(--color-ink)] sm:text-xl">
-                  {brandLabel}
-                </p>
-                <p className="truncate text-xs text-[var(--color-muted)]">
-                  Modern blinds for homes and workspaces
-                </p>
-              </div>
-            </Link>
-
-            <nav className="hidden items-center gap-1 rounded-full border border-[var(--color-line)] bg-white/72 p-1 lg:flex">
-              {navItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.link}
-                  className="rounded-full px-4 py-2 text-sm font-semibold text-[var(--color-muted)] hover:bg-[var(--color-accent)] hover:text-[var(--color-ink)]"
-                >
-                  {item.title}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="hidden items-center gap-3 lg:flex">
-              <Link
-                href="/account"
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white/78 px-4 py-2.5 text-sm font-semibold text-[var(--color-ink)]"
-              >
-                <Phone size={16} />
-                {currentUser ? "My account" : "Account"}
-              </Link>
-              <Link
-                href="/products"
-                className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_-20px_rgba(15,23,42,0.7)]"
-              >
-                <ShoppingBag size={16} />
-                Shop now
-              </Link>
-              {currentAdmin ? (
-                <Link
-                  href="/admin/dashboard"
-                  className="rounded-full border border-[var(--color-line)] bg-white/78 px-4 py-2.5 text-sm font-semibold text-[var(--color-ink)]"
-                >
-                  Admin
-                </Link>
-              ) : null}
+    <>
+      <header className="sticky top-0 z-50 border-b border-[var(--color-line)] bg-[rgba(255,255,255,0.92)] backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10">
+          <Link href="/" className="flex min-w-0 items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[linear-gradient(145deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_74%,white_26%))] text-sm font-extrabold tracking-[0.2em] text-white shadow-[0_16px_30px_-18px_rgba(15,76,151,0.75)]">
+              {getInitials(brandLabel)}
             </div>
+            <div className="min-w-0">
+              <p className="truncate text-2xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
+                {brandLabel}
+              </p>
+              <p className="truncate text-[11px] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                Blinds made simple
+              </p>
+            </div>
+          </Link>
 
-            <details className="relative lg:hidden">
-              <summary className="flex cursor-pointer list-none items-center justify-center rounded-full border border-[var(--color-line)] bg-white/82 p-3 text-[var(--color-ink)]">
-                <Menu size={18} />
-              </summary>
-              <div className="absolute right-0 top-16 w-[19rem] rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-surface)_94%,white_6%)] p-4 shadow-[0_28px_70px_-28px_rgba(15,23,42,0.5)] backdrop-blur-xl">
-                <div className="space-y-2">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={item.link}
-                      className="block rounded-[1.1rem] px-4 py-3 text-sm font-semibold text-[var(--color-ink)] hover:bg-[var(--color-accent)]"
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
-                </div>
-                <div className="mt-4 grid gap-2">
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center justify-center gap-2 rounded-[1.1rem] bg-[var(--color-ink)] px-4 py-3 text-sm font-semibold text-white"
-                  >
-                    Browse products
-                    <ArrowRight size={16} />
-                  </Link>
-                  <Link
-                    href="/account"
-                    className="rounded-[1.1rem] border border-[var(--color-line)] px-4 py-3 text-center text-sm font-semibold text-[var(--color-ink)]"
-                  >
-                    {currentUser ? "My account" : "Account access"}
-                  </Link>
-                </div>
-              </div>
-            </details>
+          <nav className="hidden items-center gap-7 md:flex">
+            {primaryNav.map((item) => (
+              <Link
+                key={item.id}
+                href={item.link}
+                className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+              >
+                {item.title}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/checkout/order"
+              className="hidden rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white shadow-[0_16px_30px_-20px_rgba(15,76,151,0.7)] sm:inline-flex"
+            >
+              Start order
+            </Link>
+            <Link
+              href="/notifications"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-line)] bg-white text-[var(--color-ink)]"
+              aria-label="Notifications"
+            >
+              <Bell size={18} />
+            </Link>
+            <Link
+              href={currentAdmin ? "/admin/dashboard" : "/account"}
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white px-3 py-2 text-sm font-semibold text-[var(--color-ink)]"
+              aria-label={currentUser ? "Open account" : "Open account access"}
+            >
+              {currentUser ? (
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-accent)] text-xs font-extrabold text-[var(--color-primary)]">
+                  {getInitials(currentUser.fullName)}
+                </span>
+              ) : (
+                <CircleUserRound size={18} />
+              )}
+              <span className="hidden sm:inline">
+                {currentAdmin ? "Admin" : currentUser ? "Account" : "Login"}
+              </span>
+            </Link>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <nav className="fixed inset-x-3 bottom-3 z-50 rounded-[1.6rem] border border-[var(--color-line)] bg-[rgba(255,255,255,0.96)] px-2 py-2 shadow-[0_26px_60px_-34px_rgba(14,42,71,0.35)] backdrop-blur-xl md:hidden">
+        <div className="grid grid-cols-5 gap-1">
+          {mobileNav.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.id}
+                href={item.link}
+                className="flex flex-col items-center justify-center rounded-[1rem] px-1 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]"
+              >
+                <span className="mb-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-accent)_78%,white_22%)] text-[var(--color-primary)]">
+                  <Icon size={18} />
+                </span>
+                {item.title}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+    </>
   );
 }

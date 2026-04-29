@@ -6,6 +6,7 @@ import {
   hasPublicSupabaseConfig,
   hasServiceRoleConfig,
 } from "@/lib/supabase/env";
+import { buildTrackingSlug } from "@/lib/utils";
 import type {
   AdminDashboardData,
   ClientItem,
@@ -173,6 +174,7 @@ type ProductRow = {
   id: string;
   slug: string;
   name: string;
+  created_at: string;
   collection: string;
   short_description: string;
   description: string;
@@ -244,6 +246,7 @@ function mapProduct(row: ProductRow): Product {
     id: row.id,
     slug: row.slug,
     name: row.name,
+    createdAt: row.created_at,
     collection: row.collection,
     shortDescription: row.short_description,
     description: row.description,
@@ -453,6 +456,7 @@ function mapOrder(row: OrderRow): OrderItem {
   return {
     id: row.id,
     reference: row.reference,
+    trackingSlug: buildTrackingSlug(row.product_slug, row.reference),
     name: row.customer_name,
     phone: row.customer_phone,
     email: row.customer_email,

@@ -194,10 +194,10 @@ export default async function ProductDetailPage({
                   Order this product
                 </Link>
                 <Link
-                  href="/account"
+                  href="/orders"
                   className="rounded-[1.2rem] border border-[var(--color-line)] bg-white/72 px-6 py-4 text-center text-sm font-semibold text-[var(--color-ink)]"
                 >
-                  Track previous orders
+                  Track orders
                 </Link>
               </div>
             </article>

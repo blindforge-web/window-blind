@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --color-page: #f3f5f8;
+  --color-page: #f7faff;
   --color-surface: #ffffff;
-  --color-accent: #eef2f6;
-  --color-ink: #0f172a;
-  --color-muted: #334155;
-  --color-line: rgba(15, 23, 42, 0.16);
-  --color-primary: #0a2540;
-  --color-secondary: #b9911f;
+  --color-accent: #eaf2ff;
+  --color-ink: #0e2a47;
+  --color-muted: #5a6b7e;
+  --color-line: rgba(14, 42, 71, 0.12);
+  --color-primary: #0f4c97;
+  --color-secondary: #f2c94c;
 }
 
 @theme inline {
@@ -24,25 +24,28 @@
 
 html {
   background:
-    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-secondary) 10%, transparent), transparent 22%),
-    radial-gradient(circle at 100% 12%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 26%),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-page) 78%, white 22%) 0%,
-      color-mix(in srgb, var(--color-page) 92%, #eef2f7 8%) 55%,
-      color-mix(in srgb, var(--color-page) 82%, white 18%) 100%
-    );
+    radial-gradient(circle at top left, rgba(242, 201, 76, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(15, 76, 151, 0.12), transparent 26%),
+    linear-gradient(180deg, #ffffff 0%, #f7faff 55%, #eef5ff 100%);
+  scroll-padding-top: 6rem;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  padding-bottom: 5.75rem;
   font-family: var(--font-body), sans-serif;
   color: var(--color-ink);
   background:
-    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--color-secondary) 5%, transparent), transparent 18%),
-    radial-gradient(circle at 90% 20%, color-mix(in srgb, var(--color-primary) 5%, transparent), transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.08));
+    radial-gradient(circle at 12% 0%, rgba(242, 201, 76, 0.12), transparent 20%),
+    radial-gradient(circle at 100% 12%, rgba(15, 76, 151, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.92));
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding-bottom: 0;
+  }
 }
 
 a {
@@ -66,13 +69,13 @@ summary::-webkit-details-marker {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-secondary) 28%, transparent);
+  background: rgba(242, 201, 76, 0.35);
   color: var(--color-ink);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: color-mix(in srgb, var(--color-muted) 62%, white 38%);
+  color: color-mix(in srgb, var(--color-muted) 72%, white 28%);
 }
 
 button,
@@ -96,10 +99,14 @@ summary:hover {
   transform: translateY(-1px);
 }
 
+.public-main {
+  padding-bottom: 1rem;
+}
+
 input:focus,
 select:focus,
 textarea:focus {
   border-color: color-mix(in srgb, var(--color-primary) 45%, white 55%);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, white 90%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 11%, white 89%);
   outline: none;
 }

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import type { Product } from "@/lib/types";
 import { InteractiveMedia } from "@/components/media/interactive-media";
 
@@ -20,7 +19,7 @@ export function ProductVisual({
       mediaKind="image"
       alt={product.name}
       previewHint="Open product image"
-      className={`relative overflow-hidden rounded-[2rem] border border-white/40 ${className}`}
+      className={`relative overflow-hidden rounded-[1.8rem] border border-white/60 ${className}`}
       mediaClassName={mediaClassName}
     >
       <div
@@ -31,11 +30,13 @@ export function ProductVisual({
             : `linear-gradient(145deg, ${product.visual.from}, ${product.visual.to})`,
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.32),transparent_32%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_20%,rgba(15,23,42,0.1)_62%,rgba(15,23,42,0.48)_100%)]" />
-      <div className="absolute -right-10 top-8 h-32 w-32 rounded-full bg-white/14 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-5 left-5 right-5 rounded-[1.6rem] border border-white/24 bg-white/10 px-4 py-4 text-white backdrop-blur-xl">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-white/70">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.9),transparent_34%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,42,71,0)_0%,rgba(14,42,71,0.08)_46%,rgba(14,42,71,0.76)_100%)]" />
+      <div className="absolute right-5 top-5 rounded-full bg-white/88 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)] shadow-[0_12px_24px_-20px_rgba(14,42,71,0.42)]">
+        {product.collection}
+      </div>
+      <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-[1.25rem] border border-white/18 bg-[rgba(14,42,71,0.68)] px-4 py-4 text-white backdrop-blur-xl">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/72">
           {product.visual.label}
         </p>
         <p className="mt-2 text-2xl font-extrabold tracking-[-0.04em]">{product.name}</p>

@@ -93,10 +93,10 @@ export default async function CheckoutOrderPage({
               </div>
               <div className="mt-5 flex flex-wrap gap-3">
                 <Link
-                  href="/account"
+                  href="/orders"
                   className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
                 >
-                  Open account
+                  Track orders
                 </Link>
                 <Link
                   href="/products"
@@ -226,8 +226,8 @@ export default async function CheckoutOrderPage({
                     Account tracking
                   </p>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Return to your account area at any time to review status updates and
-                    submitted order history.
+                    Return to your orders screen at any time to review IDs, tracking slugs,
+                    and submitted order history.
                   </p>
                 </article>
               </div>

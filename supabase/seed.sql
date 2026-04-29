@@ -32,14 +32,14 @@ values (
   '',
   '',
   'Complete payment by bank transfer, then attach your receipt so the order can move into confirmation.',
-  '#0A2540',
-  '#D4AF37',
-  '#F5F5F5',
-  '#F5F7FA',
+  '#0F4C97',
+  '#F2C94C',
+  '#EAF2FF',
+  '#F7FAFF',
   '#FFFFFF',
-  '#0F172A',
-  '#475569',
-  'rgba(10, 37, 64, 0.12)'
+  '#0E2A47',
+  '#5A6B7E',
+  'rgba(14, 42, 71, 0.12)'
 )
 on conflict (id) do update
 set
@@ -87,12 +87,11 @@ set
 
 insert into public.navbar (id, title, link, sort_order, is_active)
 values
-  ('nav-home', 'Home', '/#top', 1, true),
-  ('nav-about', 'About', '/#about', 2, true),
-  ('nav-products', 'Products', '/products', 3, true),
-  ('nav-services', 'Services', '/#services', 4, true),
-  ('nav-team', 'Team', '/#team', 5, true),
-  ('nav-contact', 'Contact', '/#contact', 6, true)
+  ('nav-home', 'Home', '/', 1, true),
+  ('nav-products', 'Products', '/products', 2, true),
+  ('nav-orders', 'Orders', '/orders', 3, true),
+  ('nav-notifications', 'Notifications', '/notifications', 4, true),
+  ('nav-contact', 'Contact', '/#contact', 5, true)
 on conflict (id) do update
 set
   title = excluded.title,

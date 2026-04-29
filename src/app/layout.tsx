@@ -33,14 +33,14 @@ export default async function RootLayout({
   const settings = await getSiteSettings();
 
   const themeStyle = {
-    "--color-page": settings?.pageColor || "#F5F7FA",
+    "--color-page": settings?.pageColor || "#F7FAFF",
     "--color-surface": settings?.surfaceColor || "#FFFFFF",
-    "--color-accent": settings?.accentColor || "#F5F5F5",
-    "--color-ink": settings?.inkColor || "#0F172A",
-    "--color-muted": settings?.mutedColor || "#475569",
-    "--color-line": settings?.lineColor || "rgba(10, 37, 64, 0.12)",
-    "--color-primary": settings?.primaryColor || "#0A2540",
-    "--color-secondary": settings?.secondaryColor || "#D4AF37",
+    "--color-accent": settings?.accentColor || "#EAF2FF",
+    "--color-ink": settings?.inkColor || "#0E2A47",
+    "--color-muted": settings?.mutedColor || "#5A6B7E",
+    "--color-line": settings?.lineColor || "rgba(14, 42, 71, 0.12)",
+    "--color-primary": settings?.primaryColor || "#0F4C97",
+    "--color-secondary": settings?.secondaryColor || "#F2C94C",
   } as CSSProperties;
 
   return (
