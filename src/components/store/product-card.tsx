@@ -8,35 +8,27 @@ export function ProductCard({ product }: { product: Product }) {
   const currentPrice = product.salePrice ?? product.basePrice;
 
   return (
-    <article className="group overflow-hidden rounded-[1.9rem] border border-[var(--color-line)] bg-[var(--color-surface)] shadow-[0_22px_50px_-36px_rgba(14,42,71,0.22)]">
-      <div className="p-3">
-        <ProductVisual
-          product={product}
-          className="h-72 bg-[linear-gradient(180deg,#f8fbff,#eaf2ff)]"
-          mediaClassName="h-full w-full object-contain p-4"
-        />
-      </div>
+    <article className="ui-panel overflow-hidden p-3">
+      <ProductVisual
+        product={product}
+        className="h-72 bg-[linear-gradient(180deg,#f8fbff,#eaf2ff)]"
+        mediaClassName="h-full w-full object-contain p-4"
+      />
 
-      <div className="space-y-4 px-5 pb-5">
+      <div className="space-y-4 px-2 pb-2 pt-5 sm:px-3 sm:pb-3">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-primary)]">
-              {product.collection}
-            </p>
+            <p className="ui-section-label">{product.collection}</p>
             <h3 className="mt-2 text-2xl font-extrabold tracking-[-0.04em] text-[var(--color-ink)]">
               {product.name}
             </h3>
           </div>
-          {product.badge ? (
-            <span className="rounded-full bg-[color-mix(in_srgb,var(--color-secondary)_32%,white_68%)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]">
-              {product.badge}
-            </span>
-          ) : null}
+          {product.badge ? <span className="ui-pill ui-pill-solid">{product.badge}</span> : null}
         </div>
 
         <p className="text-sm leading-7 text-[var(--color-muted)]">{product.shortDescription}</p>
 
-        <div className="flex items-center justify-between rounded-[1.2rem] bg-[color-mix(in_srgb,var(--color-accent)_76%,white_24%)] px-4 py-3 text-sm">
+        <div className="flex items-center justify-between rounded-[1.2rem] bg-[var(--color-accent)] px-4 py-3 text-sm">
           <div className="flex items-center gap-2 text-[var(--color-ink)]">
             <Star size={15} className="fill-[var(--color-secondary)] text-[var(--color-secondary)]" />
             <span className="font-bold">{product.rating}</span>
@@ -72,20 +64,14 @@ export function ProductCard({ product }: { product: Product }) {
               ) : null}
             </div>
           </div>
-          <Link
-            href={`/products/${product.slug}`}
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
-          >
+          <Link href={`/products/${product.slug}`} className="ui-button ui-button-outline px-4 py-3 text-sm">
             Details
             <ArrowUpRight size={16} />
           </Link>
         </div>
 
-        <Link
-          href={`/checkout/order?product=${product.slug}`}
-          className="block rounded-[1rem] bg-[var(--color-primary)] px-4 py-3 text-center text-sm font-semibold text-white"
-        >
-          Order this blind
+        <Link href={`/checkout/order?product=${product.slug}`} className="ui-button ui-button-primary w-full">
+          Order This Blind
         </Link>
       </div>
     </article>

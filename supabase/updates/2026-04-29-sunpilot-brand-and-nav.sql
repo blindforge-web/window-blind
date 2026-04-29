@@ -19,9 +19,8 @@ insert into public.navbar (id, title, link, sort_order, is_active)
 values
   ('nav-home', 'Home', '/', 1, true),
   ('nav-products', 'Products', '/products', 2, true),
-  ('nav-orders', 'Orders', '/orders', 3, true),
-  ('nav-notifications', 'Notifications', '/notifications', 4, true),
-  ('nav-contact', 'Contact', '/#contact', 5, true)
+  ('nav-team', 'Team', '/team', 3, true),
+  ('nav-contact', 'Contact', '/#contact', 4, true)
 on conflict (id) do update
 set
   title = excluded.title,
@@ -31,6 +30,6 @@ set
 
 update public.navbar
 set is_active = false
-where id in ('nav-about', 'nav-services', 'nav-team');
+where id in ('nav-about', 'nav-services', 'nav-orders', 'nav-notifications');
 
 commit;

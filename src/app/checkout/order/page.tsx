@@ -94,13 +94,13 @@ export default async function CheckoutOrderPage({
               <div className="mt-5 flex flex-wrap gap-3">
                 <Link
                   href="/orders"
-                  className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
+                  className="ui-button bg-white text-[var(--color-ink)]"
                 >
                   Track orders
                 </Link>
                 <Link
                   href="/products"
-                  className="rounded-2xl border border-white/18 px-5 py-3 text-sm font-semibold text-white"
+                  className="ui-button border border-white/18 text-white"
                 >
                   Browse catalog
                 </Link>
@@ -253,7 +253,7 @@ export default async function CheckoutOrderPage({
             <div className="mt-6 flex gap-4">
               <Link
                 href="/products"
-                className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold"
+                className="ui-button ui-button-outline"
               >
                 Browse products
               </Link>

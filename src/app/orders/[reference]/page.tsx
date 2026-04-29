@@ -62,7 +62,7 @@ export default async function OrderDetailPage({
               </h1>
               <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">{status.summary}</p>
             </div>
-            <Link href="/orders" className="rounded-full border border-[var(--color-line)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]">
+            <Link href="/orders" className="ui-button ui-button-outline">
               Back to orders
             </Link>
           </div>

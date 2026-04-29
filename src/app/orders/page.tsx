@@ -14,7 +14,7 @@ export default async function OrdersPage() {
       <div className="min-h-screen">
         <SiteHeader />
         <main className="mx-auto max-w-5xl px-4 pb-10 pt-6 sm:px-6 lg:px-10">
-          <section className="rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(150deg,#ffffff,rgba(234,242,255,0.94))] p-6 text-center shadow-[0_30px_70px_-42px_rgba(14,42,71,0.22)] sm:p-8 lg:p-10">
+          <section className="ui-panel-soft p-6 text-center sm:p-8 lg:p-10">
             <ShieldCheck size={28} className="mx-auto text-[var(--color-primary)]" />
             <h1 className="mt-4 text-5xl font-extrabold tracking-[-0.06em] text-[var(--color-ink)] sm:text-6xl">
               Sign in to track your Sunpilot orders
@@ -23,11 +23,11 @@ export default async function OrdersPage() {
               The order screen keeps customer order IDs, tracking slugs, payment review, and delivery status together.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link href="/account?next=/orders" className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white">
-                Open account access
+              <Link href="/account?next=/orders" className="ui-button ui-button-primary">
+                Open Account Access
               </Link>
-              <Link href="/products" className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)]">
-                Browse products
+              <Link href="/products" className="ui-button ui-button-outline">
+                Browse Products
               </Link>
             </div>
           </section>
@@ -44,25 +44,23 @@ export default async function OrdersPage() {
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-6 sm:px-6 lg:px-10">
-        <section className="rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(150deg,#ffffff,rgba(234,242,255,0.94))] p-6 shadow-[0_30px_70px_-42px_rgba(14,42,71,0.22)] sm:p-8 lg:p-10">
+        <section className="ui-panel-soft p-6 sm:p-8 lg:p-10">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-                Order screen
-              </p>
+              <p className="ui-section-label">Orders</p>
               <h1 className="mt-3 text-5xl font-extrabold tracking-[-0.06em] text-[var(--color-ink)] sm:text-6xl">
                 Track every Sunpilot order in one place.
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--color-muted)] sm:text-base">
-                Each order now exposes its internal ID, customer-facing tracking slug, and current fulfillment status for cleaner follow-up.
+                Each order shows its internal ID, customer-facing tracking slug, and current progress in a simple layout.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white px-5 py-4">
+              <div className="ui-panel px-5 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">All orders</p>
                 <p className="mt-2 text-3xl font-extrabold text-[var(--color-ink)]">{orders.length}</p>
               </div>
-              <div className="rounded-[1.4rem] border border-[var(--color-line)] bg-white px-5 py-4">
+              <div className="ui-panel px-5 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">Confirmed</p>
                 <p className="mt-2 text-3xl font-extrabold text-[var(--color-ink)]">{confirmedOrders}</p>
               </div>
@@ -75,15 +73,10 @@ export default async function OrdersPage() {
             {orders.map((order) => {
               const status = getOrderStatusMeta(order.status);
               return (
-                <article
-                  key={order.id}
-                  className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.18)]"
-                >
+                <article key={order.id} className="ui-panel p-6">
                   <div className="grid gap-5 lg:grid-cols-[1.05fr_1fr_auto] lg:items-start">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-                        {order.reference}
-                      </p>
+                      <p className="ui-section-label">{order.reference}</p>
                       <h2 className="mt-3 text-2xl font-extrabold tracking-[-0.04em] text-[var(--color-ink)]">
                         {order.productName}
                       </h2>
@@ -101,11 +94,8 @@ export default async function OrdersPage() {
                     </div>
 
                     <div className="flex items-center">
-                      <Link
-                        href={`/orders/${order.reference}`}
-                        className="inline-flex rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white"
-                      >
-                        View order
+                      <Link href={`/orders/${order.reference}`} className="ui-button ui-button-primary">
+                        View Order
                       </Link>
                     </div>
                   </div>
@@ -114,7 +104,7 @@ export default async function OrdersPage() {
             })}
           </section>
         ) : (
-          <section className="rounded-[1.8rem] border border-dashed border-[var(--color-line)] bg-white p-8 text-center">
+          <section className="ui-panel p-8 text-center">
             <Package2 size={28} className="mx-auto text-[var(--color-primary)]" />
             <h2 className="mt-4 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
               No tracked orders yet
@@ -123,8 +113,8 @@ export default async function OrdersPage() {
               Place an order while signed in and it will appear here automatically.
             </p>
             <div className="mt-6">
-              <Link href="/checkout/order" className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white">
-                Start an order
+              <Link href="/checkout/order" className="ui-button ui-button-primary">
+                Start An Order
               </Link>
             </div>
           </section>

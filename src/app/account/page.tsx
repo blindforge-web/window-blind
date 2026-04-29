@@ -29,16 +29,14 @@ export default async function AccountPage({
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-6 sm:px-6 lg:px-10">
-        <section className="rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(150deg,#ffffff,rgba(234,242,255,0.94))] p-6 shadow-[0_30px_70px_-42px_rgba(14,42,71,0.24)] sm:p-8 lg:p-10">
+        <section className="ui-panel-soft p-6 sm:p-8 lg:p-10">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-                Customer account
-              </p>
+              <p className="ui-section-label">Account</p>
               <h1 className="mt-3 max-w-3xl text-5xl font-extrabold tracking-[-0.06em] text-[var(--color-ink)] sm:text-6xl">
                 {user
                   ? "Your Sunpilot workspace for orders, updates, and account details"
-                  : "A cleaner account entry built for real customers"}
+                  : "A cleaner customer login and account experience"}
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--color-muted)] sm:text-base">
                 Customers can sign in, see tracked orders, open notifications, and continue shopping without losing context.
@@ -57,52 +55,39 @@ export default async function AccountPage({
         {user ? (
           <>
             <section className="grid gap-4 lg:grid-cols-[1.02fr_0.98fr]">
-              <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.18)] sm:p-7">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-primary)]">
-                  Account owner
-                </p>
+              <article className="ui-panel p-6 sm:p-7">
+                <p className="ui-section-label">Account owner</p>
                 <h2 className="mt-3 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
                   {user.fullName}
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{user.email}</p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                  <Link href="/products" className="rounded-[1rem] border border-[var(--color-line)] px-4 py-3 text-sm font-semibold text-[var(--color-ink)]">
-                    Browse products
-                  </Link>
-                  <Link href="/orders" className="rounded-[1rem] border border-[var(--color-line)] px-4 py-3 text-sm font-semibold text-[var(--color-ink)]">
-                    View orders
-                  </Link>
-                  <Link href="/notifications" className="rounded-[1rem] border border-[var(--color-line)] px-4 py-3 text-sm font-semibold text-[var(--color-ink)]">
-                    Notifications
-                  </Link>
-                  <Link href="/checkout/order" className="rounded-[1rem] bg-[var(--color-primary)] px-4 py-3 text-center text-sm font-semibold text-white">
-                    New order
-                  </Link>
+                  <Link href="/products" className="ui-button ui-button-outline w-full">Browse Products</Link>
+                  <Link href="/orders" className="ui-button ui-button-outline w-full">View Orders</Link>
+                  <Link href="/notifications" className="ui-button ui-button-outline w-full">Notifications</Link>
+                  <Link href="/checkout/order" className="ui-button ui-button-primary w-full">New Order</Link>
                 </div>
                 {admin ? (
                   <div className="mt-4">
-                    <Link
-                      href="/admin/dashboard"
-                      className="inline-flex rounded-full border border-[var(--color-line)] bg-[var(--color-accent)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
-                    >
-                      Open admin dashboard
+                    <Link href="/admin/dashboard" className="ui-button ui-button-soft">
+                      Open Admin Dashboard
                     </Link>
                   </div>
                 ) : null}
               </article>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-5">
+                <article className="ui-panel p-5">
                   <Package size={18} className="text-[var(--color-primary)]" />
                   <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">Orders</p>
                   <p className="mt-2 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">{orders.length}</p>
                 </article>
-                <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-5">
+                <article className="ui-panel p-5">
                   <Receipt size={18} className="text-[var(--color-primary)]" />
                   <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">Confirmed</p>
                   <p className="mt-2 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">{confirmedOrders}</p>
                 </article>
-                <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-[linear-gradient(160deg,color-mix(in_srgb,var(--color-primary)_96%,black_4%),color-mix(in_srgb,var(--color-primary)_72%,white_28%))] p-5 text-white">
+                <article className="rounded-[1.75rem] border border-[var(--color-line)] bg-[linear-gradient(160deg,color-mix(in_srgb,var(--color-primary)_96%,black_4%),color-mix(in_srgb,var(--color-primary)_72%,white_28%))] p-5 text-white shadow-[0_24px_56px_-36px_rgba(14,42,71,0.28)]">
                   <User2 size={18} />
                   <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/68">Total value</p>
                   <p className="mt-2 text-2xl font-extrabold tracking-[-0.05em]">{totalSpent ? formatCurrency(totalSpent) : "NGN 0"}</p>
@@ -111,10 +96,8 @@ export default async function AccountPage({
             </section>
 
             <section className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
-              <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.18)] sm:p-7">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-primary)]">
-                  Latest order snapshot
-                </p>
+              <article className="ui-panel p-6 sm:p-7">
+                <p className="ui-section-label">Latest order snapshot</p>
                 {latestOrder ? (
                   <>
                     <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
@@ -135,11 +118,11 @@ export default async function AccountPage({
                       </p>
                     </div>
                     <div className="mt-6 flex flex-wrap gap-3">
-                      <Link href={`/orders/${latestOrder.reference}`} className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white">
-                        Open order
+                      <Link href={`/orders/${latestOrder.reference}`} className="ui-button ui-button-primary">
+                        Open Order
                       </Link>
-                      <Link href="/notifications" className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)]">
-                        Check notifications
+                      <Link href="/notifications" className="ui-button ui-button-outline">
+                        Check Notifications
                       </Link>
                     </div>
                   </>
@@ -152,23 +135,21 @@ export default async function AccountPage({
                       As soon as you place an order while signed in, it will appear here with its ID, tracking slug, and current status.
                     </p>
                     <div className="mt-6">
-                      <Link href="/checkout/order" className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white">
-                        Start your first order
+                      <Link href="/checkout/order" className="ui-button ui-button-primary">
+                        Start Your First Order
                       </Link>
                     </div>
                   </>
                 )}
               </article>
 
-              <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.18)] sm:p-7">
+              <article className="ui-panel p-6 sm:p-7">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-primary)]">
                     <Bell size={18} />
                   </span>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-primary)]">
-                      Customer updates
-                    </p>
+                    <p className="ui-section-label">Customer updates</p>
                     <h2 className="mt-1 text-3xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
                       One place for store and order alerts
                     </h2>
@@ -186,8 +167,8 @@ export default async function AccountPage({
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Link href="/notifications" className="inline-flex rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white">
-                    Open notifications
+                  <Link href="/notifications" className="ui-button ui-button-primary">
+                    Open Notifications
                   </Link>
                 </div>
               </article>
@@ -196,10 +177,8 @@ export default async function AccountPage({
         ) : (
           <section className="space-y-6">
             <AccountAccessPanel redirectTo={redirectTo} />
-            <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.16)] sm:p-7">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-primary)]">
-                Guest checkout still works
-              </p>
+            <article className="ui-panel p-6 sm:p-7">
+              <p className="ui-section-label">Guest checkout</p>
               <h2 className="mt-3 text-3xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
                 Customers can order first and sign in later if needed.
               </h2>
@@ -207,11 +186,11 @@ export default async function AccountPage({
                 Signing in gives a better experience, but it does not block someone from buying. They can continue to the order screen and still submit payment proof remotely.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/checkout/order" className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white">
-                  Continue to order
+                <Link href="/checkout/order" className="ui-button ui-button-primary">
+                  Continue To Order
                 </Link>
-                <Link href="/products" className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)]">
-                  Browse products
+                <Link href="/products" className="ui-button ui-button-outline">
+                  Browse Products
                 </Link>
               </div>
             </article>

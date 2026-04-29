@@ -19,7 +19,7 @@ export function ProductVisual({
       mediaKind="image"
       alt={product.name}
       previewHint="Open product image"
-      className={`relative overflow-hidden rounded-[1.8rem] border border-white/60 ${className}`}
+      className={`relative overflow-hidden rounded-[1.65rem] border border-white/60 ${className}`}
       mediaClassName={mediaClassName}
     >
       <div
@@ -32,10 +32,10 @@ export function ProductVisual({
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.9),transparent_34%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,42,71,0)_0%,rgba(14,42,71,0.08)_46%,rgba(14,42,71,0.76)_100%)]" />
-      <div className="absolute right-5 top-5 rounded-full bg-white/88 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)] shadow-[0_12px_24px_-20px_rgba(14,42,71,0.42)]">
+      <div className="absolute left-4 top-4 rounded-full bg-[rgba(255,255,255,0.92)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--color-primary)] shadow-[0_12px_24px_-20px_rgba(14,42,71,0.42)]">
         {product.collection}
       </div>
-      <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-[1.25rem] border border-white/18 bg-[rgba(14,42,71,0.68)] px-4 py-4 text-white backdrop-blur-xl">
+      <div className="pointer-events-none absolute bottom-4 left-4 right-4 rounded-[1.2rem] border border-white/18 bg-[rgba(14,42,71,0.68)] px-4 py-4 text-white backdrop-blur-xl">
         <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/72">
           {product.visual.label}
         </p>

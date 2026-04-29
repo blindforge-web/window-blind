@@ -38,7 +38,7 @@ export default async function ProductDetailPage({
           </div>
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-white/72 px-4 py-2 text-sm font-semibold text-[var(--color-ink)]"
+            className="ui-button ui-button-outline px-4 py-3 text-sm"
           >
             <ArrowLeft size={16} />
             Back to catalog
@@ -189,13 +189,13 @@ export default async function ProductDetailPage({
               <div className="mt-6 grid gap-3">
                 <Link
                   href={`/checkout/order?product=${product.slug}`}
-                  className="rounded-[1.2rem] bg-[var(--color-primary)] px-6 py-4 text-center text-sm font-semibold text-white"
+                  className="ui-button ui-button-primary w-full rounded-[1.2rem]"
                 >
                   Order this product
                 </Link>
                 <Link
                   href="/orders"
-                  className="rounded-[1.2rem] border border-[var(--color-line)] bg-white/72 px-6 py-4 text-center text-sm font-semibold text-[var(--color-ink)]"
+                  className="ui-button ui-button-outline w-full rounded-[1.2rem]"
                 >
                   Track orders
                 </Link>

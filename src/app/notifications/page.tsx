@@ -58,20 +58,18 @@ export default async function NotificationsPage() {
     <div className="min-h-screen">
       <SiteHeader />
       <main className="mx-auto max-w-7xl space-y-8 px-4 pb-10 pt-6 sm:px-6 lg:px-10">
-        <section className="rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(150deg,#ffffff,rgba(234,242,255,0.94))] p-6 shadow-[0_30px_70px_-42px_rgba(14,42,71,0.22)] sm:p-8 lg:p-10">
+        <section className="ui-panel-soft p-6 sm:p-8 lg:p-10">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-primary)]">
-                Notification screen
-              </p>
+              <p className="ui-section-label">Notifications</p>
               <h1 className="mt-3 max-w-4xl text-5xl font-extrabold tracking-[-0.06em] text-[var(--color-ink)] sm:text-6xl">
                 Product launches, order activity, and delivery updates in one feed.
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--color-muted)] sm:text-base">
-                This screen now collects store-level notifications and, when signed in, customer-specific order updates too.
+                When signed in, this screen mixes store updates with your customer-specific order progress.
               </p>
             </div>
-            <div className="rounded-[1.5rem] border border-[var(--color-line)] bg-white px-5 py-4">
+            <div className="ui-panel px-5 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                 Signed in
               </p>
@@ -83,7 +81,7 @@ export default async function NotificationsPage() {
         </section>
 
         {!user ? (
-          <section className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.18)] sm:p-7">
+          <section className="ui-panel p-6 sm:p-7">
             <div className="flex items-center gap-3">
               <Bell size={18} className="text-[var(--color-primary)]" />
               <p className="text-sm font-semibold text-[var(--color-ink)]">
@@ -91,8 +89,8 @@ export default async function NotificationsPage() {
               </p>
             </div>
             <div className="mt-5">
-              <Link href="/account?next=/notifications" className="rounded-full bg-[var(--color-primary)] px-5 py-3 text-sm font-semibold text-white">
-                Open account access
+              <Link href="/account?next=/notifications" className="ui-button ui-button-primary">
+                Open Account Access
               </Link>
             </div>
           </section>
@@ -101,19 +99,14 @@ export default async function NotificationsPage() {
         {feed.length ? (
           <section className="grid gap-4">
             {feed.map((item) => (
-              <article
-                key={item.id}
-                className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-6 shadow-[0_20px_46px_-34px_rgba(14,42,71,0.18)]"
-              >
+              <article key={item.id} className="ui-panel p-6">
                 <div className="grid gap-5 lg:grid-cols-[auto_1fr_auto] lg:items-start">
                   <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-primary)]">
                     {item.tag === "Product update" ? <Box size={20} /> : <PackageSearch size={20} />}
                   </span>
                   <div>
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="rounded-full bg-[color-mix(in_srgb,var(--color-secondary)_32%,white_68%)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-ink)]">
-                        {item.tag}
-                      </span>
+                      <span className="ui-pill ui-pill-solid">{item.tag}</span>
                       <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                         {formatDateTime(item.createdAt)}
                       </span>
@@ -124,7 +117,7 @@ export default async function NotificationsPage() {
                     <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">{item.body}</p>
                   </div>
                   <div className="flex items-center">
-                    <Link href={item.href} className="rounded-full border border-[var(--color-line)] px-5 py-3 text-sm font-semibold text-[var(--color-ink)]">
+                    <Link href={item.href} className="ui-button ui-button-outline">
                       Open
                     </Link>
                   </div>
@@ -133,7 +126,7 @@ export default async function NotificationsPage() {
             ))}
           </section>
         ) : (
-          <section className="rounded-[1.8rem] border border-dashed border-[var(--color-line)] bg-white p-8 text-center">
+          <section className="ui-panel p-8 text-center">
             <Bell size={28} className="mx-auto text-[var(--color-primary)]" />
             <h2 className="mt-4 text-4xl font-extrabold tracking-[-0.05em] text-[var(--color-ink)]">
               No notifications yet
