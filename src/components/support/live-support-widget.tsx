@@ -112,11 +112,6 @@ export function LiveSupportWidget({
   );
 
   useEffect(() => {
-    setConversations(initialConversations);
-    setActiveConversationId(initialConversations[0]?.id ?? "");
-  }, [initialConversations]);
-
-  useEffect(() => {
     if (!currentUser) {
       return;
     }

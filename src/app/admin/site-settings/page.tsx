@@ -21,8 +21,7 @@ import {
   upsertSocialLink,
   upsertTeamMember,
 } from "@/app/actions";
-import { SignOutButton } from "@/components/admin/sign-out-button";
-import { SiteHeader } from "@/components/navigation/site-header";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { getCurrentAdmin } from "@/lib/auth";
 import { getAdminDashboardData } from "@/lib/data";
 import { hasPublicSupabaseConfig } from "@/lib/supabase/env";
@@ -364,35 +363,17 @@ export default async function AdminSiteSettingsPage({
   };
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <main className="mx-auto max-w-7xl space-y-8 px-6 py-12 lg:px-10">
-        <section className="rounded-[2.7rem] border border-[var(--color-line)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(244,247,251,0.9))] p-8 lg:p-10">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                Admin Site Settings
-              </p>
-              <h1 className="mt-2 font-display text-6xl leading-none">
-                Manage the live website experience
-              </h1>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
-                Update the customer-facing website here, including brand assets, homepage
-                sections, navigation, contact details, gallery media, and supporting content.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/admin/dashboard"
-                className="rounded-full border border-[var(--color-line)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
-              >
-                Back to dashboard
-              </Link>
-              {admin ? <SignOutButton /> : null}
-            </div>
-          </div>
-        </section>
-
+    <AdminShell
+      admin={admin}
+      active="settings"
+      title="Site settings"
+      subtitle="Manage customer-facing website content, brand details, payment instructions, navigation, team profiles, and gallery media."
+      actions={
+        <Link href="/admin/dashboard" className="ui-button ui-button-outline hidden sm:inline-flex">
+          Dashboard
+        </Link>
+      }
+    >
         {!hasPublicSupabaseConfig ? (
           <div className="rounded-[1.8rem] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
             Store configuration is incomplete. Live editing will resume once the secure connection is restored.
@@ -1129,7 +1110,6 @@ export default async function AdminSiteSettingsPage({
             ) : null}
           </div>
         </section>
-      </main>
-    </div>
+    </AdminShell>
   );
 }

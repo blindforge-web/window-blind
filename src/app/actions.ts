@@ -77,6 +77,14 @@ const NIGERIA_DELIVERY_STATES = [
   { code: "abuja", name: "Abuja", eta: "3 to 5 working days" },
 ];
 
+const ADMIN_ROLES = new Set([
+  "super_admin",
+  "admin",
+  "orders",
+  "support",
+  "content",
+]);
+
 function revalidateSite() {
   revalidatePath("/");
   revalidatePath("/products");
@@ -88,6 +96,7 @@ function revalidateSite() {
 function revalidateCatalog(slug?: string | null) {
   revalidateSite();
   revalidatePath("/catalog");
+  revalidatePath("/admin/products");
   if (slug) {
     revalidatePath(`/products/${slug}`);
     revalidatePath(`/blinds/${slug}`);
@@ -124,6 +133,44 @@ async function requireAdminSupabase() {
   }
 
   return supabase;
+}
+
+async function requireSuperAdminService() {
+  if (!hasServiceRoleConfig) {
+    return {
+      error:
+        "Admin management is unavailable until the service-role configuration is completed.",
+      serviceSupabase: null,
+      currentAdmin: null,
+    };
+  }
+
+  const currentAdmin = await getCurrentAdmin();
+
+  if (!currentAdmin || currentAdmin.role !== "super_admin") {
+    return {
+      error: "Only a super admin can manage admin accounts.",
+      serviceSupabase: null,
+      currentAdmin: null,
+    };
+  }
+
+  const serviceSupabase = createSupabaseServiceClient();
+
+  if (!serviceSupabase) {
+    return {
+      error: "Supabase service connection is unavailable.",
+      serviceSupabase: null,
+      currentAdmin: null,
+    };
+  }
+
+  return { error: "", serviceSupabase, currentAdmin };
+}
+
+function getAdminRole(formData: FormData) {
+  const role = getText(formData, "role");
+  return ADMIN_ROLES.has(role) ? role : "admin";
 }
 
 async function resolveMediaUrl({
@@ -380,6 +427,8 @@ export async function submitOfflineOrder(
     }
 
     revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/orders");
+    revalidatePath("/admin/notifications");
     revalidatePath("/checkout/order");
     revalidatePath("/checkout/offline");
     revalidatePath("/account");
@@ -672,6 +721,188 @@ export async function resetAdminPassword(
   };
 }
 
+export async function createAdminAccount(
+  _previousState: ActionFeedbackState,
+  formData: FormData,
+): Promise<ActionFeedbackState> {
+  const { error, serviceSupabase } = await requireSuperAdminService();
+
+  if (error || !serviceSupabase) {
+    return { status: "error", message: error };
+  }
+
+  const email = getText(formData, "email").toLowerCase();
+  const fullName = getText(formData, "fullName");
+  const password = getText(formData, "password");
+  const role = getAdminRole(formData);
+
+  if (!email || !fullName) {
+    return {
+      status: "error",
+      message: "Enter the admin name and email address.",
+    };
+  }
+
+  const { data: userPage, error: listError } =
+    await serviceSupabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+
+  if (listError) {
+    return {
+      status: "error",
+      message: "Could not check existing Supabase Auth users.",
+    };
+  }
+
+  let targetUser = userPage.users.find(
+    (user) => user.email?.toLowerCase() === email,
+  );
+
+  if (!targetUser) {
+    if (password.length < 8) {
+      return {
+        status: "error",
+        message: "New admin accounts need a password with at least 8 characters.",
+      };
+    }
+
+    const { data: createdUser, error: createError } =
+      await serviceSupabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          full_name: fullName,
+        },
+      });
+
+    if (createError || !createdUser.user) {
+      return {
+        status: "error",
+        message: createError?.message || "Admin user could not be created.",
+      };
+    }
+
+    targetUser = createdUser.user;
+  }
+
+  const { error: profileError } = await serviceSupabase
+    .from("admin_profiles")
+    .upsert({
+      user_id: targetUser.id,
+      full_name: fullName,
+      role,
+      is_active: true,
+    });
+
+  if (profileError) {
+    return {
+      status: "error",
+      message: "Admin profile could not be saved.",
+    };
+  }
+
+  revalidatePath("/admin/team");
+  revalidatePath("/admin/dashboard");
+
+  return {
+    status: "success",
+    message: `${fullName} now has ${role.replaceAll("_", " ")} access.`,
+  };
+}
+
+export async function updateAdminProfile(
+  _previousState: ActionFeedbackState,
+  formData: FormData,
+): Promise<ActionFeedbackState> {
+  const { error, serviceSupabase, currentAdmin } =
+    await requireSuperAdminService();
+
+  if (error || !serviceSupabase || !currentAdmin) {
+    return { status: "error", message: error };
+  }
+
+  const userId = getText(formData, "userId");
+  const fullName = getText(formData, "fullName");
+  const role = getAdminRole(formData);
+  const isActive = isChecked(formData, "isActive");
+
+  if (!userId || !fullName) {
+    return {
+      status: "error",
+      message: "Admin profile is missing a required field.",
+    };
+  }
+
+  if (userId === currentAdmin.id && (!isActive || role !== "super_admin")) {
+    return {
+      status: "error",
+      message: "A super admin cannot remove their own super-admin access.",
+    };
+  }
+
+  const { error: updateError } = await serviceSupabase
+    .from("admin_profiles")
+    .update({
+      full_name: fullName,
+      role,
+      is_active: isActive,
+    })
+    .eq("user_id", userId);
+
+  if (updateError) {
+    return {
+      status: "error",
+      message: "Admin profile could not be updated.",
+    };
+  }
+
+  revalidatePath("/admin/team");
+  revalidatePath("/admin/dashboard");
+
+  return {
+    status: "success",
+    message: "Admin access updated.",
+  };
+}
+
+export async function removeAdminAccess(formData: FormData) {
+  const { error, serviceSupabase, currentAdmin } =
+    await requireSuperAdminService();
+  const userId = getText(formData, "userId");
+
+  if (error || !serviceSupabase || !currentAdmin || !userId) {
+    return;
+  }
+
+  if (userId === currentAdmin.id) {
+    return;
+  }
+
+  await serviceSupabase
+    .from("admin_profiles")
+    .update({ is_active: false })
+    .eq("user_id", userId);
+
+  revalidatePath("/admin/team");
+  revalidatePath("/admin/dashboard");
+}
+
+export async function markAdminNotificationsRead() {
+  const supabase = await requireAdminSupabase();
+
+  if (!supabase) {
+    return;
+  }
+
+  await supabase
+    .from("admin_notifications")
+    .update({ read_at: new Date().toISOString() })
+    .is("read_at", null);
+
+  revalidatePath("/admin/notifications");
+  revalidatePath("/admin/dashboard");
+}
+
 export async function saveProductPricing(formData: FormData) {
   const supabase = await requireAdminSupabase();
   const productId = getText(formData, "productId");
@@ -838,6 +1069,7 @@ export async function toggleDeliveryState(formData: FormData) {
   revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/delivery");
 }
 
 export async function upsertDeliveryState(formData: FormData) {
@@ -864,6 +1096,7 @@ export async function upsertDeliveryState(formData: FormData) {
   revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/delivery");
 }
 
 export async function seedNigeriaDeliveryStates() {
@@ -883,6 +1116,7 @@ export async function seedNigeriaDeliveryStates() {
   revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/delivery");
 }
 
 export async function deleteDeliveryState(formData: FormData) {
@@ -897,6 +1131,7 @@ export async function deleteDeliveryState(formData: FormData) {
   revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/delivery");
 }
 
 export async function savePaymentAccount(formData: FormData) {
@@ -1340,6 +1575,7 @@ export async function deleteGalleryItem(formData: FormData) {
 export async function updateOrderStatus(formData: FormData) {
   const supabase = await requireAdminSupabase();
   const orderId = getText(formData, "orderId");
+  const reference = getText(formData, "reference");
   const status = getText(formData, "status") as OrderStatus;
 
   if (!supabase || !orderId || !status) {
@@ -1348,5 +1584,10 @@ export async function updateOrderStatus(formData: FormData) {
 
   await supabase.from("orders").update({ status }).eq("id", orderId);
   revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/orders");
+  if (reference) {
+    revalidatePath(`/admin/orders/${reference}`);
+  }
+  revalidatePath("/admin/notifications");
   revalidatePath("/account");
 }

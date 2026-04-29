@@ -272,3 +272,25 @@ export type UserIdentity = {
 export type AdminIdentity = UserIdentity & {
   role: string;
 };
+
+export type AdminProfile = {
+  userId: string;
+  email: string;
+  fullName: string;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+  lastSignInAt: string | null;
+};
+
+export type AdminNotification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  href: string;
+  entityType: string | null;
+  entityId: string | null;
+  isRead: boolean;
+  createdAt: string;
+};

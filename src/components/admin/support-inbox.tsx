@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, MessageCircle, Send } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type {
@@ -92,15 +93,20 @@ function mergeMessage(
 export function SupportInbox({
   admin,
   initialConversations,
+  selectedConversationId,
+  basePath,
 }: {
   admin: AdminIdentity;
   initialConversations: SupportConversation[];
+  selectedConversationId?: string;
+  basePath?: string;
 }) {
+  const router = useRouter();
   const [conversations, setConversations] = useState(
     sortConversations(initialConversations),
   );
   const [activeConversationId, setActiveConversationId] = useState(
-    initialConversations[0]?.id ?? "",
+    selectedConversationId ?? initialConversations[0]?.id ?? "",
   );
   const [draft, setDraft] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
@@ -118,11 +124,6 @@ export function SupportInbox({
   const openCount = conversations.filter(
     (conversation) => conversation.status === "open",
   ).length;
-
-  useEffect(() => {
-    setConversations(sortConversations(initialConversations));
-    setActiveConversationId((current) => current || initialConversations[0]?.id || "");
-  }, [initialConversations]);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -303,7 +304,12 @@ export function SupportInbox({
               <button
                 key={conversation.id}
                 type="button"
-                onClick={() => setActiveConversationId(conversation.id)}
+                onClick={() => {
+                  setActiveConversationId(conversation.id);
+                  if (basePath) {
+                    router.push(`${basePath}/${conversation.id}`);
+                  }
+                }}
                 className={`w-full rounded-[1.3rem] border px-4 py-3 text-left ${
                   isActive
                     ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"

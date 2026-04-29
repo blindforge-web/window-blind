@@ -1,457 +1,225 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { seedNigeriaDeliveryStates } from "@/app/actions";
-import { AdminPasswordResetPanel } from "@/components/admin/admin-password-reset-panel";
-import { CreateProductPanel } from "@/components/admin/create-product-panel";
-import { DeliveryStateCard } from "@/components/admin/delivery-state-card";
-import { OrderAdminRow } from "@/components/admin/order-admin-row";
+import {
+  ArrowRight,
+  Bell,
+  Inbox,
+  PackageOpen,
+  ShoppingBag,
+  Truck,
+} from "lucide-react";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { OrdersRealtimeRefresh } from "@/components/admin/orders-realtime-refresh";
-import { ProductAdminCard } from "@/components/admin/product-admin-card";
-import { SignOutButton } from "@/components/admin/sign-out-button";
-import { SupportInbox } from "@/components/admin/support-inbox";
-import { SiteHeader } from "@/components/navigation/site-header";
 import { getCurrentAdmin } from "@/lib/auth";
-import { getAdminDashboardData } from "@/lib/data";
+import {
+  getAdminNotifications,
+  getAdminOrderStatusCounts,
+  getAdminProducts,
+  getAdminSupportConversations,
+  getDeliveryStates,
+} from "@/lib/data";
 import { hasPublicSupabaseConfig } from "@/lib/supabase/env";
-import { formatCompactNumber } from "@/lib/utils";
+import { formatCompactNumber, formatDateTime } from "@/lib/utils";
 
-const dashboardViews = [
+const quickLinks = [
   {
-    id: "overview",
-    label: "Overview",
-    description: "Daily store summary and quick access.",
+    title: "Review orders",
+    body: "Open the order queue, filter by status, search by ID, and inspect full details.",
+    href: "/admin/orders",
+    icon: PackageOpen,
   },
   {
-    id: "products",
-    label: "Products",
-    description: "Create and update product listings.",
+    title: "Reply to support",
+    body: "Open customer messages, answer conversations, and close resolved requests.",
+    href: "/admin/support",
+    icon: Inbox,
   },
   {
-    id: "orders",
-    label: "Orders",
-    description: "Review payments and update delivery status.",
+    title: "Manage products",
+    body: "Create, price, publish, and edit product listings.",
+    href: "/admin/products",
+    icon: ShoppingBag,
   },
   {
-    id: "support",
-    label: "Support",
-    description: "Reply to customer live-support DMs.",
+    title: "Delivery coverage",
+    body: "Enable states, edit ETA text, and maintain checkout coverage.",
+    href: "/admin/delivery",
+    icon: Truck,
   },
-  {
-    id: "setup",
-    label: "Store Setup",
-    description: "Delivery coverage and links to site settings.",
-  },
-  {
-    id: "security",
-    label: "Security",
-    description: "Restricted admin account tools.",
-  },
-] as const;
+];
 
-const overviewMetrics = [
-  {
-    label: "Listed products",
-    view: "products",
-  },
-  {
-    label: "All products",
-    view: "products",
-  },
-  {
-    label: "Pending orders",
-    view: "orders",
-  },
-  {
-    label: "Open support chats",
-    view: "support",
-  },
-  {
-    label: "Delivery states",
-    view: "setup",
-  },
-] as const;
-
-type DashboardViewId = (typeof dashboardViews)[number]["id"];
-
-function isDashboardView(value?: string): value is DashboardViewId {
-  return dashboardViews.some((view) => view.id === value);
-}
-
-function PanelHeading({
-  eyebrow,
-  title,
-  body,
-}: {
-  eyebrow: string;
-  title: string;
-  body?: string;
-}) {
-  return (
-    <div className="mb-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-        {eyebrow}
-      </p>
-      <h2 className="mt-2 font-display text-4xl leading-none">{title}</h2>
-      {body ? (
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
-          {body}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-export default async function AdminDashboardPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ view?: string }>;
-}) {
-  const params = await searchParams;
+export default async function AdminDashboardPage() {
   const admin = hasPublicSupabaseConfig ? await getCurrentAdmin() : null;
 
   if (hasPublicSupabaseConfig && !admin) {
     redirect("/admin/login");
   }
 
-  const dashboard = await getAdminDashboardData();
-  const actionsEnabled = Boolean(admin);
-  const selectedView = isDashboardView(params.view) ? params.view : "overview";
-  const activeView = dashboardViews.find((view) => view.id === selectedView) ?? dashboardViews[0];
+  const [orderCounts, products, conversations, deliveryStates, notifications] =
+    await Promise.all([
+      getAdminOrderStatusCounts(),
+      getAdminProducts(),
+      getAdminSupportConversations({ limit: 60 }),
+      getDeliveryStates(),
+      getAdminNotifications(8),
+    ]);
 
-  const pendingOrders = dashboard.orders.filter((order) => order.status === "pending").length;
-  const activeProducts = dashboard.products.filter((product) => product.isListed).length;
-  const openSupportChats = dashboard.supportConversations.filter(
+  const listedProducts = products.filter((product) => product.isListed).length;
+  const openSupport = conversations.filter(
     (conversation) => conversation.status === "open",
   ).length;
+  const activeDeliveryStates = deliveryStates.filter((state) => state.isActive).length;
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      {actionsEnabled ? <OrdersRealtimeRefresh /> : null}
+    <AdminShell
+      admin={admin}
+      active="dashboard"
+      title="Operations dashboard"
+      subtitle="A simple starting point for order processing, support, product updates, delivery coverage, and admin alerts."
+    >
+      {admin ? <OrdersRealtimeRefresh /> : null}
 
-      <main className="mx-auto max-w-7xl space-y-8 px-6 py-12 lg:px-10">
-        <section className="rounded-[2.7rem] border border-[var(--color-line)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(244,247,251,0.9))] p-8 lg:p-10">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                Admin Dashboard
-              </p>
-              <h1 className="mt-2 font-display text-6xl leading-none">
-                Product-first admin workspace
-              </h1>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--color-muted)]">
-                This workspace focuses on daily commercial operations: product listings,
-                order review, delivery coverage, and account-level administration. Brand and
-                website presentation are managed separately in the content studio.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/admin/site-settings"
-                className="rounded-full border border-[var(--color-line)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
-              >
-                Open site settings
-              </Link>
-              {admin ? <SignOutButton /> : null}
-            </div>
-          </div>
+      {!hasPublicSupabaseConfig ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
+          Store configuration is incomplete. Live admin data will return when Supabase configuration is restored.
         </section>
+      ) : null}
 
-        {!hasPublicSupabaseConfig ? (
-          <div className="rounded-[1.8rem] border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-7 text-amber-900">
-            Store configuration is incomplete. Live dashboard access and editing will resume once the secure connection is restored.
-          </div>
-        ) : null}
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Link href="/admin/orders?status=pending" className="rounded-2xl border border-[var(--color-line)] bg-white p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Pending orders
+          </p>
+          <p className="mt-3 text-3xl font-extrabold">
+            {formatCompactNumber(orderCounts.pending)}
+          </p>
+        </Link>
+        <Link href="/admin/orders" className="rounded-2xl border border-[var(--color-line)] bg-white p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Total orders
+          </p>
+          <p className="mt-3 text-3xl font-extrabold">
+            {formatCompactNumber(orderCounts.all)}
+          </p>
+        </Link>
+        <Link href="/admin/support?status=open" className="rounded-2xl border border-[var(--color-line)] bg-white p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Open support
+          </p>
+          <p className="mt-3 text-3xl font-extrabold">
+            {formatCompactNumber(openSupport)}
+          </p>
+        </Link>
+        <Link href="/admin/products" className="rounded-2xl border border-[var(--color-line)] bg-white p-5">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Listed products
+          </p>
+          <p className="mt-3 text-3xl font-extrabold">
+            {formatCompactNumber(listedProducts)}
+          </p>
+        </Link>
+      </section>
 
-        <section className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
-          <aside className="h-fit rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-4 lg:sticky lg:top-24">
-            <p className="px-3 text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-              Admin Views
-            </p>
-            <nav className="mt-3 space-y-2">
-              {dashboardViews.map((view) => {
-                const isActive = selectedView === view.id;
-                return (
-                  <Link
-                    key={view.id}
-                    href={`/admin/dashboard?view=${view.id}`}
-                    className={`block rounded-2xl border px-3 py-3 transition ${
-                      isActive
-                        ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
-                        : "border-[var(--color-line)] bg-white text-[var(--color-ink)]"
-                    }`}
-                  >
-                    <p className="text-sm font-bold">{view.label}</p>
-                    <p
-                      className={`mt-1 text-xs leading-5 ${
-                        isActive ? "text-white/80" : "text-[var(--color-muted)]"
-                      }`}
-                    >
-                      {view.description}
-                    </p>
-                  </Link>
-                );
-              })}
-            </nav>
-          </aside>
-
-          <div className="space-y-8">
-            <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                {activeView.label}
-              </p>
-              <h2 className="mt-2 font-display text-4xl leading-none">
-                {activeView.description}
+      <section className="grid gap-4 xl:grid-cols-4">
+        {quickLinks.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-2xl border border-[var(--color-line)] bg-white p-5"
+            >
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-primary)]">
+                <Icon size={19} />
+              </span>
+              <h2 className="mt-4 text-xl font-extrabold tracking-[-0.03em]">
+                {item.title}
               </h2>
-            </section>
+              <p className="mt-2 min-h-14 text-sm leading-7 text-[var(--color-muted)]">
+                {item.body}
+              </p>
+              <span className="mt-4 inline-flex items-center gap-2 text-sm font-extrabold text-[var(--color-primary)]">
+                Open
+                <ArrowRight size={15} />
+              </span>
+            </Link>
+          );
+        })}
+      </section>
 
-            {selectedView === "overview" ? (
-              <>
-                <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  {overviewMetrics.map(({ label, view }) => {
-                    const value =
-                      label === "Listed products"
-                        ? formatCompactNumber(activeProducts)
-                        : label === "All products"
-                          ? formatCompactNumber(dashboard.products.length)
-                          : label === "Pending orders"
-                            ? formatCompactNumber(pendingOrders)
-                            : label === "Open support chats"
-                              ? formatCompactNumber(openSupportChats)
-                              : formatCompactNumber(dashboard.deliveryStates.length);
+      <section className="grid gap-5 xl:grid-cols-[1fr_0.8fr]">
+        <section className="rounded-2xl border border-[var(--color-line)] bg-white p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                Latest alerts
+              </p>
+              <h2 className="mt-2 text-2xl font-extrabold tracking-[-0.04em]">
+                Admin notifications
+              </h2>
+            </div>
+            <Link href="/admin/notifications" className="ui-button ui-button-outline">
+              View all
+            </Link>
+          </div>
 
-                    return (
-                      <Link
-                        key={label}
-                        href={`/admin/dashboard?view=${view}`}
-                        className="rounded-[1.8rem] border border-[var(--color-line)] bg-white/90 p-5 transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-32px_rgba(15,23,42,0.35)]"
-                      >
-                      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-muted)]">
-                        {label}
-                      </p>
-                      <p className="mt-3 font-display text-4xl">{value}</p>
-                      <p className="mt-3 text-sm font-semibold text-[var(--color-secondary)]">
-                        Open {view}
-                      </p>
-                      </Link>
-                    );
-                  })}
-                </section>
-
-                <section className="grid gap-5 xl:grid-cols-[1fr_1fr]">
-                  <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
-                    <PanelHeading
-                      eyebrow="Quick access"
-                      title="Main admin actions"
-                      body="Most admin work should happen in these three areas."
-                    />
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <Link
-                        href="/admin/dashboard?view=products"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
-                      >
-                        Product library
-                      </Link>
-                      <Link
-                        href="/admin/dashboard?view=orders"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
-                      >
-                        Order queue
-                      </Link>
-                      <Link
-                        href="/admin/dashboard?view=support"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
-                      >
-                        Support inbox
-                      </Link>
-                      <Link
-                        href="/admin/dashboard?view=setup"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
-                      >
-                        Delivery coverage
-                      </Link>
-                      <Link
-                        href="/admin/site-settings"
-                        className="rounded-2xl border border-[var(--color-line)] bg-white px-4 py-4 text-sm font-semibold transition hover:-translate-y-0.5"
-                      >
-                        Content studio
-                      </Link>
-                    </div>
-                  </section>
-
-                  <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
-                    <PanelHeading
-                      eyebrow="Content studio"
-                      title="Website presentation is managed separately"
-                      body="Homepage storytelling, navigation, brand visuals, gallery media, social links, services, team profiles, and client references are maintained in the site settings workspace."
-                    />
-                    <p className="text-sm leading-7 text-[var(--color-muted)]">
-                      Use this dashboard for operational work and open site settings when you
-                      need to adjust customer-facing website content.
-                    </p>
-                  </section>
-                </section>
-              </>
-            ) : null}
-
-            {selectedView === "products" ? (
-              <>
-                <CreateProductPanel actionsEnabled={actionsEnabled} />
-
-                <section className="space-y-5">
-                  <PanelHeading
-                    eyebrow="Catalog"
-                    title="Existing products"
-                    body="Use the essential fields first. Advanced styling and merchandising options are still available, but they are now kept behind shorter editing surfaces."
-                  />
-
-                  {dashboard.products.length ? (
-                    <div className="grid gap-5 xl:grid-cols-2">
-                      {dashboard.products.map((product) => (
-                        <ProductAdminCard
-                          key={product.id}
-                          product={product}
-                          actionsEnabled={actionsEnabled}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/92 p-8">
-                      <h3 className="font-display text-4xl">No products created yet</h3>
-                      <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                        Create the first product listing above.
-                      </p>
-                    </div>
-                  )}
-                </section>
-              </>
-            ) : null}
-
-            {selectedView === "orders" ? (
-              <section className="space-y-5">
-                <PanelHeading
-                  eyebrow="Orders"
-                  title="Incoming order queue"
-                  body="New orders appear here for receipt review, confirmation, and delivery-status updates."
-                />
-
-                {dashboard.orders.length ? (
-                  <div className="space-y-4">
-                    {dashboard.orders.map((order) => (
-                      <OrderAdminRow
-                        key={order.id}
-                        order={order}
-                        actionsEnabled={actionsEnabled}
-                      />
-                    ))}
+          <div className="mt-5 space-y-3">
+            {notifications.length ? (
+              notifications.map((notification) => (
+                <Link
+                  key={notification.id}
+                  href={notification.href}
+                  className="block rounded-2xl border border-[var(--color-line)] px-4 py-3"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-primary)]">
+                      <Bell size={15} />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-extrabold">
+                        {notification.title}
+                      </span>
+                      <span className="mt-1 block text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-muted)]">
+                        {formatDateTime(notification.createdAt)}
+                      </span>
+                    </span>
                   </div>
-                ) : (
-                  <div className="rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/92 p-8">
-                    <h3 className="font-display text-4xl">No orders yet</h3>
-                    <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                      New customer orders will appear here.
-                    </p>
-                  </div>
-                )}
-              </section>
-            ) : null}
-
-            {selectedView === "support" && admin ? (
-              <section className="space-y-5">
-                <PanelHeading
-                  eyebrow="Live support"
-                  title="Customer DM inbox"
-                  body="Reply to signed-in customers in real time and close conversations when support is complete."
-                />
-                <SupportInbox
-                  admin={admin}
-                  initialConversations={dashboard.supportConversations}
-                />
-              </section>
-            ) : null}
-
-            {selectedView === "support" && !admin ? (
-              <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6 text-sm text-[var(--color-muted)]">
-                Admin access is required for the live support inbox.
-              </section>
-            ) : null}
-
-            {selectedView === "setup" ? (
-              <>
-                <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
-                  <PanelHeading
-                    eyebrow="Scope"
-                    title="Customer-facing content is managed separately"
-                    body="Payment instructions, contact information, navigation, team, gallery, services, and other website content are managed in site settings."
-                  />
-                  <Link
-                    href="/admin/site-settings"
-                    className="inline-flex rounded-full border border-[var(--color-line)] bg-white px-5 py-3 text-sm font-semibold text-[var(--color-ink)]"
-                  >
-                    Open site settings
-                  </Link>
-                </section>
-
-                <section className="space-y-5">
-                  <PanelHeading
-                    eyebrow="Delivery"
-                    title="Delivery state coverage"
-                    body="These states are used during checkout."
-                  />
-
-                  <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
-                    <div className="flex flex-wrap items-end justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-                          Quick setup
-                        </p>
-                        <h3 className="mt-2 text-2xl font-extrabold text-[var(--color-ink)]">
-                          Load Nigeria delivery coverage fast
-                        </h3>
-                        <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                          Add the full Nigeria state list in one click, then edit ETA or switch
-                          any state off.
-                        </p>
-                      </div>
-
-                      <form action={seedNigeriaDeliveryStates}>
-                        <button
-                          type="submit"
-                          disabled={!actionsEnabled}
-                          className="ui-button ui-button-primary disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          Add all Nigeria states
-                        </button>
-                      </form>
-                    </div>
-                  </section>
-
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    <DeliveryStateCard actionsEnabled={actionsEnabled} />
-                    {dashboard.deliveryStates.map((deliveryState) => (
-                      <DeliveryStateCard
-                        key={deliveryState.code}
-                        deliveryState={deliveryState}
-                        actionsEnabled={actionsEnabled}
-                      />
-                    ))}
-                  </div>
-                </section>
-              </>
-            ) : null}
-
-            {selectedView === "security" && admin?.role === "super_admin" ? (
-              <AdminPasswordResetPanel />
-            ) : null}
-
-            {selectedView === "security" && admin?.role !== "super_admin" ? (
-              <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6 text-sm text-[var(--color-muted)]">
-                Only `super_admin` accounts can access security tools.
-              </section>
-            ) : null}
+                </Link>
+              ))
+            ) : (
+              <p className="rounded-2xl border border-dashed border-[var(--color-line)] p-5 text-sm leading-7 text-[var(--color-muted)]">
+                No admin notifications yet.
+              </p>
+            )}
           </div>
         </section>
-      </main>
-    </div>
+
+        <section className="rounded-2xl border border-[var(--color-line)] bg-white p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+            Store readiness
+          </p>
+          <div className="mt-5 space-y-4">
+            <div className="flex items-center justify-between gap-4 border-b border-[var(--color-line)] pb-4">
+              <span className="text-sm font-semibold text-[var(--color-muted)]">
+                Active delivery states
+              </span>
+              <span className="text-lg font-extrabold">{activeDeliveryStates}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4 border-b border-[var(--color-line)] pb-4">
+              <span className="text-sm font-semibold text-[var(--color-muted)]">
+                Product records
+              </span>
+              <span className="text-lg font-extrabold">{products.length}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className="text-sm font-semibold text-[var(--color-muted)]">
+                Support conversations
+              </span>
+              <span className="text-lg font-extrabold">{conversations.length}</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </AdminShell>
   );
 }

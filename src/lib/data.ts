@@ -9,6 +9,8 @@ import {
 import { buildTrackingSlug } from "@/lib/utils";
 import type {
   AdminDashboardData,
+  AdminNotification,
+  AdminProfile,
   ClientItem,
   ContactInfo,
   DeliveryState,
@@ -223,6 +225,26 @@ type SupportMessageRow = {
   sender_role: SupportMessage["senderRole"];
   sender_name: string;
   body: string;
+  created_at: string;
+};
+
+type AdminNotificationRow = {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  href: string | null;
+  entity_type: string | null;
+  entity_id: string | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+type AdminProfileRow = {
+  user_id: string;
+  full_name: string | null;
+  role: string | null;
+  is_active: boolean | null;
   created_at: string;
 };
 
@@ -530,6 +552,20 @@ function mapSupportConversation(
     lastMessageAt: row.last_message_at,
     createdAt: row.created_at,
     messages: messagesByConversation[row.id] ?? [],
+  };
+}
+
+function mapAdminNotification(row: AdminNotificationRow): AdminNotification {
+  return {
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    body: row.body,
+    href: row.href ?? "/admin/notifications",
+    entityType: row.entity_type,
+    entityId: row.entity_id,
+    isRead: Boolean(row.read_at),
+    createdAt: row.created_at,
   };
 }
 
@@ -930,6 +966,357 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     ),
     supportConversations: await loadSupportConversations({ supabase }),
   };
+}
+
+export async function getAdminOrders({
+  status = "all",
+  query = "",
+  limit = 160,
+}: {
+  status?: OrderItem["status"] | "all";
+  query?: string;
+  limit?: number;
+} = {}): Promise<OrderItem[]> {
+  if (!hasPublicSupabaseConfig) {
+    return [];
+  }
+
+  const normalizedQuery = query.trim().toLowerCase();
+  const supabase = await createSupabaseServerClient();
+  let orderQuery = supabase
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(normalizedQuery ? Math.max(limit, 300) : limit);
+
+  if (status !== "all") {
+    orderQuery = orderQuery.eq("status", status);
+  }
+
+  const { data } = await orderQuery;
+  const orders = ((data as OrderRow[] | null) ?? []).map(mapOrder);
+
+  if (!normalizedQuery) {
+    return orders;
+  }
+
+  return orders.filter((order) =>
+    [
+      order.id,
+      order.reference,
+      order.name,
+      order.phone,
+      order.email,
+      order.productName,
+      order.productSlug,
+      order.deliveryState,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(normalizedQuery),
+  );
+}
+
+export async function getAdminProducts(): Promise<Product[]> {
+  if (!hasPublicSupabaseConfig) {
+    return [];
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const [{ data: products }, { data: productMedia }] = await Promise.all([
+    supabase.from("products").select("*").order("created_at", { ascending: false }),
+    supabase
+      .from("product_media")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+  ]);
+
+  return attachProductMedia(
+    (products as ProductRow[] | null)?.map(mapProduct) ?? [],
+    productMedia as ProductMediaRow[] | null,
+  );
+}
+
+export async function getAdminOrderByReference(
+  referenceOrId: string,
+): Promise<OrderItem | null> {
+  if (!hasPublicSupabaseConfig) {
+    return null;
+  }
+
+  const lookup = decodeURIComponent(referenceOrId).trim();
+  if (!lookup) {
+    return null;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      lookup,
+    );
+
+  const { data } = await supabase
+    .from("orders")
+    .select("*")
+    .eq(isUuid ? "id" : "reference", lookup)
+    .maybeSingle<OrderRow>();
+
+  if (!data) {
+    return null;
+  }
+
+  return {
+    ...mapOrder(data),
+    paymentProofUrl: await createProofUrl(data.payment_proof_path),
+  };
+}
+
+export async function getAdminOrderStatusCounts() {
+  const counts: Record<OrderItem["status"] | "all", number> = {
+    all: 0,
+    pending: 0,
+    paid: 0,
+    paid_delivered: 0,
+  };
+
+  if (!hasPublicSupabaseConfig) {
+    return counts;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.from("orders").select("status");
+
+  ((data as Pick<OrderRow, "status">[] | null) ?? []).forEach((order) => {
+    counts.all += 1;
+    counts[order.status] += 1;
+  });
+
+  return counts;
+}
+
+export async function getAdminSupportConversations({
+  status = "all",
+  query = "",
+  limit = 90,
+}: {
+  status?: SupportConversation["status"] | "all";
+  query?: string;
+  limit?: number;
+} = {}): Promise<SupportConversation[]> {
+  if (!hasPublicSupabaseConfig) {
+    return [];
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const conversations = await loadSupportConversations({ supabase, limit });
+  const normalizedQuery = query.trim().toLowerCase();
+
+  return conversations.filter((conversation) => {
+    const statusMatches = status === "all" || conversation.status === status;
+    const queryMatches =
+      !normalizedQuery ||
+      [
+        conversation.id,
+        conversation.customerName,
+        conversation.customerEmail,
+        conversation.subject,
+        conversation.messages.at(-1)?.body,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery);
+
+    return statusMatches && queryMatches;
+  });
+}
+
+export async function getAdminSupportConversation(
+  conversationId: string,
+): Promise<SupportConversation | null> {
+  if (!hasPublicSupabaseConfig) {
+    return null;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data: conversation } = await supabase
+    .from("support_conversations")
+    .select("*")
+    .eq("id", conversationId)
+    .maybeSingle<SupportConversationRow>();
+
+  if (!conversation) {
+    return null;
+  }
+
+  const { data: messages } = await supabase
+    .from("support_messages")
+    .select("*")
+    .eq("conversation_id", conversation.id)
+    .order("created_at", { ascending: true });
+
+  const messagesByConversation = {
+    [conversation.id]: ((messages as SupportMessageRow[] | null) ?? []).map(
+      mapSupportMessage,
+    ),
+  };
+
+  return mapSupportConversation(conversation, messagesByConversation);
+}
+
+async function buildDerivedAdminNotifications(
+  supabase: ServerSupabaseClient,
+  limit: number,
+): Promise<AdminNotification[]> {
+  const [{ data: orders }, { data: conversations }, { data: messages }] =
+    await Promise.all([
+      supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit),
+      supabase
+        .from("support_conversations")
+        .select("*")
+        .order("last_message_at", { ascending: false })
+        .limit(limit),
+      supabase
+        .from("support_messages")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit),
+    ]);
+
+  const orderItems = ((orders as OrderRow[] | null) ?? []).map((order) => ({
+    id: `derived-order-${order.id}`,
+    type: "order_created",
+    title: `New order ${order.reference}`,
+    body: `${order.customer_name} ordered ${order.product_name}.`,
+    href: `/admin/orders/${order.reference}`,
+    entityType: "order",
+    entityId: order.id,
+    isRead: order.status !== "pending",
+    createdAt: order.created_at,
+  }));
+
+  const conversationItems = ((conversations as SupportConversationRow[] | null) ?? [])
+    .map((conversation) => ({
+      id: `derived-support-${conversation.id}`,
+      type: "support_conversation",
+      title: `Support request from ${conversation.customer_name}`,
+      body: conversation.subject,
+      href: `/admin/support/${conversation.id}`,
+      entityType: "support_conversation",
+      entityId: conversation.id,
+      isRead: conversation.status === "closed",
+      createdAt: conversation.last_message_at,
+    }));
+
+  const messageItems = ((messages as SupportMessageRow[] | null) ?? [])
+    .filter((message) => message.sender_role === "customer")
+    .map((message) => ({
+      id: `derived-message-${message.id}`,
+      type: "support_message",
+      title: `Message from ${message.sender_name}`,
+      body: message.body,
+      href: `/admin/support/${message.conversation_id}`,
+      entityType: "support_message",
+      entityId: message.id,
+      isRead: false,
+      createdAt: message.created_at,
+    }));
+
+  return [...orderItems, ...conversationItems, ...messageItems]
+    .sort(
+      (left, right) =>
+        new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+    )
+    .slice(0, limit);
+}
+
+export async function getAdminNotifications(
+  limit = 80,
+): Promise<AdminNotification[]> {
+  if (!hasPublicSupabaseConfig) {
+    return [];
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("admin_notifications")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    return buildDerivedAdminNotifications(supabase, limit);
+  }
+
+  return ((data as AdminNotificationRow[] | null) ?? []).map(mapAdminNotification);
+}
+
+export async function getUnreadAdminNotificationCount() {
+  if (!hasPublicSupabaseConfig) {
+    return 0;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { count, error } = await supabase
+    .from("admin_notifications")
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null);
+
+  if (!error) {
+    return count ?? 0;
+  }
+
+  const [orders, conversations] = await Promise.all([
+    getAdminOrders({ status: "pending", limit: 100 }),
+    getAdminSupportConversations({ status: "open", limit: 100 }),
+  ]);
+
+  return orders.length + conversations.length;
+}
+
+export async function getAdminProfiles(): Promise<AdminProfile[]> {
+  const serviceSupabase = createSupabaseServiceClient();
+
+  if (!serviceSupabase || !hasServiceRoleConfig) {
+    return [];
+  }
+
+  const [{ data: profiles }, { data: userPage }] = await Promise.all([
+    serviceSupabase.from("admin_profiles").select("*").order("created_at", {
+      ascending: false,
+    }),
+    serviceSupabase.auth.admin.listUsers({ page: 1, perPage: 1000 }),
+  ]);
+
+  const usersById = new Map(
+    userPage.users.map((authUser) => [authUser.id, authUser]),
+  );
+
+  return ((profiles as AdminProfileRow[] | null) ?? []).map((profile) => {
+    const authUser = usersById.get(profile.user_id);
+    const metadataName =
+      typeof authUser?.user_metadata?.full_name === "string"
+        ? authUser.user_metadata.full_name
+        : typeof authUser?.user_metadata?.name === "string"
+          ? authUser.user_metadata.name
+          : null;
+
+    return {
+      userId: profile.user_id,
+      email: authUser?.email ?? "",
+      fullName:
+        profile.full_name ?? metadataName ?? authUser?.email ?? "Admin user",
+      role: profile.role ?? "admin",
+      isActive: Boolean(profile.is_active),
+      createdAt: profile.created_at,
+      lastSignInAt: authUser?.last_sign_in_at ?? null,
+    };
+  });
 }
 
 export async function getCustomerOrders(userId: string): Promise<OrderItem[]> {
