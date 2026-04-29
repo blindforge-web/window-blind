@@ -9,7 +9,7 @@ export const siteConfig = {
     bankName: "Sterling Bank",
     accountName: "Sunpilot Studio Ltd",
     accountNumber: "0029416831",
-    note: "Transfer to the account, then upload your receipt. Orders move forward after payment review.",
+    note: "Transfer the full amount, upload the receipt, and submit your order.",
   },
   highlights: [
     "Guest browsing with optional account access",

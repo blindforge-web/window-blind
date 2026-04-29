@@ -5,8 +5,14 @@ import { useActionState, useState } from "react";
 import { submitOfflineOrder } from "@/app/actions";
 import { SubmitButton } from "@/components/store/submit-button";
 import { initialOfflineOrderState } from "@/lib/action-states";
-import type { DeliveryState, Product } from "@/lib/types";
+import type { DeliveryState, PaymentAccount, Product } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+
+const inputClassName =
+  "w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none";
+
+const sectionClassName =
+  "rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5";
 
 function FieldLabel({
   title,
@@ -23,9 +29,15 @@ function FieldLabel({
   );
 }
 
+function splitMeasurementPreset(value: string) {
+  const [width = "", height = ""] = value.split(/\s*x\s*/i).map((part) => part.trim());
+  return { width, height };
+}
+
 export function OfflineOrderForm({
   product,
   deliveryStates,
+  paymentAccount,
   liveMode,
   initialCustomerName = "",
   initialEmail = "",
@@ -33,6 +45,7 @@ export function OfflineOrderForm({
 }: {
   product: Product;
   deliveryStates: DeliveryState[];
+  paymentAccount: PaymentAccount | null;
   liveMode: boolean;
   initialCustomerName?: string;
   initialEmail?: string;
@@ -43,77 +56,87 @@ export function OfflineOrderForm({
     initialOfflineOrderState,
   );
   const [quantity, setQuantity] = useState(1);
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
+  const [selectedPreset, setSelectedPreset] = useState("");
+  const [selectedStateName, setSelectedStateName] = useState("");
   const activeStates = deliveryStates.filter((item) => item.isActive);
+  const selectedState =
+    activeStates.find((item) => item.name === selectedStateName) ?? null;
   const unitAmount = product.salePrice ?? product.basePrice;
   const totalAmount = unitAmount * quantity;
+  const accountReady = Boolean(
+    paymentAccount?.bankName &&
+      paymentAccount?.accountName &&
+      paymentAccount?.accountNumber,
+  );
+
+  function applyMeasurementPreset(measurement: string) {
+    const preset = splitMeasurementPreset(measurement);
+
+    if (!preset.width || !preset.height) {
+      return;
+    }
+
+    setSelectedPreset(measurement);
+    setWidth(preset.width);
+    setHeight(preset.height);
+  }
 
   return (
-    <form action={formAction} className="space-y-6" encType="multipart/form-data">
+    <form action={formAction} className="space-y-5" encType="multipart/form-data">
       <input type="hidden" name="productId" value={product.id} />
       <input type="hidden" name="productSlug" value={product.slug} />
       <input type="hidden" name="productName" value={product.name} />
       <input type="hidden" name="unitAmount" value={unitAmount} />
 
-      <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-            Guided order details
-          </p>
-          <h2 className="mt-3 text-2xl font-extrabold text-[var(--color-ink)]">
-            Build the final order brief in one clean pass.
+      <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
+        <div className={sectionClassName}>
+          <p className="ui-section-label">Quick form</p>
+          <h2 className="mt-2 text-2xl font-extrabold text-[var(--color-ink)]">
+            Short, simple, and easy to finish.
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-            Customer details, blind specification, delivery information, and transfer
-            receipt are grouped into separate cards so the process reads like a checkout
-            summary instead of a long admin-style form.
+            {loggedIn ? (
+              "This order will be saved to your account."
+            ) : (
+              <>
+                Guest checkout is on.{" "}
+                <Link
+                  href={`/account?next=/checkout/order?product=${product.slug}`}
+                  className="font-semibold text-[var(--color-primary)] underline underline-offset-4"
+                >
+                  Sign in first
+                </Link>{" "}
+                if you want this order saved to your account automatically.
+              </>
+            )}
           </p>
         </div>
 
         <div className="rounded-[2rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-primary)_94%,white_6%)] p-5 text-white">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/68">
-            Live summary
+            Live total
           </p>
-          <div className="mt-3 flex items-end justify-between gap-3">
-            <div>
-              <p className="text-sm text-white/72">{product.name}</p>
-              <p className="mt-1 text-3xl font-extrabold">{formatCurrency(totalAmount)}</p>
-            </div>
-            <div className="text-right text-sm text-white/72">
-              <p>{formatCurrency(unitAmount)} each</p>
-              <p>Qty {quantity}</p>
-            </div>
+          <div className="mt-3">
+            <p className="text-sm text-white/72">{product.name}</p>
+            <p className="mt-1 text-3xl font-extrabold">{formatCurrency(totalAmount)}</p>
+            <p className="mt-3 text-sm text-white/72">{formatCurrency(unitAmount)} each</p>
+            <p className="mt-1 text-sm text-white/72">Qty {quantity}</p>
           </div>
-          <p className="mt-4 text-sm leading-7 text-white/80">
-            {loggedIn ? (
-              "This order will be connected to your account so you can track changes later."
-            ) : (
-              <>
-                You can continue without signing in.{" "}
-                <Link
-                  href={`/account?next=/checkout/order?product=${product.slug}`}
-                  className="font-semibold text-white underline underline-offset-4"
-                >
-                  Access your account first
-                </Link>{" "}
-                if you want this order saved directly into your order history.
-              </>
-            )}
-          </p>
         </div>
       </div>
 
-      <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/88 p-5">
+      <section className={sectionClassName}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-              1. Customer details
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              These details are used for delivery coordination, status updates, and final confirmation.
-            </p>
+            <p className="ui-section-label">1. Your details</p>
+            <h3 className="mt-2 text-xl font-extrabold text-[var(--color-ink)]">
+              Who should we contact?
+            </h3>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
-            Buyer information
+            Contact details
           </div>
         </div>
 
@@ -124,46 +147,71 @@ export function OfflineOrderForm({
               name="customerName"
               required
               defaultValue={initialCustomerName}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              placeholder="Your full name"
+              className={inputClassName}
             />
           </label>
           <label className="block">
             <FieldLabel title="Phone number" />
             <input
               name="phone"
+              type="tel"
+              inputMode="tel"
               required
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              placeholder="0800 000 0000"
+              className={inputClassName}
             />
           </label>
           <label className="block md:col-span-2">
-            <FieldLabel
-              title="Email address"
-              helper="Optional, but recommended for updates, receipts, and future order access."
-            />
+            <FieldLabel title="Email address" helper="Optional" />
             <input
               name="email"
               type="email"
               defaultValue={initialEmail}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              placeholder="you@example.com"
+              className={inputClassName}
             />
           </label>
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/88 p-5">
+      <section className={sectionClassName}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-              2. Product setup
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              Confirm the exact blind specification you want prepared for production.
-            </p>
+            <p className="ui-section-label">2. Blind details</p>
+            <h3 className="mt-2 text-xl font-extrabold text-[var(--color-ink)]">
+              Tell us what you want.
+            </h3>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
-            Blind specification
+            Product setup
           </div>
         </div>
+
+        {product.measurements.length ? (
+          <div className="mt-5 rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-secondary)_8%,white_92%)] p-4">
+            <p className="text-sm font-semibold text-[var(--color-ink)]">
+              Tap a size to fill width and height faster.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {product.measurements.map((measurement) => (
+                <button
+                  key={measurement}
+                  type="button"
+                  onClick={() => applyMeasurementPreset(measurement)}
+                  aria-pressed={selectedPreset === measurement}
+                  className={`rounded-full border px-3 py-2 text-xs font-semibold ${
+                    selectedPreset === measurement
+                      ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
+                      : "border-[var(--color-line)] bg-white text-[var(--color-ink)]"
+                  }`}
+                >
+                  {measurement}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           <label className="block">
@@ -171,8 +219,13 @@ export function OfflineOrderForm({
             <input
               name="width"
               placeholder="180cm"
+              value={width}
               required
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              onChange={(event) => {
+                setSelectedPreset("");
+                setWidth(event.currentTarget.value);
+              }}
+              className={inputClassName}
             />
           </label>
           <label className="block">
@@ -180,8 +233,13 @@ export function OfflineOrderForm({
             <input
               name="height"
               placeholder="220cm"
+              value={height}
               required
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              onChange={(event) => {
+                setSelectedPreset("");
+                setHeight(event.currentTarget.value);
+              }}
+              className={inputClassName}
             />
           </label>
           <label className="block">
@@ -195,7 +253,7 @@ export function OfflineOrderForm({
               onChange={(event) =>
                 setQuantity(Math.max(1, Number(event.currentTarget.value) || 1))
               }
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              className={inputClassName}
             />
           </label>
           <label className="block">
@@ -204,7 +262,7 @@ export function OfflineOrderForm({
               name="color"
               required
               defaultValue=""
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              className={inputClassName}
             >
               <option value="" disabled>
                 Choose colour
@@ -222,7 +280,7 @@ export function OfflineOrderForm({
               name="mountType"
               required
               defaultValue=""
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              className={inputClassName}
             >
               <option value="" disabled>
                 Select mount
@@ -237,7 +295,7 @@ export function OfflineOrderForm({
               name="controlSide"
               required
               defaultValue=""
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              className={inputClassName}
             >
               <option value="" disabled>
                 Select side
@@ -247,58 +305,31 @@ export function OfflineOrderForm({
             </select>
           </label>
         </div>
-
-        <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-secondary)_8%,white_92%)] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Popular measurement presets
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {product.measurements.map((measurement) => (
-                <span
-                  key={measurement}
-                  className="rounded-full border border-[var(--color-line)] bg-white px-3 py-2 text-xs font-semibold text-[var(--color-ink)]"
-                >
-                  {measurement}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Marketplace tip
-            </p>
-            <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-              Need another look? Open the product page to review visuals, finishes, and use cases.
-            </p>
-          </div>
-        </div>
       </section>
 
-      <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/88 p-5">
+      <section className={sectionClassName}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-              3. Delivery details
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              Choose the delivery destination and provide the address as clearly as possible.
-            </p>
+            <p className="ui-section-label">3. Delivery</p>
+            <h3 className="mt-2 text-xl font-extrabold text-[var(--color-ink)]">
+              Where should we deliver?
+            </h3>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
-            Shipping information
+            {activeStates.length} state{activeStates.length === 1 ? "" : "s"} live
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="mt-5 grid gap-4 md:grid-cols-[1fr_0.85fr]">
           <label className="block">
-            <FieldLabel title="State" helper="Choose the delivery location nearest to you." />
+            <FieldLabel title="State" helper="Choose your delivery state." />
             <select
               name="state"
               required
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
-              defaultValue=""
+              value={selectedStateName}
+              disabled={!activeStates.length}
+              onChange={(event) => setSelectedStateName(event.currentTarget.value)}
+              className={inputClassName}
             >
               <option value="" disabled>
                 {activeStates.length
@@ -318,10 +349,12 @@ export function OfflineOrderForm({
               Estimated delivery window
             </p>
             <p className="mt-3 text-lg font-extrabold text-[var(--color-ink)]">
-              {activeStates[0]?.eta || "3 to 6 working days"}
+              {selectedState?.eta || "Choose a state"}
             </p>
             <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              Final timing depends on product lead time, payment confirmation, and location.
+              {selectedState
+                ? `${selectedState.name} is currently active for delivery.`
+                : "ETA updates after you pick a state."}
             </p>
           </div>
 
@@ -330,102 +363,129 @@ export function OfflineOrderForm({
             <textarea
               name="location"
               required
-              rows={4}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
+              rows={3}
+              placeholder="Street, area, landmark, and city"
+              className={inputClassName}
             />
           </label>
         </div>
       </section>
 
-      <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/88 p-5">
+      <section className={sectionClassName}>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
-              4. Payment proof and notes
-            </p>
-            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-              Attach your transfer receipt and include any production or installation notes.
-            </p>
+            <p className="ui-section-label">4. Pay and finish</p>
+            <h3 className="mt-2 text-xl font-extrabold text-[var(--color-ink)]">
+              Make payment, upload the receipt, and submit.
+            </h3>
           </div>
           <div className="rounded-full border border-[var(--color-line)] bg-[rgba(248,250,252,0.9)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
-            Final review
+            Final step
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.9fr]">
-          <label className="block">
-            <FieldLabel
-              title="Additional notes"
-              helper="Use this for room notes, fitting instructions, or anything the team should know."
-            />
-            <textarea
-              name="notes"
-              rows={6}
-              className="w-full rounded-2xl border border-[var(--color-line)] bg-white px-4 py-3 outline-none"
-            />
-          </label>
-
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_0.95fr]">
           <div className="rounded-[1.8rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-primary)_5%,white_95%)] p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Receipt upload
+              Payment details
             </p>
-            <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-              Attach the receipt or transfer screenshot for{" "}
-              <span className="font-bold text-[var(--color-ink)]">
-                {formatCurrency(totalAmount)}
-              </span>
-              .
-            </p>
-            {!liveMode ? (
-              <p className="mt-2 text-xs font-semibold text-[var(--color-secondary)]">
-                Live order storage is not connected yet. This screen is currently running in preview mode.
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {[
+                `1. Transfer ${formatCurrency(totalAmount)}`,
+                "2. Upload receipt",
+                "3. Submit order",
+              ].map((step) => (
+                <div
+                  key={step}
+                  className="rounded-[1.4rem] border border-[var(--color-line)] bg-white/88 px-4 py-3 text-sm font-semibold text-[var(--color-ink)]"
+                >
+                  {step}
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 rounded-[1.6rem] border border-[var(--color-line)] bg-white p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                {paymentAccount?.bankName || "Business transfer account"}
               </p>
-            ) : null}
-            <input
-              type="file"
-              name="paymentProof"
-              required
-              accept="image/*,.pdf"
-              className="mt-4 w-full rounded-2xl border border-dashed border-[var(--color-line)] bg-white px-4 py-3 text-sm"
-            />
-            <div className="mt-4 rounded-[1.4rem] border border-[var(--color-line)] bg-white/88 p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
-                Accepted files
-              </p>
-              <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-                Images and PDF receipts only.
+              {paymentAccount?.accountName ? (
+                <p className="mt-2 text-lg font-semibold text-[var(--color-ink)]">
+                  {paymentAccount.accountName}
+                </p>
+              ) : null}
+              {paymentAccount?.accountNumber ? (
+                <p className="mt-1 text-3xl font-extrabold tracking-[0.12em] text-[var(--color-ink)]">
+                  {paymentAccount.accountNumber}
+                </p>
+              ) : null}
+              <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                {paymentAccount?.note ||
+                  "Transfer the full amount, upload the receipt, and submit your order."}
               </p>
             </div>
+
+            {!accountReady ? (
+              <p className="mt-3 text-sm font-semibold text-[var(--color-secondary)]">
+                Payment account setup is incomplete. The admin should finish it before taking live orders.
+              </p>
+            ) : null}
+
+            {!liveMode ? (
+              <p className="mt-3 text-sm font-semibold text-[var(--color-secondary)]">
+                Preview mode is on. Orders are not being stored live yet.
+              </p>
+            ) : null}
+          </div>
+
+          <div className="space-y-4">
+            <label className="block">
+              <FieldLabel title="Upload payment receipt" helper="Image or PDF, max 5MB." />
+              <input
+                type="file"
+                name="paymentProof"
+                required
+                accept="image/*,.pdf"
+                className="w-full rounded-2xl border border-dashed border-[var(--color-line)] bg-white px-4 py-3 text-sm"
+              />
+            </label>
+
+            <label className="block">
+              <FieldLabel title="Extra note" helper="Optional" />
+              <textarea
+                name="notes"
+                rows={4}
+                placeholder="Anything the team should know"
+                className={inputClassName}
+              />
+            </label>
           </div>
         </div>
-      </section>
 
-      {state.message ? (
-        <div
-          className={`rounded-[1.8rem] border px-5 py-4 text-sm ${
-            state.status === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-900"
-              : "border-rose-200 bg-rose-50 text-rose-900"
-          }`}
-        >
-          <p>{state.message}</p>
-          {state.orderReference ? (
-            <p className="mt-1 font-semibold">Order reference: {state.orderReference}</p>
-          ) : null}
-        </div>
-      ) : null}
+        {state.message ? (
+          <div
+            className={`mt-5 rounded-[1.8rem] border px-5 py-4 text-sm ${
+              state.status === "success"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                : "border-rose-200 bg-rose-50 text-rose-900"
+            }`}
+          >
+            <p>{state.message}</p>
+            {state.orderReference ? (
+              <p className="mt-1 font-semibold">Order reference: {state.orderReference}</p>
+            ) : null}
+          </div>
+        ) : null}
 
-      <div className="rounded-[2rem] border border-[var(--color-line)] bg-white/96 p-5 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.25)]">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-[1.8rem] border border-[var(--color-line)] bg-white/96 p-5 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.25)]">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-              Final amount
+              Amount to pay
             </p>
             <p className="text-3xl font-extrabold text-[var(--color-ink)]">
               {formatCurrency(totalAmount)}
             </p>
             <p className="text-sm leading-7 text-[var(--color-muted)]">
-              Submit after completing the transfer and attaching the receipt.
+              Submit after the transfer and receipt upload.
             </p>
           </div>
           <SubmitButton
@@ -434,7 +494,7 @@ export function OfflineOrderForm({
             className="px-7 py-4"
           />
         </div>
-      </div>
+      </section>
     </form>
   );
 }

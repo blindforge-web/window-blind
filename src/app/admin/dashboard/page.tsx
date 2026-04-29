@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { seedNigeriaDeliveryStates } from "@/app/actions";
 import { AdminPasswordResetPanel } from "@/components/admin/admin-password-reset-panel";
 import { CreateProductPanel } from "@/components/admin/create-product-panel";
 import { DeliveryStateCard } from "@/components/admin/delivery-state-card";
@@ -358,7 +359,35 @@ export default async function AdminDashboardPage({
                     body="These states are used during checkout."
                   />
 
+                  <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/92 p-6">
+                    <div className="flex flex-wrap items-end justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-secondary)]">
+                          Quick setup
+                        </p>
+                        <h3 className="mt-2 text-2xl font-extrabold text-[var(--color-ink)]">
+                          Load Nigeria delivery coverage fast
+                        </h3>
+                        <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
+                          Add the full Nigeria state list in one click, then edit ETA or switch
+                          any state off.
+                        </p>
+                      </div>
+
+                      <form action={seedNigeriaDeliveryStates}>
+                        <button
+                          type="submit"
+                          disabled={!actionsEnabled}
+                          className="ui-button ui-button-primary disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Add all Nigeria states
+                        </button>
+                      </form>
+                    </div>
+                  </section>
+
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <DeliveryStateCard actionsEnabled={actionsEnabled} />
                     {dashboard.deliveryStates.map((deliveryState) => (
                       <DeliveryStateCard
                         key={deliveryState.code}

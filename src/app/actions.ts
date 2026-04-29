@@ -37,6 +37,46 @@ function buildEntityId(prefix: string, source: string) {
   return `${prefix}-${base}-${suffix}`;
 }
 
+const NIGERIA_DELIVERY_STATES = [
+  { code: "abia", name: "Abia", eta: "2 to 4 working days" },
+  { code: "adamawa", name: "Adamawa", eta: "3 to 6 working days" },
+  { code: "akwa-ibom", name: "Akwa Ibom", eta: "3 to 6 working days" },
+  { code: "anambra", name: "Anambra", eta: "2 to 4 working days" },
+  { code: "bauchi", name: "Bauchi", eta: "3 to 6 working days" },
+  { code: "bayelsa", name: "Bayelsa", eta: "3 to 6 working days" },
+  { code: "benue", name: "Benue", eta: "3 to 6 working days" },
+  { code: "borno", name: "Borno", eta: "3 to 6 working days" },
+  { code: "cross-river", name: "Cross River", eta: "3 to 6 working days" },
+  { code: "delta", name: "Delta", eta: "2 to 4 working days" },
+  { code: "ebonyi", name: "Ebonyi", eta: "2 to 4 working days" },
+  { code: "edo", name: "Edo", eta: "3 to 5 working days" },
+  { code: "ekiti", name: "Ekiti", eta: "3 to 6 working days" },
+  { code: "enugu", name: "Enugu", eta: "2 to 4 working days" },
+  { code: "gombe", name: "Gombe", eta: "3 to 6 working days" },
+  { code: "imo", name: "Imo", eta: "2 to 4 working days" },
+  { code: "jigawa", name: "Jigawa", eta: "3 to 6 working days" },
+  { code: "kaduna", name: "Kaduna", eta: "3 to 6 working days" },
+  { code: "kano", name: "Kano", eta: "3 to 6 working days" },
+  { code: "katsina", name: "Katsina", eta: "3 to 6 working days" },
+  { code: "kebbi", name: "Kebbi", eta: "3 to 6 working days" },
+  { code: "kogi", name: "Kogi", eta: "3 to 6 working days" },
+  { code: "kwara", name: "Kwara", eta: "3 to 6 working days" },
+  { code: "lagos", name: "Lagos", eta: "3 to 5 working days" },
+  { code: "nasarawa", name: "Nasarawa", eta: "3 to 6 working days" },
+  { code: "niger", name: "Niger", eta: "3 to 6 working days" },
+  { code: "ogun", name: "Ogun", eta: "3 to 5 working days" },
+  { code: "ondo", name: "Ondo", eta: "3 to 6 working days" },
+  { code: "osun", name: "Osun", eta: "3 to 6 working days" },
+  { code: "oyo", name: "Oyo", eta: "3 to 5 working days" },
+  { code: "plateau", name: "Plateau", eta: "3 to 6 working days" },
+  { code: "rivers", name: "Rivers", eta: "3 to 5 working days" },
+  { code: "sokoto", name: "Sokoto", eta: "3 to 6 working days" },
+  { code: "taraba", name: "Taraba", eta: "3 to 6 working days" },
+  { code: "yobe", name: "Yobe", eta: "3 to 6 working days" },
+  { code: "zamfara", name: "Zamfara", eta: "3 to 6 working days" },
+  { code: "abuja", name: "Abuja", eta: "3 to 5 working days" },
+];
+
 function revalidateSite() {
   revalidatePath("/");
   revalidatePath("/products");
@@ -821,6 +861,25 @@ export async function upsertDeliveryState(formData: FormData) {
   if (oldCode && oldCode !== code) {
     await supabase.from("delivery_states").delete().eq("code", oldCode);
   }
+
+  revalidatePath("/checkout/order");
+  revalidatePath("/checkout/offline");
+  revalidatePath("/admin/dashboard");
+}
+
+export async function seedNigeriaDeliveryStates() {
+  const supabase = await requireAdminSupabase();
+
+  if (!supabase) {
+    return;
+  }
+
+  await supabase.from("delivery_states").upsert(
+    NIGERIA_DELIVERY_STATES.map((state) => ({
+      ...state,
+      is_active: true,
+    })),
+  );
 
   revalidatePath("/checkout/order");
   revalidatePath("/checkout/offline");

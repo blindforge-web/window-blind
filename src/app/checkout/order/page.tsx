@@ -30,88 +30,45 @@ export default async function CheckoutOrderPage({
       <SiteHeader />
       <main className="mx-auto max-w-7xl px-6 py-10 lg:px-10">
         <section className="rounded-[2.8rem] border border-[var(--color-line)] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(244,247,251,0.9))] p-8 lg:p-10">
-          <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--color-secondary)]">
-                Order checkout
-              </p>
-              <h1 className="mt-3 font-display text-6xl leading-none">
-                Confirm your specification and submit your order with confidence.
+              <p className="ui-section-label">Easy checkout</p>
+              <h1 className="mt-3 font-display text-5xl leading-none sm:text-6xl">
+                Order in three short steps.
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--color-muted)]">
-                Review the selected blind, confirm delivery details, and attach your transfer
-                receipt in one guided flow designed for real customer orders.
+                Pick your blind, add delivery details, upload your receipt, and submit.
               </p>
-
-              <div className="mt-6 grid gap-4 sm:grid-cols-3">
-                <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                    01
-                  </p>
-                  <p className="mt-2 text-sm font-bold text-[var(--color-ink)]">
-                    Review selection
-                  </p>
-                </article>
-                <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                    02
-                  </p>
-                  <p className="mt-2 text-sm font-bold text-[var(--color-ink)]">
-                    Confirm delivery
-                  </p>
-                </article>
-                <article className="rounded-[1.8rem] border border-[var(--color-line)] bg-white p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                    03
-                  </p>
-                  <p className="mt-2 text-sm font-bold text-[var(--color-ink)]">
-                    Upload receipt
-                  </p>
-                </article>
-              </div>
             </div>
 
-            <div className="rounded-[2.2rem] border border-[var(--color-line)] bg-[color-mix(in_srgb,var(--color-primary)_94%,white_6%)] p-6 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70">
-                Account and support
-              </p>
-              <div className="mt-4 space-y-3 text-sm leading-7 text-white/82">
-                <p>
-                  {currentUser
-                    ? `Signed in as ${currentUser.email}. This order will appear in your account timeline.`
-                    : "You can continue as a guest, but account access gives you a cleaner order history and receipt archive."}
-                </p>
-                <p>
-                  {activeStates.length} delivery destination
-                  {activeStates.length === 1 ? "" : "s"} currently available.
-                </p>
-                <p>
-                  {paymentAccount?.bankName
-                    ? `Transfers are received through ${paymentAccount.bankName}.`
-                    : "Transfers will be routed to the business account currently configured."}
-                </p>
-              </div>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Link
-                  href="/orders"
-                  className="ui-button bg-white text-[var(--color-ink)]"
+            <div className="flex flex-wrap gap-3">
+              {["Pick product", "Add details", "Upload receipt"].map((step, index) => (
+                <span
+                  key={step}
+                  className="rounded-full border border-[var(--color-line)] bg-white px-4 py-3 text-sm font-semibold text-[var(--color-ink)]"
                 >
-                  Track orders
-                </Link>
-                <Link
-                  href="/products"
-                  className="ui-button border border-white/18 text-white"
-                >
-                  Browse catalog
-                </Link>
-              </div>
+                  {index + 1}. {step}
+                </span>
+              ))}
             </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <span className="ui-pill ui-pill-solid">
+              {currentUser ? "Signed in checkout" : "Guest checkout is on"}
+            </span>
+            <span className="ui-pill">
+              {activeStates.length} delivery state{activeStates.length === 1 ? "" : "s"}
+            </span>
+            <span className="ui-pill">
+              {paymentAccount?.bankName || "Transfer account shown in payment step"}
+            </span>
           </div>
 
           {products.length ? (
             <div className="mt-8">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                Available collections
+                Choose a blind
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {products.map((product) => {
@@ -136,14 +93,26 @@ export default async function CheckoutOrderPage({
         </section>
 
         {selectedProduct ? (
-          <div className="mt-10 grid gap-8 xl:grid-cols-[0.92fr_1.08fr]">
-            <section className="space-y-6">
+          <div className="mt-10 grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
+            <section className="rounded-[2.4rem] border border-[var(--color-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,247,251,0.92))] p-6 lg:p-8">
+              <OfflineOrderForm
+                product={selectedProduct}
+                deliveryStates={deliveryStates}
+                paymentAccount={paymentAccount}
+                liveMode={hasServiceRoleConfig}
+                loggedIn={Boolean(currentUser)}
+                initialCustomerName={currentUser?.fullName ?? ""}
+                initialEmail={currentUser?.email ?? ""}
+              />
+            </section>
+
+            <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
               <Link
                 href={`/products/${selectedProduct.slug}`}
                 className="block overflow-hidden rounded-[2.4rem] border border-[var(--color-line)] bg-white/90 shadow-[0_22px_50px_-35px_rgba(15,23,42,0.28)] transition hover:-translate-y-0.5"
               >
                 <div className="p-4">
-                  <ProductVisual product={selectedProduct} className="min-h-[22rem]" />
+                  <ProductVisual product={selectedProduct} className="min-h-[20rem]" />
                 </div>
                 <div className="space-y-5 px-6 pb-6">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -155,7 +124,7 @@ export default async function CheckoutOrderPage({
                         {selectedProduct.name}
                       </h2>
                       <p className="mt-1 text-sm font-medium text-[var(--color-muted)]">
-                        Open the full product page for extended details and visuals.
+                        Open the full product page for photos and more details.
                       </p>
                     </div>
                     <span className="rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-semibold text-[var(--color-ink)]">
@@ -187,62 +156,34 @@ export default async function CheckoutOrderPage({
                       </p>
                     </div>
                   </div>
+
+                  <div className="rounded-[1.8rem] border border-[var(--color-line)] bg-[rgba(248,250,252,0.84)] p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+                      Colours
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+                      {selectedProduct.colors.join(", ")}
+                    </p>
+                  </div>
                 </div>
               </Link>
 
-              <div className="rounded-[2rem] border border-[var(--color-line)] bg-[linear-gradient(160deg,var(--color-primary),color-mix(in_srgb,var(--color-primary)_68%,black_32%))] p-6 text-white">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
-                  Transfer instructions
+              <section className="rounded-[2rem] border border-[var(--color-line)] bg-white/90 p-6">
+                <p className="ui-section-label">Need help?</p>
+                <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
+                  You can switch products, continue as a guest, or come back later to track your
+                  order.
                 </p>
-                <h2 className="mt-3 text-3xl font-extrabold">
-                  {paymentAccount?.bankName || "Business transfer account"}
-                </h2>
-                {paymentAccount?.accountName ? (
-                  <p className="mt-3 text-lg font-semibold">{paymentAccount.accountName}</p>
-                ) : null}
-                {paymentAccount?.accountNumber ? (
-                  <p className="mt-1 text-3xl font-extrabold tracking-[0.14em]">
-                    {paymentAccount.accountNumber}
-                  </p>
-                ) : null}
-                <p className="mt-4 text-sm leading-7 text-white/80">
-                  {paymentAccount?.note ||
-                    "Transfer to the configured business account, then attach the receipt so the order can move into confirmation."}
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <article className="rounded-[2rem] border border-[var(--color-line)] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    Order record
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Every submission stores the product, measurements, delivery destination,
-                    and receipt reference for follow-up.
-                  </p>
-                </article>
-                <article className="rounded-[2rem] border border-[var(--color-line)] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    Account tracking
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Return to your orders screen at any time to review IDs, tracking slugs,
-                    and submitted order history.
-                  </p>
-                </article>
-              </div>
-            </section>
-
-            <section className="rounded-[2.4rem] border border-[var(--color-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,247,251,0.92))] p-6 lg:p-8">
-              <OfflineOrderForm
-                product={selectedProduct}
-                deliveryStates={deliveryStates}
-                liveMode={hasServiceRoleConfig}
-                loggedIn={Boolean(currentUser)}
-                initialCustomerName={currentUser?.fullName ?? ""}
-                initialEmail={currentUser?.email ?? ""}
-              />
-            </section>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Link href="/products" className="ui-button ui-button-outline">
+                    Browse catalog
+                  </Link>
+                  <Link href="/orders" className="ui-button ui-button-secondary">
+                    Track orders
+                  </Link>
+                </div>
+              </section>
+            </aside>
           </div>
         ) : (
           <div className="mt-10 rounded-[2rem] border border-dashed border-[var(--color-line)] bg-white/70 p-10">

@@ -24,8 +24,13 @@ export function DeliveryStateCard({
               {isNew ? "New delivery state" : deliveryState.code}
             </p>
             <h3 className="mt-1 text-xl font-extrabold">
-              {isNew ? "Add delivery state" : deliveryState.name}
+              {isNew ? "Add another state" : deliveryState.name}
             </h3>
+            <p className="mt-2 text-sm text-[var(--color-muted)]">
+              {isNew
+                ? "This appears in checkout as soon as you save it."
+                : "Customers can pick this location during checkout."}
+            </p>
           </div>
           <label className="flex items-center gap-2 text-sm font-semibold">
             <input
@@ -51,7 +56,7 @@ export function DeliveryStateCard({
 
         <details className="rounded-[1.6rem] border border-[var(--color-line)] bg-white/88 p-4" open={isNew}>
           <summary className="cursor-pointer list-none text-sm font-semibold text-[var(--color-ink)]">
-            {isNew ? "Add delivery coverage" : "Edit delivery coverage"}
+            {isNew ? "Create delivery coverage" : "Edit delivery coverage"}
           </summary>
           <div className="mt-4 grid gap-4">
             <label className="space-y-2">
