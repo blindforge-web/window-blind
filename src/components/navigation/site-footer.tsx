@@ -40,15 +40,15 @@ export async function SiteFooter() {
               )}
               <div>
                 <p className="text-2xl font-extrabold tracking-[-0.05em]">{brandLabel}</p>
-                <p className="text-sm text-white/72">Easy online ordering for custom blinds</p>
+                <p className="text-sm text-white/72">Made-to-measure blinds for homes, offices, and projects</p>
               </div>
             </div>
             <h2 className="max-w-xl text-4xl font-extrabold tracking-[-0.05em] sm:text-5xl">
-              Clean navigation, clear buttons, and an easier Sunpilot customer experience.
+              Made-to-measure blinds with dependable support from selection to delivery.
             </h2>
             <p className="max-w-xl text-sm leading-7 text-white/76">
               {settings?.footerNote ||
-                "Browse products, start an order, upload payment proof, and come back later for updates without getting lost in the website."}
+                "Speak with the Sunpilot team for guidance on style selection, measurements, ordering, and delivery planning."}
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/products" className="ui-button bg-white px-5 py-3 text-[var(--color-ink)]">

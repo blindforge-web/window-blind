@@ -23,11 +23,11 @@ export default async function ProductsPage() {
             <div>
               <p className="ui-section-label">Products</p>
               <h1 className="mt-3 max-w-4xl text-5xl font-extrabold tracking-[-0.06em] text-[var(--color-ink)] sm:text-6xl">
-                Clear product cards, simple actions, and less clutter.
+                Browse blind styles for homes, offices, and project spaces.
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--color-muted)] sm:text-base">
                 {settings?.tagline ||
-                  "This catalog is designed so customers can understand the products quickly and move to ordering without confusion."}
+                  "Made-to-measure blinds with dependable support from selection to delivery."}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 {collections.map((collection) => (
@@ -47,7 +47,7 @@ export default async function ProductsPage() {
                   {products.length}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                  Products are easier to scan and compare.
+                  Curated styles ready for measurement, specification, and ordering.
                 </p>
               </article>
               <article className="rounded-[1.75rem] border border-[var(--color-line)] bg-[linear-gradient(160deg,color-mix(in_srgb,var(--color-primary)_96%,black_4%),color-mix(in_srgb,var(--color-primary)_72%,white_28%))] p-5 text-white shadow-[0_24px_56px_-36px_rgba(14,42,71,0.28)]">

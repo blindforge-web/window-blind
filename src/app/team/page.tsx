@@ -20,7 +20,7 @@ export default async function TeamPage() {
                 Meet the Sunpilot team behind every order.
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--color-muted)] sm:text-base">
-                View every team member one after another, understand their role, and see how support, production, and delivery work together.
+                Meet the people who guide product selection, coordinate fabrication, support delivery, and help customers prepare for installation.
               </p>
             </div>
             <Link href="/checkout/order" className="ui-button ui-button-secondary">

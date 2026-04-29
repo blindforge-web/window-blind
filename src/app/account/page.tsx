@@ -36,7 +36,7 @@ export default async function AccountPage({
               <h1 className="mt-3 max-w-3xl text-5xl font-extrabold tracking-[-0.06em] text-[var(--color-ink)] sm:text-6xl">
                 {user
                   ? "Your Sunpilot workspace for orders, updates, and account details"
-                  : "A cleaner customer login and account experience"}
+                  : "Customer access for orders, updates, and saved details"}
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-8 text-[var(--color-muted)] sm:text-base">
                 Customers can sign in, see tracked orders, open notifications, and continue shopping without losing context.

@@ -26,8 +26,8 @@ from (
       'hero',
       'Made-to-measure blinds',
       'Custom blinds for homes, offices, and project spaces',
-      'Sunpilot helps homeowners, businesses, and project teams choose the right blind style, confirm measurements, and place orders with confidence.',
-      'Browse the collection, choose your preferred finish, and place your order through a simple checkout with payment confirmation and delivery updates.',
+      'Made-to-measure blinds with dependable support from selection to delivery.',
+      'Sunpilot supports private homes, offices, hospitality spaces, and project interiors with practical product guidance, accurate preparation, and coordinated delivery follow-up.',
       'Shop blinds',
       '/products',
       'Track your order',
@@ -147,13 +147,13 @@ from (
     ),
     (
       'highlight-offline-verification',
-      'Payment confirmation',
-      'Receipts are reviewed promptly so approved orders can move ahead without confusion or delay.'
+      'Practical guidance',
+      'Customers get clear help with style selection, measurements, and order planning before production begins.'
     ),
     (
       'highlight-account-tracking',
-      'Order tracking',
-      'Customers can review submitted details and follow updates from confirmation to delivery.'
+      'Reliable fulfilment',
+      'Sunpilot keeps each order moving with coordinated follow-up from confirmation to delivery.'
     )
 ) as source (id, title, description)
 where target.id = source.id;
